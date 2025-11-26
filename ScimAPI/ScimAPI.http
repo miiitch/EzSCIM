@@ -1,0 +1,237 @@
+### Tests du endpoint SCIM pour Microsoft Entra (Azure AD)
+
+### 1. Obtenir la configuration du Service Provider
+GET https://localhost:7091/scim/ServiceProviderConfig
+Content-Type: application/scim+json
+
+###
+
+### 2. Obtenir tous les schémas (incluant les customs)
+GET https://localhost:7091/scim/Schemas
+Content-Type: application/scim+json
+
+###
+
+### 3. Obtenir le schéma User
+GET https://localhost:7091/scim/Schemas/urn:ietf:params:scim:schemas:core:2.0:User
+Content-Type: application/scim+json
+
+###
+
+### 4. Ajouter un schéma custom
+POST https://localhost:7091/scim/Schemas
+Content-Type: application/scim+json
+
+{
+  "id": "urn:ietf:params:scim:schemas:extension:mycompany:2.0:User",
+  "name": "MyCompanyUser",
+  "description": "Extension pour les utilisateurs de MyCompany",
+  "attributes": [
+    {
+      "name": "badgeNumber",
+      "type": "string",
+      "description": "Numéro de badge de l'employé",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "server"
+    },
+    {
+      "name": "accessLevel",
+      "type": "integer",
+      "description": "Niveau d'accès de 1 à 5",
+      "multiValued": false,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none"
+    }
+  ]
+}
+
+###
+
+### 5. Créer un utilisateur avec des champs customs
+POST https://localhost:7091/scim/Users
+Content-Type: application/scim+json
+
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User",
+    "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+  ],
+  "userName": "john.doe@example.com",
+  "name": {
+    "givenName": "John",
+    "familyName": "Doe",
+    "formatted": "John Doe"
+  },
+  "displayName": "John Doe",
+  "active": true,
+  "emails": [
+    {
+      "value": "john.doe@example.com",
+      "type": "work",
+      "primary": true
+    }
+  ],
+  "title": "Développeur Senior",
+  "externalId": "ext-12345",
+  "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User": {
+    "employeeNumber": "EMP001",
+    "department": "IT",
+    "costCenter": "CC-IT-001",
+    "organization": "Example Corp"
+  }
+}
+
+###
+
+### 6. Lister tous les utilisateurs
+GET https://localhost:7091/scim/Users?startIndex=1&count=10
+Content-Type: application/scim+json
+
+###
+
+### 7. Filtrer les utilisateurs par userName
+GET https://localhost:7091/scim/Users?filter=userName eq "john.doe@example.com"
+Content-Type: application/scim+json
+
+###
+
+### 8. Obtenir un utilisateur par ID (remplacer {id} par un ID réel)
+GET https://localhost:7091/scim/Users/{id}
+Content-Type: application/scim+json
+
+###
+
+### 9. Mettre à jour un utilisateur (PUT)
+PUT https://localhost:7091/scim/Users/{id}
+Content-Type: application/scim+json
+
+{
+  "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+  "id": "{id}",
+  "userName": "john.doe@example.com",
+  "name": {
+    "givenName": "John",
+    "familyName": "Doe",
+    "formatted": "John Doe"
+  },
+  "displayName": "John Doe - Modifié",
+  "active": true,
+  "emails": [
+    {
+      "value": "john.doe@example.com",
+      "type": "work",
+      "primary": true
+    }
+  ],
+  "title": "Lead Developer"
+}
+
+###
+
+### 10. Désactiver un utilisateur (PATCH)
+PATCH https://localhost:7091/scim/Users/{id}
+Content-Type: application/scim+json
+
+{
+  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+  "Operations": [
+    {
+      "op": "replace",
+      "path": "active",
+      "value": false
+    }
+  ]
+}
+
+###
+
+### 11. Créer un groupe
+POST https://localhost:7091/scim/Groups
+Content-Type: application/scim+json
+
+{
+  "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+  "displayName": "Développeurs",
+  "externalId": "grp-dev-001",
+  "members": []
+}
+
+###
+
+### 12. Lister tous les groupes
+GET https://localhost:7091/scim/Groups
+Content-Type: application/scim+json
+
+###
+
+### 13. Filtrer les groupes par displayName
+GET https://localhost:7091/scim/Groups?filter=displayName eq "Développeurs"
+Content-Type: application/scim+json
+
+###
+
+### 14. Obtenir un groupe par ID
+GET https://localhost:7091/scim/Groups/{groupId}
+Content-Type: application/scim+json
+
+###
+
+### 15. Ajouter un membre à un groupe (PATCH)
+PATCH https://localhost:7091/scim/Groups/{groupId}
+Content-Type: application/scim+json
+
+{
+  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+  "Operations": [
+    {
+      "op": "add",
+      "path": "members",
+      "value": [
+        {
+          "value": "{userId}",
+          "display": "John Doe"
+        }
+      ]
+    }
+  ]
+}
+
+###
+
+### 16. Retirer un membre d'un groupe (PATCH)
+PATCH https://localhost:7091/scim/Groups/{groupId}
+Content-Type: application/scim+json
+
+{
+  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+  "Operations": [
+    {
+      "op": "remove",
+      "path": "members",
+      "value": [
+        {
+          "value": "{userId}"
+        }
+      ]
+    }
+  ]
+}
+
+###
+
+### 17. Supprimer un utilisateur
+DELETE https://localhost:7091/scim/Users/{id}
+
+###
+
+### 18. Supprimer un groupe
+DELETE https://localhost:7091/scim/Groups/{groupId}
+
+###
+

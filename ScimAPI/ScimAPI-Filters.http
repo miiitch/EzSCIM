@@ -1,0 +1,214 @@
+### Tests des Filtres SCIM pour Microsoft Entra
+
+@baseUrl = http://localhost:5049
+@contentType = application/scim+json
+
+### 1. Test basique - Recherche utilisateur par userName (eq)
+GET {{baseUrl}}/scim/Users?filter=userName eq "john.doe@example.com"
+Accept: {{contentType}}
+
+### 2. Test - Recherche utilisateur par externalId (eq)
+GET {{baseUrl}}/scim/Users?filter=externalId eq "ext-001"
+Accept: {{contentType}}
+
+### 3. Test - Recherche utilisateurs actifs
+GET {{baseUrl}}/scim/Users?filter=active eq true
+Accept: {{contentType}}
+
+### 4. Test - Recherche utilisateurs inactifs
+GET {{baseUrl}}/scim/Users?filter=active eq false
+Accept: {{contentType}}
+
+### 5. Test - Recherche par displayName contient (co)
+GET {{baseUrl}}/scim/Users?filter=displayName co "Admin"
+Accept: {{contentType}}
+
+### 6. Test - Recherche par userName commence par (sw)
+GET {{baseUrl}}/scim/Users?filter=userName sw "john"
+Accept: {{contentType}}
+
+### 7. Test - Recherche par prénom (name.givenName eq)
+GET {{baseUrl}}/scim/Users?filter=name.givenName eq "John"
+Accept: {{contentType}}
+
+### 8. Test - Recherche par nom de famille (name.familyName eq)
+GET {{baseUrl}}/scim/Users?filter=name.familyName eq "Doe"
+Accept: {{contentType}}
+
+### 9. Test - Recherche par prénom contient (name.givenName co)
+GET {{baseUrl}}/scim/Users?filter=name.givenName co "Jo"
+Accept: {{contentType}}
+
+### 10. Test - Recherche par email
+GET {{baseUrl}}/scim/Users?filter=emails.value eq "john.doe@example.com"
+Accept: {{contentType}}
+
+### 11. Test - Opérateur AND - userName et active
+GET {{baseUrl}}/scim/Users?filter=userName sw "john" and active eq true
+Accept: {{contentType}}
+
+### 12. Test - Opérateur AND - prénom et nom
+GET {{baseUrl}}/scim/Users?filter=name.givenName eq "John" and name.familyName eq "Doe"
+Accept: {{contentType}}
+
+### 13. Test - Opérateur OR - plusieurs userNames
+GET {{baseUrl}}/scim/Users?filter=userName eq "john.doe@example.com" or userName eq "jane.smith@example.com"
+Accept: {{contentType}}
+
+### 14. Test - Opérateur OR - displayName
+GET {{baseUrl}}/scim/Users?filter=displayName co "Admin" or displayName co "Manager"
+Accept: {{contentType}}
+
+### 15. Test - Opérateur NOT - utilisateurs actifs
+GET {{baseUrl}}/scim/Users?filter=not (active eq false)
+Accept: {{contentType}}
+
+### 16. Test - Expression complexe avec parenthèses
+GET {{baseUrl}}/scim/Users?filter=(userName sw "john" or userName sw "jane") and active eq true
+Accept: {{contentType}}
+
+### 17. Test - Opérateur pr (present) - userName présent
+GET {{baseUrl}}/scim/Users?filter=userName pr
+Accept: {{contentType}}
+
+### 18. Test - Opérateur pr (present) - displayName présent
+GET {{baseUrl}}/scim/Users?filter=displayName pr
+Accept: {{contentType}}
+
+### 19. Test - Pagination avec filtre
+GET {{baseUrl}}/scim/Users?filter=active eq true&startIndex=1&count=10
+Accept: {{contentType}}
+
+### 20. Test - Tous les utilisateurs sans filtre
+GET {{baseUrl}}/scim/Users
+Accept: {{contentType}}
+
+###
+### TESTS GROUPES
+###
+
+### 21. Test - Recherche groupe par displayName (eq)
+GET {{baseUrl}}/scim/Groups?filter=displayName eq "Administrators"
+Accept: {{contentType}}
+
+### 22. Test - Recherche groupe par displayName contient (co)
+GET {{baseUrl}}/scim/Groups?filter=displayName co "Dev"
+Accept: {{contentType}}
+
+### 23. Test - Recherche groupe par displayName commence par (sw)
+GET {{baseUrl}}/scim/Groups?filter=displayName sw "Test"
+Accept: {{contentType}}
+
+### 24. Test - Recherche groupe par externalId
+GET {{baseUrl}}/scim/Groups?filter=externalId eq "grp-001"
+Accept: {{contentType}}
+
+### 25. Test - Opérateur OR sur groupes
+GET {{baseUrl}}/scim/Groups?filter=displayName eq "Administrators" or displayName eq "Developers"
+Accept: {{contentType}}
+
+### 26. Test - Recherche groupe par membre
+GET {{baseUrl}}/scim/Groups?filter=members.value eq "user-id-123"
+Accept: {{contentType}}
+
+### 27. Test - Opérateur pr sur groupe
+GET {{baseUrl}}/scim/Groups?filter=displayName pr
+Accept: {{contentType}}
+
+### 28. Test - Tous les groupes sans filtre
+GET {{baseUrl}}/scim/Groups
+Accept: {{contentType}}
+
+###
+### TESTS SCÉNARIOS MICROSOFT ENTRA
+###
+
+### 29. Scénario Entra - Vérification existence utilisateur
+# Microsoft Entra vérifie si l'utilisateur existe avant de le créer
+GET {{baseUrl}}/scim/Users?filter=userName eq "newuser@example.com"
+Accept: {{contentType}}
+
+### 30. Scénario Entra - Recherche par external ID (Azure Object ID)
+# Microsoft Entra utilise l'externalId pour mapper avec l'Azure Object ID
+GET {{baseUrl}}/scim/Users?filter=externalId eq "azure-object-id-12345"
+Accept: {{contentType}}
+
+### 31. Scénario Entra - Vérification existence groupe
+# Microsoft Entra vérifie si le groupe existe avant de le créer
+GET {{baseUrl}}/scim/Groups?filter=displayName eq "New Group"
+Accept: {{contentType}}
+
+### 32. Scénario Entra - Liste des utilisateurs actifs avec pagination
+# Microsoft Entra synchronise les utilisateurs actifs par batch
+GET {{baseUrl}}/scim/Users?filter=active eq true&startIndex=1&count=100
+Accept: {{contentType}}
+
+### 33. Test PATCH - Désactiver un utilisateur
+# D'abord créer un utilisateur pour le test
+POST {{baseUrl}}/scim/Users
+Content-Type: {{contentType}}
+
+{
+  "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+  "userName": "test.user@example.com",
+  "name": {
+    "givenName": "Test",
+    "familyName": "User"
+  },
+  "active": true,
+  "emails": [
+    {
+      "value": "test.user@example.com",
+      "type": "work",
+      "primary": true
+    }
+  ]
+}
+
+### 34. PATCH - Mettre à jour l'état actif (utiliser l'ID de l'utilisateur créé ci-dessus)
+PATCH {{baseUrl}}/scim/Users/{user-id}
+Content-Type: {{contentType}}
+
+{
+  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+  "Operations": [
+    {
+      "op": "replace",
+      "path": "active",
+      "value": false
+    }
+  ]
+}
+
+### 35. PATCH - Mettre à jour displayName et d'autres champs
+PATCH {{baseUrl}}/scim/Users/{user-id}
+Content-Type: {{contentType}}
+
+{
+  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+  "Operations": [
+    {
+      "op": "replace",
+      "path": "displayName",
+      "value": "Test User Updated"
+    },
+    {
+      "op": "replace",
+      "path": "title",
+      "value": "Developer"
+    }
+  ]
+}
+
+### 36. Test - Configuration du Service Provider
+GET {{baseUrl}}/scim/ServiceProviderConfig
+Accept: {{contentType}}
+
+### 37. Test - Schémas SCIM
+GET {{baseUrl}}/scim/Schemas
+Accept: {{contentType}}
+
+### 38. Test - Schéma utilisateur spécifique
+GET {{baseUrl}}/scim/Schemas/urn:ietf:params:scim:schemas:core:2.0:User
+Accept: {{contentType}}
+
