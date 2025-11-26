@@ -150,7 +150,7 @@ public class InMemoryScimRepositoryTests
 
         // Assert
         result.TotalResults.ShouldBe(2);
-        result.Resources.ShouldAllBe(u => u.UserName.StartsWith("john"));
+        result.Resources.All(u => u.UserName.StartsWith("john")).ShouldBeTrue();
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class InMemoryScimRepositoryTests
 
         // Assert
         result.TotalResults.ShouldBe(2);
-        result.Resources.ShouldAllBe(u => u.UserName.Contains("doe"));
+        result.Resources.All(u => u.UserName.Contains("doe")).ShouldBeTrue();
     }
 
     [Fact]
@@ -242,7 +242,7 @@ public class InMemoryScimRepositoryTests
 
         // Assert
         result.TotalResults.ShouldBe(2);
-        result.Resources.ShouldAllBe(u => u.Name.FamilyName == "Doe");
+        result.Resources.All(u => u.Name.FamilyName == "Doe").ShouldBeTrue();
     }
 
     [Fact]

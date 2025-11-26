@@ -720,14 +720,31 @@ namespace ScimAPI.Repositories
                         group.Members.Add(member);
                 }
             }
-            else if (op == "remove" && operation.Value != null)
+            else if (op == "remove" && operation.Path != null)
             {
-                var members = ParseMembers(operation.Value);
-                foreach (var member in members)
+                // Gérer le cas "members[value eq "id"]"
+                if (operation.Path.Contains("[value eq", StringComparison.OrdinalIgnoreCase))
                 {
-                    var existing = group.Members.FirstOrDefault(m => m.Value == member.Value);
-                    if (existing != null)
-                        group.Members.Remove(existing);
+                    var startIdx = operation.Path.IndexOf("\"") + 1;
+                    var endIdx = operation.Path.LastIndexOf("\"");
+                    if (startIdx > 0 && endIdx > startIdx)
+                    {
+                        var memberId = operation.Path.Substring(startIdx, endIdx - startIdx);
+                        var existing = group.Members.FirstOrDefault(m => m.Value == memberId);
+                        if (existing != null)
+                            group.Members.Remove(existing);
+                    }
+                }
+                // Gérer le cas où les membres sont dans Value
+                else if (operation.Value != null)
+                {
+                    var members = ParseMembers(operation.Value);
+                    foreach (var member in members)
+                    {
+                        var existing = group.Members.FirstOrDefault(m => m.Value == member.Value);
+                        if (existing != null)
+                            group.Members.Remove(existing);
+                    }
                 }
             }
         }
@@ -736,7 +753,22 @@ namespace ScimAPI.Repositories
         {
             var members = new List<ScimMember>();
             
-            if (value is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Array)
+            // Gérer le cas List<Dictionary<string, string>>
+            if (value is List<Dictionary<string, string>> dictList)
+            {
+                foreach (var dict in dictList)
+                {
+                    var member = new ScimMember();
+                    if (dict.TryGetValue("value", out var memberValue))
+                        member.Value = memberValue;
+                    if (dict.TryGetValue("display", out var display))
+                        member.Display = display;
+                    if (!string.IsNullOrEmpty(member.Value))
+                        members.Add(member);
+                }
+            }
+            // Gérer le cas JsonElement
+            else if (value is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Array)
             {
                 foreach (var item in jsonElement.EnumerateArray())
                 {
