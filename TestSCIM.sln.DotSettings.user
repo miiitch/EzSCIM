@@ -1,0 +1,4 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4c2b80dd_002D1aae_002D438d_002Dbe96_002D899b0cea4ddc/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;ScimAPI.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="C:\Users\MichelPERFETTI\src\tempdev\TestSCIM\ScimAPI.Tests" Presentation="&amp;lt;ScimAPI.Tests&amp;gt;" /&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
