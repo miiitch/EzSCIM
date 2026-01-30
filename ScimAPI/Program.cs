@@ -3,6 +3,8 @@ using ScimAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 // Ajouter la configuration des schémas SCIM customs
 builder.Configuration.AddJsonFile("appsettings.Scim.json", optional: true, reloadOnChange: true);
 
@@ -26,6 +28,8 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
