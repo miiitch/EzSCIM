@@ -1,4 +1,4 @@
-﻿# Guide d'Intégration Microsoft Entra (Azure AD)
+﻿﻿# Guide d'Intégration Microsoft Entra (Azure AD)
 
 Ce guide explique comment configurer l'approvisionnement automatique des utilisateurs et groupes depuis Microsoft Entra (anciennement Azure Active Directory) vers votre application via SCIM 2.0.
 
@@ -35,13 +35,64 @@ Pour le développement local avec ngrok :
 https://your-subdomain.ngrok.io/scim
 ```
 
-#### Token Secret
-Générez un token Bearer et configurez-le. Pour la production, utilisez un token JWT sécurisé.
+#### Token Secret - JWT Bearer Token
 
-Pour le développement, vous pouvez utiliser un token simple :
+L'API SCIM utilise des tokens JWT Bearer pour sécuriser les endpoints. Voici comment générer et utiliser un token:
+
+##### Générer un Token (Développement uniquement)
+
+En développement, appelez l'endpoint de test pour obtenir un token valide:
+
+```bash
+curl -X GET "https://localhost:7001/scim/auth/token"
 ```
-Bearer my-secret-token-12345
+
+Réponse:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresIn": "60 minutes"
+}
 ```
+
+**⚠️ NOTE:** Cet endpoint est disponible **UNIQUEMENT en développement** et retourne un HTTP 403 en production.
+
+##### Utiliser le Token dans les Requêtes
+
+Incluez le token dans le header `Authorization`:
+
+```bash
+curl -X GET "https://votre-serveur.com/scim/Users" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+##### Configuration du Token pour Entra
+
+1. Générez un token JWT avec le secret configuré en production
+2. Copier le token complet (y compris le prefix `Bearer `)
+3. Dans Microsoft Entra, allez à **Approvisionnement → Admin Credentials**
+4. Collez le token dans le champ **Secret Token**
+5. Cliquez sur **Test Connection**
+
+##### Sécurité en Production
+
+- Les tokens JWT sont générés avec une clé secrète HS256 stockée dans **Azure Key Vault**
+- Les tokens expirent après 60 minutes par défaut
+- Chaque intégration doit disposer de sa propre clé secrète unique
+- Les clés secrètes ne doivent JAMAIS être commitées dans le contrôle de version
+
+##### Format du JWT (Développement)
+
+Payload minimal:
+```json
+{
+  "sub": "scim-client",
+  "jti": "unique-id",
+  "exp": 1234567890
+}
+```
+
+Pas de claims supplémentaires requises. La validation ne vérifie que la signature et l'expiration.
 
 ### Étape 4 : Tester la Connexion
 

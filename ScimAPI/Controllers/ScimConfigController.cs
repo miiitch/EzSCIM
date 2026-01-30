@@ -1,23 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ScimAPI.Models;
 using ScimAPI.Repositories;
+using ScimAPI.Services;
 
 namespace ScimAPI.Controllers
 {
     [ApiController]
     [Route("scim")]
     [Produces("application/scim+json")]
-    public class ScimConfigController : ControllerBase
+    [Authorize]
+    public class ScimConfigController(
+        IScimRepository repository,
+        ILogger<ScimConfigController> logger,
+        IJwtTokenService jwtTokenService,
+        IWebHostEnvironment environment)
+        : ControllerBase
     {
-        private readonly IScimRepository _repository;
-        private readonly ILogger<ScimConfigController> _logger;
-
-        public ScimConfigController(IScimRepository repository, ILogger<ScimConfigController> logger)
-        {
-            _repository = repository;
-            _logger = logger;
-        }
-
         [HttpGet("ServiceProviderConfig")]
         public IActionResult GetServiceProviderConfig()
         {
@@ -48,7 +47,7 @@ namespace ScimAPI.Controllers
         public async Task<IActionResult> GetSchemas()
         {
             var schemas = new List<ScimSchema> { GetUserSchema(), GetGroupSchema() };
-            var customSchemas = await _repository.GetCustomSchemasAsync();
+            var customSchemas = await repository.GetCustomSchemasAsync();
             schemas.AddRange(customSchemas);
             return Ok(schemas);
         }
@@ -60,7 +59,7 @@ namespace ScimAPI.Controllers
             {
                 "urn:ietf:params:scim:schemas:core:2.0:User" => GetUserSchema(),
                 "urn:ietf:params:scim:schemas:core:2.0:Group" => GetGroupSchema(),
-                _ => (await _repository.GetCustomSchemasAsync()).FirstOrDefault(s => s.Id == id)
+                _ => (await repository.GetCustomSchemasAsync()).FirstOrDefault(s => s.Id == id)
             };
 
             if (schema == null)
@@ -77,12 +76,12 @@ namespace ScimAPI.Controllers
                 if (string.IsNullOrEmpty(schema.Id) || !schema.Id.StartsWith("urn:"))
                     return BadRequest(new ScimError { Detail = "ID du schéma invalide", Status = 400 });
 
-                await _repository.AddCustomSchemaAsync(schema);
+                await repository.AddCustomSchemaAsync(schema);
                 return CreatedAtAction(nameof(GetSchema), new { id = schema.Id }, schema);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur AddCustomSchema");
+                logger.LogError(ex, "Erreur AddCustomSchema");
                 return StatusCode(500, new ScimError { Detail = "Erreur interne", Status = 500 });
             }
         }
@@ -125,6 +124,30 @@ namespace ScimAPI.Controllers
                     new() { Name = "externalId", Type = "string" }
                 }
             };
+        }
+
+        /// <summary>
+        /// Endpoint de test pour générer un token JWT (développement uniquement)
+        /// </summary>
+        [HttpGet("auth/token")]
+        [AllowAnonymous]
+        public IActionResult GetAuthToken()
+        {
+            if (!environment.IsDevelopment())
+            {
+                return Forbid("Cet endpoint n'est accessible qu'en développement");
+            }
+
+            try
+            {
+                var token = jwtTokenService.GenerateToken();
+                return Ok(new { token, expiresIn = "60 minutes" });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Erreur lors de la génération du token");
+                return StatusCode(500, new ScimError { Detail = "Erreur lors de la génération du token", Status = 500 });
+            }
         }
     }
 }

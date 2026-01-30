@@ -7,12 +7,7 @@ namespace ScimAPI.Tests;
 
 public class InMemoryScimRepositoryTests
 {
-    private readonly InMemoryScimRepository _repository;
-
-    public InMemoryScimRepositoryTests()
-    {
-        _repository = new InMemoryScimRepository();
-    }
+    private readonly InMemoryScimRepository _repository = new();
 
     #region User CRUD Tests
 

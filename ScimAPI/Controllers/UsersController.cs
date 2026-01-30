@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ScimAPI.Models;
 using ScimAPI.Repositories;
 
@@ -7,29 +8,22 @@ namespace ScimAPI.Controllers
     [ApiController]
     [Route("scim/[controller]")]
     [Produces("application/scim+json")]
-    public class UsersController : ControllerBase
+    [Authorize]
+    public class UsersController(IScimRepository repository, ILogger<UsersController> logger)
+        : ControllerBase
     {
-        private readonly IScimRepository _repository;
-        private readonly ILogger<UsersController> _logger;
-
-        public UsersController(IScimRepository repository, ILogger<UsersController> logger)
-        {
-            _repository = repository;
-            _logger = logger;
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] string? filter, [FromQuery] int startIndex = 1, [FromQuery] int count = 100)
         {
             try
             {
-                _logger.LogInformation("GetUsers - Filter: {Filter}", filter);
-                var response = await _repository.GetUsersAsync(filter, startIndex, count);
+                logger.LogInformation("GetUsers - Filter: {Filter}", filter);
+                var response = await repository.GetUsersAsync(filter, startIndex, count);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur GetUsers");
+                logger.LogError(ex, "Erreur GetUsers");
                 return StatusCode(500, new ScimError { Detail = "Erreur interne", Status = 500 });
             }
         }
@@ -37,7 +31,7 @@ namespace ScimAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
-            var user = await _repository.GetUserAsync(id);
+            var user = await repository.GetUserAsync(id);
             if (user == null)
                 return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
             return Ok(user);
@@ -48,16 +42,16 @@ namespace ScimAPI.Controllers
         {
             try
             {
-                var existing = await _repository.GetUserByUserNameAsync(user.UserName);
+                var existing = await repository.GetUserByUserNameAsync(user.UserName);
                 if (existing != null)
                     return Conflict(new ScimError { Detail = "Utilisateur existe déjà", Status = 409 });
 
-                var createdUser = await _repository.CreateUserAsync(user);
+                var createdUser = await repository.CreateUserAsync(user);
                 return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur CreateUser");
+                logger.LogError(ex, "Erreur CreateUser");
                 return StatusCode(500, new ScimError { Detail = "Erreur interne", Status = 500 });
             }
         }
@@ -65,7 +59,7 @@ namespace ScimAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] ScimUser user)
         {
-            var updatedUser = await _repository.UpdateUserAsync(id, user);
+            var updatedUser = await repository.UpdateUserAsync(id, user);
             if (updatedUser == null)
                 return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
             return Ok(updatedUser);
@@ -74,7 +68,7 @@ namespace ScimAPI.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchUser(string id, [FromBody] ScimPatchRequest patchRequest)
         {
-            var patchedUser = await _repository.PatchUserAsync(id, patchRequest);
+            var patchedUser = await repository.PatchUserAsync(id, patchRequest);
             if (patchedUser == null)
                 return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
             return Ok(patchedUser);
@@ -83,7 +77,7 @@ namespace ScimAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var deleted = await _repository.DeleteUserAsync(id);
+            var deleted = await repository.DeleteUserAsync(id);
             if (!deleted)
                 return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
             return NoContent();

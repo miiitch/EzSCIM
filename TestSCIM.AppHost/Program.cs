@@ -1,6 +1,15 @@
+using Aspire.Hosting.DevTunnels;
+
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.ScimAPI>("scimapi")
+var api = builder.AddProject<Projects.ScimAPI>("scimapi")
     .WithExternalHttpEndpoints();
 
+var tunnel = builder.AddDevTunnel("scim")
+    .WithReference(api)
+    .WithAnonymousAccess()
+    .WithHttpsEndpoint();
+
 builder.Build().Run();
+

@@ -19,6 +19,9 @@ public class GroupsControllerTests
         _mockRepository = new Mock<IScimRepository>();
         _mockLogger = new Mock<ILogger<GroupsController>>();
         _controller = new GroupsController(_mockRepository.Object, _mockLogger.Object);
+        
+        // Configurer l'authentification pour les tests
+        AuthenticationTestHelper.SetupAuthenticatedContext(_controller);
     }
 
     #region GetGroups Tests

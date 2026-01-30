@@ -1,25 +1,59 @@
 using ScimAPI.Repositories;
 using ScimAPI.Services;
+using ScimAPI.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Azure.Identity;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Ajouter la configuration des schémas SCIM customs
+// Add custom SCIM schema configuration
 builder.Configuration.AddJsonFile("appsettings.Scim.json", optional: true, reloadOnChange: true);
 
-// Add services to the container.
+// Load Azure Key Vault in production
+if (!builder.Environment.IsDevelopment())
+{
+    try
+    {
+        var keyVaultUrl = builder.Configuration["AzureKeyVault:VaultUri"];
+        if (!string.IsNullOrEmpty(keyVaultUrl))
+        {
+            builder.Configuration.AddAzureKeyVault(
+                new Uri(keyVaultUrl),
+                new DefaultAzureCredential());
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = builder.Services.BuildServiceProvider().GetService<ILogger<Program>>();
+        logger?.LogWarning(ex, "Unable to load Azure Key Vault");
+    }
+}
 
-// Enregistrer le repository SCIM en tant que Singleton pour l'implémentation en mémoire
+// Add services to the container
+
+// Register SCIM repository as Singleton for in-memory implementation
 builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
 
-// Enregistrer le service d'initialisation des schémas
+// Register JWT token service
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+// Register schema initialization service
 builder.Services.AddHostedService<ScimSchemaInitializer>();
+
+// Configure JWT authentication
+builder.Services.AddAuthentication()
+    .AddScheme<JwtBearerTokenAuthenticationOptions, JwtBearerTokenAuthenticationHandler>(
+        "Bearer", null);
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // Configuration JSON pour SCIM (camelCase par défaut)
+        // Configure JSON for SCIM (camelCase by default)
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
@@ -31,7 +65,7 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -39,8 +73,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+

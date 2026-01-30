@@ -4,44 +4,37 @@ using System.Text.Json;
 
 namespace ScimAPI.Services
 {
-    public class ScimSchemaInitializer : IHostedService
+    public class ScimSchemaInitializer(
+        IScimRepository repository,
+        ILogger<ScimSchemaInitializer> logger,
+        IConfiguration configuration)
+        : IHostedService
     {
-        private readonly IScimRepository _repository;
-        private readonly ILogger<ScimSchemaInitializer> _logger;
-        private readonly IConfiguration _configuration;
-
-        public ScimSchemaInitializer(IScimRepository repository, ILogger<ScimSchemaInitializer> logger, IConfiguration configuration)
-        {
-            _repository = repository;
-            _logger = logger;
-            _configuration = configuration;
-        }
-
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Initialisation des schémas SCIM customs...");
+            logger.LogInformation("Initialisation des schémas SCIM customs...");
 
             try
             {
-                var customSchemas = _configuration.GetSection("CustomSchemas").Get<List<ScimSchema>>();
+                var customSchemas = configuration.GetSection("CustomSchemas").Get<List<ScimSchema>>();
 
                 if (customSchemas != null && customSchemas.Any())
                 {
                     foreach (var schema in customSchemas)
                     {
-                        await _repository.AddCustomSchemaAsync(schema);
-                        _logger.LogInformation("Schéma custom chargé: {SchemaId}", schema.Id);
+                        await repository.AddCustomSchemaAsync(schema);
+                        logger.LogInformation("Schéma custom chargé: {SchemaId}", schema.Id);
                     }
                 }
 
-                if (_configuration.GetValue("Scim:LoadTestData", false))
+                if (configuration.GetValue("Scim:LoadTestData", false))
                 {
                     await LoadTestDataAsync();
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur lors de l'initialisation des schémas SCIM");
+                logger.LogError(ex, "Erreur lors de l'initialisation des schémas SCIM");
             }
 
             return;
@@ -54,7 +47,7 @@ namespace ScimAPI.Services
 
         private async Task LoadTestDataAsync()
         {
-            _logger.LogInformation("Chargement des données de test...");
+            logger.LogInformation("Chargement des données de test...");
 
             var testUser = new ScimUser
             {
@@ -74,8 +67,8 @@ namespace ScimAPI.Services
                 }
             };
 
-            await _repository.CreateUserAsync(testUser);
-            _logger.LogInformation("Utilisateur de test créé");
+            await repository.CreateUserAsync(testUser);
+            logger.LogInformation("Utilisateur de test créé");
 
             var testGroup = new ScimGroup
             {
@@ -83,8 +76,8 @@ namespace ScimAPI.Services
                 ExternalId = "test-group-001"
             };
 
-            await _repository.CreateGroupAsync(testGroup);
-            _logger.LogInformation("Groupe de test créé");
+            await repository.CreateGroupAsync(testGroup);
+            logger.LogInformation("Groupe de test créé");
         }
     }
 }

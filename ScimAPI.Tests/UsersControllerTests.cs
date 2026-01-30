@@ -19,6 +19,9 @@ public class UsersControllerTests
         _mockRepository = new Mock<IScimRepository>();
         _mockLogger = new Mock<ILogger<UsersController>>();
         _controller = new UsersController(_mockRepository.Object, _mockLogger.Object);
+        
+        // Configurer l'authentification pour les tests
+        AuthenticationTestHelper.SetupAuthenticatedContext(_controller);
     }
 
     #region GetUsers Tests
