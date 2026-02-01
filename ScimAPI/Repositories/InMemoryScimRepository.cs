@@ -1,3 +1,5 @@
+using ScimAPI.Filtering;
+using ScimAPI.Filtering.AST;
 using ScimAPI.Models;
 using System.Collections.Concurrent;
 using System.Text.Json;
@@ -24,13 +26,13 @@ namespace ScimAPI.Repositories
             return Task.FromResult(user);
         }
 
-        public Task<ScimListResponse<ScimUser>> GetUsersAsync(string? filter = null, int startIndex = 1, int count = 100)
+        public Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100)
         {
             var users = _users.Values.AsEnumerable();
 
-            if (!string.IsNullOrEmpty(filter))
+            if (filter != null)
             {
-                users = ApplyUserFilter(users, filter);
+                users = users.Where(filter);
             }
 
             var usersList = users.ToList();
@@ -107,13 +109,13 @@ namespace ScimAPI.Repositories
             return Task.FromResult(group);
         }
 
-        public Task<ScimListResponse<ScimGroup>> GetGroupsAsync(string? filter = null, int startIndex = 1, int count = 100)
+        public Task<ScimListResponse<ScimGroup>> GetGroupsAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100)
         {
             var groups = _groups.Values.AsEnumerable();
 
-            if (!string.IsNullOrEmpty(filter))
+            if (filter != null)
             {
-                groups = ApplyGroupFilter(groups, filter);
+                groups = groups.Where(filter);
             }
 
             var groupsList = groups.ToList();
@@ -197,323 +199,8 @@ namespace ScimAPI.Repositories
             return Task.CompletedTask;
         }
 
-        private IEnumerable<ScimUser> ApplyUserFilter(IEnumerable<ScimUser> users, string filter)
-        {
-            // Suppression des parenthèses externes si présentes (IMPORTANT: avant les opérateurs logiques)
-            filter = filter.Trim();
-            while (filter.StartsWith("(") && filter.EndsWith(")"))
-            {
-                // Vérifier que ce sont bien des parenthèses externes correspondantes
-                int depth = 0;
-                bool isOuterParenthesis = true;
-                for (int i = 0; i < filter.Length - 1; i++)
-                {
-                    if (filter[i] == '(') depth++;
-                    else if (filter[i] == ')') depth--;
-                    if (depth == 0)
-                    {
-                        isOuterParenthesis = false;
-                        break;
-                    }
-                }
-                if (isOuterParenthesis)
-                {
-                    filter = filter.Substring(1, filter.Length - 2).Trim();
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            // Gestion des opérateurs logiques AND
-            if (filter.Contains(" and ", StringComparison.OrdinalIgnoreCase))
-            {
-                var parts = SplitFilterByLogicalOperator(filter, "and");
-                var result = users;
-                foreach (var part in parts)
-                {
-                    result = ApplyUserFilter(result, part.Trim());
-                }
-                return result;
-            }
-
-            // Gestion des opérateurs logiques OR
-            if (filter.Contains(" or ", StringComparison.OrdinalIgnoreCase))
-            {
-                var parts = SplitFilterByLogicalOperator(filter, "or");
-                var usersList = users.ToList();
-                var result = new List<ScimUser>();
-                foreach (var part in parts)
-                {
-                    result.AddRange(ApplyUserFilter(usersList, part.Trim()));
-                }
-                return result.Distinct();
-            }
-
-            // Gestion de l'opérateur NOT
-            if (filter.StartsWith("not ", StringComparison.OrdinalIgnoreCase))
-            {
-                var innerFilter = filter.Substring(4).Trim();
-                var usersList = users.ToList();
-                var filtered = ApplyUserFilter(usersList, innerFilter).ToList();
-                return usersList.Where(u => !filtered.Contains(u));
-            }
-
-
-            // userName
-            if (filter.Contains("userName eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.UserName.Equals(value, StringComparison.OrdinalIgnoreCase));
-            }
-            if (filter.Contains("userName sw", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.UserName.StartsWith(value, StringComparison.OrdinalIgnoreCase));
-            }
-            if (filter.Contains("userName co", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.UserName.Contains(value, StringComparison.OrdinalIgnoreCase));
-            }
-
-            // externalId
-            if (filter.Contains("externalId eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.ExternalId.Equals(value, StringComparison.OrdinalIgnoreCase));
-            }
-            if (filter.Contains("externalId sw", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.ExternalId.StartsWith(value, StringComparison.OrdinalIgnoreCase));
-            }
-
-            // displayName
-            if (filter.Contains("displayName eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.DisplayName?.Equals(value, StringComparison.OrdinalIgnoreCase) == true);
-            }
-            if (filter.Contains("displayName co", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.DisplayName?.Contains(value, StringComparison.OrdinalIgnoreCase) == true);
-            }
-
-            // active
-            if (filter.Contains("active eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                var isActive = bool.Parse(value);
-                return users.Where(u => u.Active == isActive);
-            }
-
-            // name.givenName
-            if (filter.Contains("name.givenName eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.Name.GivenName?.Equals(value, StringComparison.OrdinalIgnoreCase) == true);
-            }
-            if (filter.Contains("name.givenName co", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.Name.GivenName?.Contains(value, StringComparison.OrdinalIgnoreCase) == true);
-            }
-
-            // name.familyName
-            if (filter.Contains("name.familyName eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.Name.FamilyName?.Equals(value, StringComparison.OrdinalIgnoreCase) == true);
-            }
-            if (filter.Contains("name.familyName co", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.Name.FamilyName?.Contains(value, StringComparison.OrdinalIgnoreCase) == true);
-            }
-
-            // emails[type eq "work"].value
-            if (filter.Contains("emails", StringComparison.OrdinalIgnoreCase) && filter.Contains("value", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return users.Where(u => u.Emails.Any(e => e.Value.Equals(value, StringComparison.OrdinalIgnoreCase)));
-            }
-
-            // Opérateur pr (present) - vérifie si un attribut est présent
-            if (filter.Contains(" pr", StringComparison.OrdinalIgnoreCase))
-            {
-                var attribute = filter.Replace(" pr", "", StringComparison.OrdinalIgnoreCase).Trim();
-                if (attribute.Equals("userName", StringComparison.OrdinalIgnoreCase))
-                    return users.Where(u => !string.IsNullOrEmpty(u.UserName));
-                if (attribute.Equals("displayName", StringComparison.OrdinalIgnoreCase))
-                    return users.Where(u => !string.IsNullOrEmpty(u.DisplayName));
-                if (attribute.Equals("externalId", StringComparison.OrdinalIgnoreCase))
-                    return users.Where(u => !string.IsNullOrEmpty(u.ExternalId));
-            }
-
-            return users;
-        }
-
-        private List<string> SplitFilterByLogicalOperator(string filter, string logicalOperator)
-        {
-            var parts = new List<string>();
-            var current = "";
-            var depth = 0;
-            var keyword = $" {logicalOperator} ";
-            
-            for (int i = 0; i < filter.Length; i++)
-            {
-                if (filter[i] == '(')
-                    depth++;
-                else if (filter[i] == ')')
-                    depth--;
-
-                if (depth == 0 && i + keyword.Length <= filter.Length)
-                {
-                    var substring = filter.Substring(i, keyword.Length);
-                    if (substring.Equals(keyword, StringComparison.OrdinalIgnoreCase))
-                    {
-                        parts.Add(current.Trim());
-                        current = "";
-                        i += keyword.Length - 1;
-                        continue;
-                    }
-                }
-
-                current += filter[i];
-            }
-
-            if (!string.IsNullOrWhiteSpace(current))
-                parts.Add(current.Trim());
-
-            return parts;
-        }
-
-        private IEnumerable<ScimGroup> ApplyGroupFilter(IEnumerable<ScimGroup> groups, string filter)
-        {
-            // Suppression des parenthèses externes si présentes (IMPORTANT: avant les opérateurs logiques)
-            filter = filter.Trim();
-            while (filter.StartsWith("(") && filter.EndsWith(")"))
-            {
-                int depth = 0;
-                bool isOuterParenthesis = true;
-                for (int i = 0; i < filter.Length - 1; i++)
-                {
-                    if (filter[i] == '(') depth++;
-                    else if (filter[i] == ')') depth--;
-                    if (depth == 0)
-                    {
-                        isOuterParenthesis = false;
-                        break;
-                    }
-                }
-                if (isOuterParenthesis)
-                {
-                    filter = filter.Substring(1, filter.Length - 2).Trim();
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            // Gestion des opérateurs logiques AND
-            if (filter.Contains(" and ", StringComparison.OrdinalIgnoreCase))
-            {
-                var parts = SplitFilterByLogicalOperator(filter, "and");
-                var result = groups;
-                foreach (var part in parts)
-                {
-                    result = ApplyGroupFilter(result, part.Trim());
-                }
-                return result;
-            }
-
-            // Gestion des opérateurs logiques OR
-            if (filter.Contains(" or ", StringComparison.OrdinalIgnoreCase))
-            {
-                var parts = SplitFilterByLogicalOperator(filter, "or");
-                var groupsList = groups.ToList();
-                var result = new List<ScimGroup>();
-                foreach (var part in parts)
-                {
-                    result.AddRange(ApplyGroupFilter(groupsList, part.Trim()));
-                }
-                return result.Distinct();
-            }
-
-
-            // displayName
-            if (filter.Contains("displayName eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return groups.Where(g => g.DisplayName.Equals(value, StringComparison.OrdinalIgnoreCase));
-            }
-            if (filter.Contains("displayName co", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return groups.Where(g => g.DisplayName.Contains(value, StringComparison.OrdinalIgnoreCase));
-            }
-            if (filter.Contains("displayName sw", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return groups.Where(g => g.DisplayName.StartsWith(value, StringComparison.OrdinalIgnoreCase));
-            }
-
-            // externalId
-            if (filter.Contains("externalId eq", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return groups.Where(g => g.ExternalId.Equals(value, StringComparison.OrdinalIgnoreCase));
-            }
-
-            // members - recherche par membre
-            if (filter.Contains("members", StringComparison.OrdinalIgnoreCase) && filter.Contains("value", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = ExtractFilterValue(filter);
-                return groups.Where(g => g.Members.Any(m => m.Value.Equals(value, StringComparison.OrdinalIgnoreCase)));
-            }
-
-            // Opérateur pr (present)
-            if (filter.Contains(" pr", StringComparison.OrdinalIgnoreCase))
-            {
-                var attribute = filter.Replace(" pr", "", StringComparison.OrdinalIgnoreCase).Trim();
-                if (attribute.Equals("displayName", StringComparison.OrdinalIgnoreCase))
-                    return groups.Where(g => !string.IsNullOrEmpty(g.DisplayName));
-                if (attribute.Equals("externalId", StringComparison.OrdinalIgnoreCase))
-                    return groups.Where(g => !string.IsNullOrEmpty(g.ExternalId));
-            }
-
-            return groups;
-        }
-
-        private string ExtractFilterValue(string filter)
-        {
-            // Chercher la valeur entre guillemets
-            var startIndex = filter.IndexOf('"');
-            var endIndex = filter.LastIndexOf('"');
-            if (startIndex >= 0 && endIndex > startIndex)
-                return filter.Substring(startIndex + 1, endIndex - startIndex - 1);
-            
-            // Si pas de guillemets, extraire la valeur après l'opérateur (pour les booléens)
-            var operators = new[] { " eq ", " ne ", " co ", " sw ", " ew ", " gt ", " ge ", " lt ", " le " };
-            foreach (var op in operators)
-            {
-                var opIndex = filter.IndexOf(op, StringComparison.OrdinalIgnoreCase);
-                if (opIndex >= 0)
-                {
-                    var valueStart = opIndex + op.Length;
-                    var value = filter.Substring(valueStart).Trim();
-                    // Nettoyer les parenthèses de fin
-                    value = value.TrimEnd(')').Trim();
-                    return value;
-                }
-            }
-            
-            return string.Empty;
-        }
+        // Obsolete string-based filter methods removed - now using FilterExpression AST pattern
+        // See ApplyUserFilter(IEnumerable<ScimUser>, FilterExpression) at line ~792
 
         private void ApplyUserPatchOperation(ScimUser user, ScimPatchOperation operation)
         {
@@ -784,6 +471,10 @@ namespace ScimAPI.Repositories
 
             return members;
         }
+
+        // Filter methods moved to FilterExtensions class for reusability
+        // Use: users.Where(filter) or groups.Where(filter)
     }
 }
+
 

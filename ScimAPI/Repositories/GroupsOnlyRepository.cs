@@ -1,7 +1,8 @@
-﻿using ScimAPI.Models;
-using ScimAPI.Repositories;
+﻿﻿using ScimAPI.Filtering;
+using ScimAPI.Filtering.AST;
+using ScimAPI.Models;
 
-namespace ScimAPI.Repositories.Examples
+namespace ScimAPI.Repositories
 {
     /// <summary>
     /// Example implementation of a Groups-only SCIM repository.
@@ -39,24 +40,21 @@ namespace ScimAPI.Repositories.Examples
         }
 
         /// <summary>
-        /// Gets a paginated list of groups with optional filtering.
+        /// Gets a paginated list of groups with optional filtering using FilterExpression AST.
         /// </summary>
-        public Task<ScimListResponse<ScimGroup>> GetGroupsAsync(string? filter = null, int startIndex = 1, int count = 100)
+        public Task<ScimListResponse<ScimGroup>> GetGroupsAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100)
         {
             _logger.LogInformation("Getting groups. Filter: {Filter}, StartIndex: {StartIndex}, Count: {Count}", 
                 filter, startIndex, count);
 
-            var allGroups = _groups.Values.ToList();
+            var allGroups = _groups.Values.AsEnumerable();
 
-            // Simple filtering example (in production, use a proper SCIM filter parser)
-            if (!string.IsNullOrEmpty(filter))
+            if (filter != null)
             {
-                if (filter.Contains("displayName"))
-                {
-                    var displayName = filter.Split("\"")[1];
-                    allGroups = allGroups.Where(g => g.DisplayName == displayName).ToList();
-                }
+                allGroups = allGroups.Where(filter);
             }
+
+            allGroups = allGroups.ToList();
 
             var groups = allGroups
                 .Skip(startIndex - 1)
@@ -65,12 +63,15 @@ namespace ScimAPI.Repositories.Examples
 
             return Task.FromResult(new ScimListResponse<ScimGroup>
             {
-                TotalResults = allGroups.Count,
+                TotalResults = allGroups.Count(),
                 ItemsPerPage = count,
                 StartIndex = startIndex,
                 Resources = groups
             });
         }
+
+        // Filter methods moved to FilterExtensions class
+        // Use: groups.Where(filter)
 
         /// <summary>
         /// Creates a new group.
@@ -105,11 +106,12 @@ namespace ScimAPI.Repositories.Examples
                 return Task.FromResult<ScimGroup?>(null);
             }
 
+            var existingGroup = _groups[id];
             group.Id = id;
             group.Meta = new ScimMeta
             {
                 ResourceType = "Group",
-                Created = _groups[id].Meta?.Created ?? DateTime.UtcNow,
+                Created = existingGroup.Meta.Created,
                 LastModified = DateTime.UtcNow,
                 Location = $"/Groups/{id}"
             };
@@ -141,7 +143,7 @@ namespace ScimAPI.Repositories.Examples
                 }
             }
 
-            group.Meta!.LastModified = DateTime.UtcNow;
+            group.Meta.LastModified = DateTime.UtcNow;
             _logger.LogInformation("Patched group: {GroupId}", id);
             return Task.FromResult<ScimGroup?>(group);
         }

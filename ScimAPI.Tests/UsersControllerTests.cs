@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ScimAPI.Controllers;
+using ScimAPI.Filtering.AST;
 using ScimAPI.Models;
 using ScimAPI.Repositories;
 using Shouldly;
@@ -73,7 +74,7 @@ public class UsersControllerTests
         };
 
         _mockRepository
-            .Setup(r => r.GetUsersAsync(filter, 1, 100))
+            .Setup(r => r.GetUsersAsync(It.IsAny<FilterExpression>(), 1, 100))
             .ReturnsAsync(users);
 
         // Act
@@ -120,7 +121,7 @@ public class UsersControllerTests
     {
         // Arrange
         _mockRepository
-            .Setup(r => r.GetUsersAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+            .Setup(r => r.GetUsersAsync(It.IsAny<FilterExpression>(), It.IsAny<int>(), It.IsAny<int>()))
             .ThrowsAsync(new Exception("Database error"));
 
         // Act

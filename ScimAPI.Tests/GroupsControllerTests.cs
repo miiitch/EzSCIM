@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ScimAPI.Controllers;
+using ScimAPI.Filtering.AST;
 using ScimAPI.Models;
 using ScimAPI.Repositories;
 using Shouldly;
@@ -73,7 +74,7 @@ public class GroupsControllerTests
         };
 
         _mockRepository
-            .Setup(r => r.GetGroupsAsync(filter, 1, 100))
+            .Setup(r => r.GetGroupsAsync(It.IsAny<FilterExpression>(), 1, 100))
             .ReturnsAsync(groups);
 
         // Act
@@ -92,7 +93,7 @@ public class GroupsControllerTests
     {
         // Arrange
         _mockRepository
-            .Setup(r => r.GetGroupsAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+            .Setup(r => r.GetGroupsAsync(It.IsAny<FilterExpression>(), It.IsAny<int>(), It.IsAny<int>()))
             .ThrowsAsync(new Exception("Database error"));
 
         // Act

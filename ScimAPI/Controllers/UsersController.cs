@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ScimAPI.Filtering;
+using ScimAPI.Filtering.AST;
 using ScimAPI.Models;
 using ScimAPI.Repositories;
 
@@ -18,13 +20,31 @@ namespace ScimAPI.Controllers
             try
             {
                 logger.LogInformation("GetUsers - Filter: {Filter}", filter);
-                var response = await repository.GetUsersAsync(filter, startIndex, count);
+
+                FilterExpression? filterExpression = null;
+                if (!string.IsNullOrWhiteSpace(filter))
+                {
+                    var parseResult = new FilterParser().Parse(filter);
+                    if (parseResult.IsError)
+                    {
+                        var errorDetails = string.Join("; ", parseResult.Errors.Select(e => $"{e.Code}: {e.Description}"));
+                        logger.LogWarning("GetUsers - Invalid filter: {Filter}. Errors: {Errors}", filter, errorDetails);
+                        return BadRequest(new ScimError
+                        {
+                            Detail = $"Invalid filter: {parseResult.FirstError.Description}",
+                            Status = 400
+                        });
+                    }
+                    filterExpression = parseResult.Value;
+                }
+
+                var response = await repository.GetUsersAsync(filterExpression, startIndex, count);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Erreur GetUsers");
-                return StatusCode(500, new ScimError { Detail = "Erreur interne", Status = 500 });
+                logger.LogError(ex, "Error in GetUsers");
+                return StatusCode(500, new ScimError { Detail = "Internal server error", Status = 500 });
             }
         }
 

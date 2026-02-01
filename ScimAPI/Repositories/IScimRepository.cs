@@ -1,4 +1,5 @@
-﻿using ScimAPI.Models;
+﻿﻿using ScimAPI.Filtering.AST;
+using ScimAPI.Models;
 
 namespace ScimAPI.Repositories
 {
@@ -19,9 +20,9 @@ namespace ScimAPI.Repositories
         Task<ScimUser?> GetUserByUserNameAsync(string userName);
         
         /// <summary>
-        /// Gets a paginated list of users with optional filtering.
+        /// Gets a paginated list of users with optional filtering using FilterExpression AST.
         /// </summary>
-        Task<ScimListResponse<ScimUser>> GetUsersAsync(string? filter = null, int startIndex = 1, int count = 100);
+        Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100);
         
         /// <summary>
         /// Creates a new user.
@@ -61,9 +62,9 @@ namespace ScimAPI.Repositories
         Task<ScimGroup?> GetGroupByDisplayNameAsync(string displayName);
         
         /// <summary>
-        /// Gets a paginated list of groups with optional filtering.
+        /// Gets a paginated list of groups with optional filtering using FilterExpression AST.
         /// </summary>
-        Task<ScimListResponse<ScimGroup>> GetGroupsAsync(string? filter = null, int startIndex = 1, int count = 100);
+        Task<ScimListResponse<ScimGroup>> GetGroupsAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100);
         
         /// <summary>
         /// Creates a new group.

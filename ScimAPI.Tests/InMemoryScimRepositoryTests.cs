@@ -1,4 +1,6 @@
 ﻿using Shouldly;
+using ScimAPI.Filtering;
+using ScimAPI.Filtering.AST;
 using ScimAPI.Models;
 using ScimAPI.Repositories;
 using Xunit;
@@ -8,6 +10,20 @@ namespace ScimAPI.Tests;
 public class InMemoryScimRepositoryTests
 {
     private readonly InMemoryScimRepository _repository = new();
+
+    /// <summary>
+    /// Helper method to parse filter strings for testing
+    /// </summary>
+    private static FilterExpression ParseFilterString(string filterString)
+    {
+        var parser = new FilterParser();
+        var result = parser.Parse(filterString);
+        if (result.IsError)
+        {
+            throw new InvalidOperationException($"Filter parsing failed: {string.Join("; ", result.Errors.Select(e => e.Description))}");
+        }
+        return result.Value;
+    }
 
     #region User CRUD Tests
 
@@ -125,7 +141,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "jane.smith@example.com" });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "userName eq \"john.doe@example.com\"");
+        var filter = ParseFilterString("userName eq \"john.doe@example.com\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(1);
@@ -141,7 +158,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "jane.doe@example.com" });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "userName sw \"john\"");
+        var filter = ParseFilterString("userName sw \"john\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -157,7 +175,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "bob.smith@example.com" });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "userName co \"doe\"");
+        var filter = ParseFilterString("userName co \"doe\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -172,7 +191,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "inactive@example.com", Active = false });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "active eq true");
+        var filter = ParseFilterString("active eq true");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(1);
@@ -188,7 +208,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "user3", DisplayName = "Guest" });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "displayName co \"User\"");
+        var filter = ParseFilterString("displayName co \"User\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -210,7 +231,8 @@ public class InMemoryScimRepositoryTests
         });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "name.givenName eq \"John\"");
+        var filter = ParseFilterString("name.givenName eq \"John\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(1);
@@ -233,7 +255,8 @@ public class InMemoryScimRepositoryTests
         });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "name.familyName eq \"Doe\"");
+        var filter = ParseFilterString("name.familyName eq \"Doe\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -249,7 +272,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "jane@example.com", Active = true });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "userName sw \"john\" and active eq true");
+        var filter = ParseFilterString("userName sw \"john\" and active eq true");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(1);
@@ -265,7 +289,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "bob@example.com" });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "userName eq \"john@example.com\" or userName eq \"jane@example.com\"");
+        var filter = ParseFilterString("userName eq \"john@example.com\" or userName eq \"jane@example.com\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -279,7 +304,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "inactive@example.com", Active = false });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "not (active eq false)");
+        var filter = ParseFilterString("not (active eq false)");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(1);
@@ -295,7 +321,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "bob@example.com", Active = false });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "(userName sw \"john\" or userName sw \"jane\") and active eq true");
+        var filter = ParseFilterString("(userName sw \"john\" or userName sw \"jane\") and active eq true");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -309,7 +336,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateUserAsync(new ScimUser { UserName = "user2@example.com", DisplayName = null });
 
         // Act
-        var result = await _repository.GetUsersAsync(filter: "displayName pr");
+        var filter = ParseFilterString("displayName pr");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(1);
@@ -548,7 +576,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateGroupAsync(new ScimGroup { DisplayName = "Developers" });
 
         // Act
-        var result = await _repository.GetGroupsAsync(filter: "displayName eq \"Administrators\"");
+        var filter = ParseFilterString("displayName eq \"Administrators\"");
+        var result = await _repository.GetGroupsAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(1);
@@ -564,7 +593,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateGroupAsync(new ScimGroup { DisplayName = "QA Team" });
 
         // Act
-        var result = await _repository.GetGroupsAsync(filter: "displayName co \"Dev\"");
+        var filter = ParseFilterString("displayName co \"Dev\"");
+        var result = await _repository.GetGroupsAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -579,7 +609,8 @@ public class InMemoryScimRepositoryTests
         await _repository.CreateGroupAsync(new ScimGroup { DisplayName = "Production Group" });
 
         // Act
-        var result = await _repository.GetGroupsAsync(filter: "displayName sw \"Test\"");
+        var filter = ParseFilterString("displayName sw \"Test\"");
+        var result = await _repository.GetGroupsAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(2);
@@ -749,7 +780,8 @@ public class InMemoryScimRepositoryTests
     public async Task GetUsers_WithNoResults_ShouldReturnEmptyList()
     {
         // Act
-        var result = await _repository.GetUsersAsync(filter: "userName eq \"nonexistent@example.com\"");
+        var filter = ParseFilterString("userName eq \"nonexistent@example.com\"");
+        var result = await _repository.GetUsersAsync(filter);
 
         // Assert
         result.TotalResults.ShouldBe(0);

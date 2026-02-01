@@ -1,7 +1,8 @@
-﻿using ScimAPI.Models;
-using ScimAPI.Repositories;
+﻿using ScimAPI.Filtering;
+using ScimAPI.Filtering.AST;
+using ScimAPI.Models;
 
-namespace ScimAPI.Repositories.Examples
+namespace ScimAPI.Repositories
 {
     /// <summary>
     /// Example implementation of a Users-only SCIM repository.
@@ -39,24 +40,21 @@ namespace ScimAPI.Repositories.Examples
         }
 
         /// <summary>
-        /// Gets a paginated list of users with optional filtering.
+        /// Gets a paginated list of users with optional filtering using FilterExpression AST.
         /// </summary>
-        public Task<ScimListResponse<ScimUser>> GetUsersAsync(string? filter = null, int startIndex = 1, int count = 100)
+        public Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100)
         {
             _logger.LogInformation("Getting users. Filter: {Filter}, StartIndex: {StartIndex}, Count: {Count}", 
                 filter, startIndex, count);
 
-            var allUsers = _users.Values.ToList();
+            var allUsers = _users.Values.AsEnumerable();
 
-            // Simple filtering example (in production, use a proper SCIM filter parser)
-            if (!string.IsNullOrEmpty(filter))
+            if (filter != null)
             {
-                if (filter.Contains("userName"))
-                {
-                    var userName = filter.Split("\"")[1];
-                    allUsers = allUsers.Where(u => u.UserName == userName).ToList();
-                }
+                allUsers = allUsers.Where(filter);
             }
+
+            allUsers = allUsers.ToList();
 
             var users = allUsers
                 .Skip(startIndex - 1)
@@ -65,12 +63,15 @@ namespace ScimAPI.Repositories.Examples
 
             return Task.FromResult(new ScimListResponse<ScimUser>
             {
-                TotalResults = allUsers.Count,
+                TotalResults = allUsers.Count(),
                 ItemsPerPage = count,
                 StartIndex = startIndex,
                 Resources = users
             });
         }
+
+        // Filter methods moved to FilterExtensions class
+        // Use: users.Where(filter)
 
         /// <summary>
         /// Creates a new user.
@@ -105,11 +106,12 @@ namespace ScimAPI.Repositories.Examples
                 return Task.FromResult<ScimUser?>(null);
             }
 
+            var existingUser = _users[id];
             user.Id = id;
             user.Meta = new ScimMeta
             {
                 ResourceType = "User",
-                Created = _users[id].Meta?.Created ?? DateTime.UtcNow,
+                Created = existingUser.Meta.Created,
                 LastModified = DateTime.UtcNow,
                 Location = $"/Users/{id}"
             };
@@ -141,7 +143,7 @@ namespace ScimAPI.Repositories.Examples
                 }
             }
 
-            user.Meta!.LastModified = DateTime.UtcNow;
+            user.Meta.LastModified = DateTime.UtcNow;
             _logger.LogInformation("Patched user: {UserId}", id);
             return Task.FromResult<ScimUser?>(user);
         }
