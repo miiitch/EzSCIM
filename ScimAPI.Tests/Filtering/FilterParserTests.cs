@@ -1,4 +1,4 @@
-﻿using Shouldly;
+using Shouldly;
 using Xunit;
 using ScimAPI.Filtering;
 using ScimAPI.Filtering.AST;
@@ -19,9 +19,11 @@ public class FilterParserTests
         var expected = F.Equals("userName", "john.doe");
         
         // Act
-        var actual = _parser.Parse("userName eq \"john.doe\"");
+        var result = _parser.Parse("userName eq \"john.doe\"");
         
         // Assert
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         FilterAssert.AreEqual(expected, actual);
     }
 
@@ -32,7 +34,9 @@ public class FilterParserTests
         var expected = F.Equals("active", true);
         
         // Act
-        var actual = _parser.Parse("active eq true");
+        var result = _parser.Parse("active eq true");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -45,7 +49,9 @@ public class FilterParserTests
         var expected = F.Equals("id", 12345);
         
         // Act
-        var actual = _parser.Parse("id eq 12345");
+        var result = _parser.Parse("id eq 12345");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -58,7 +64,9 @@ public class FilterParserTests
         var expected = F.Contains("displayName", "John");
         
         // Act
-        var actual = _parser.Parse("displayName co \"John\"");
+        var result = _parser.Parse("displayName co \"John\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -71,7 +79,9 @@ public class FilterParserTests
         var expected = F.StartsWith("userName", "admin");
         
         // Act
-        var actual = _parser.Parse("userName sw \"admin\"");
+        var result = _parser.Parse("userName sw \"admin\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -84,7 +94,9 @@ public class FilterParserTests
         var expected = F.EndsWith("emails.value", "@company.com");
         
         // Act
-        var actual = _parser.Parse("emails.value ew \"@company.com\"");
+        var result = _parser.Parse("emails.value ew \"@company.com\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -97,7 +109,9 @@ public class FilterParserTests
         var expected = F.GreaterThan("id", 1000);
         
         // Act
-        var actual = _parser.Parse("id gt 1000");
+        var result = _parser.Parse("id gt 1000");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -110,7 +124,9 @@ public class FilterParserTests
         var expected = F.LessOrEqual("salary", 50000);
         
         // Act
-        var actual = _parser.Parse("salary le 50000");
+        var result = _parser.Parse("salary le 50000");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -125,7 +141,9 @@ public class FilterParserTests
         var expected = F.Present("phoneNumbers");
         
         // Act
-        var actual = _parser.Parse("phoneNumbers pr");
+        var result = _parser.Parse("phoneNumbers pr");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -138,7 +156,9 @@ public class FilterParserTests
         var expected = F.Present("emails.value");
         
         // Act
-        var actual = _parser.Parse("emails.value pr");
+        var result = _parser.Parse("emails.value pr");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -153,7 +173,9 @@ public class FilterParserTests
         var expected = F.Equals("active", true).And(F.Equals("userName", "john"));
         
         // Act
-        var actual = _parser.Parse("active eq true and userName eq \"john\"");
+        var result = _parser.Parse("active eq true and userName eq \"john\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -166,7 +188,9 @@ public class FilterParserTests
         var expected = F.Equals("title", "Admin").Or(F.Equals("title", "Manager"));
         
         // Act
-        var actual = _parser.Parse("title eq \"Admin\" or title eq \"Manager\"");
+        var result = _parser.Parse("title eq \"Admin\" or title eq \"Manager\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -179,7 +203,9 @@ public class FilterParserTests
         var expected = F.Equals("active", false).Negate();
         
         // Act
-        var actual = _parser.Parse("not (active eq false)");
+        var result = _parser.Parse("not (active eq false)");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -195,7 +221,9 @@ public class FilterParserTests
             .And(F.Equals("title", "Admin").Or(F.Equals("title", "Manager")));
         
         // Act
-        var actual = _parser.Parse("active eq true and (title eq \"Admin\" or title eq \"Manager\")");
+        var result = _parser.Parse("active eq true and (title eq \"Admin\" or title eq \"Manager\")");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -211,7 +239,9 @@ public class FilterParserTests
             .And(F.Equals("department", "Engineering"));
         
         // Act
-        var actual = _parser.Parse("((active eq true and (title eq \"Admin\" or title eq \"Manager\")) or (active eq false and title eq \"Director\")) and department eq \"Engineering\"");
+        var result = _parser.Parse("((active eq true and (title eq \"Admin\" or title eq \"Manager\")) or (active eq false and title eq \"Director\")) and department eq \"Engineering\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -224,7 +254,9 @@ public class FilterParserTests
         var expected = F.Equals("active", true).And(F.StartsWith("userName", "admin").Negate());
         
         // Act
-        var actual = _parser.Parse("active eq true and not (userName sw \"admin\")");
+        var result = _parser.Parse("active eq true and not (userName sw \"admin\")");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -244,7 +276,9 @@ public class FilterParserTests
             .Or(F.Equals("title", "Manager"));
         
         // Act
-        var actual = _parser.Parse("active eq true and title eq \"Admin\" or title eq \"Manager\"");
+        var result = _parser.Parse("active eq true and title eq \"Admin\" or title eq \"Manager\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -261,7 +295,9 @@ public class FilterParserTests
             .And(F.Equals("title", "Admin"));
         
         // Act
-        var actual = _parser.Parse("not active eq false and title eq \"Admin\"");
+        var result = _parser.Parse("not active eq false and title eq \"Admin\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -270,27 +306,68 @@ public class FilterParserTests
     // ==================== ERROR HANDLING TESTS ====================
 
     [Fact]
-    public void Parse_EmptyString_Throws()
+    public void Parse_EmptyString_ReturnsError()
     {
-        Should.Throw<FilterParseException>(() => _parser.Parse(""));
+        // Act
+        var result = _parser.Parse("");
+        
+        // Assert
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe("Filter.Empty");
+        result.FirstError.Description.ShouldContain("cannot be empty");
     }
 
     [Fact]
-    public void Parse_MissingClosingParen_Throws()
+    public void Parse_MissingClosingParen_ReturnsError()
     {
-        Should.Throw<FilterParseException>(() => _parser.Parse("(active eq true"));
+        // Act
+        var result = _parser.Parse("(active eq true");
+        
+        // Assert
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe("Filter.MissingClosingParenthesis");
+        result.FirstError.Description.ShouldContain("closing parenthesis");
     }
 
     [Fact]
-    public void Parse_InvalidOperator_Throws()
+    public void Parse_InvalidOperator_ReturnsError()
     {
-        Should.Throw<FilterParseException>(() => _parser.Parse("userName xx \"john\""));
+        // Act - "xx" is tokenized as AttributeName, not Operator, so parser expects an operator after it
+        var result = _parser.Parse("userName xx \"john\"");
+        
+        // Assert
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe("Filter.ExpectedOperator");
+        result.FirstError.Description.ShouldContain("Expected operator");
     }
 
     [Fact]
-    public void Parse_MissingValue_Throws()
+    public void Parse_MissingValue_ReturnsError()
     {
-        Should.Throw<FilterParseException>(() => _parser.Parse("userName eq"));
+        // Act
+        var result = _parser.Parse("userName eq");
+        
+        // Assert
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe("Filter.ExpectedValue");
+        result.FirstError.Description.ShouldContain("Expected value");
+    }
+
+    [Theory]
+    [InlineData("", "Filter.Empty")]
+    [InlineData("   ", "Filter.Empty")]
+    [InlineData("(active eq true", "Filter.MissingClosingParenthesis")]
+    [InlineData("userName eq", "Filter.ExpectedValue")]
+    [InlineData("eq \"value\"", "Filter.ExpectedAttributeName")]
+    [InlineData("userName \"value\"", "Filter.ExpectedOperator")]
+    public void Parse_InvalidFilter_ReturnsCorrectErrorCode(string filter, string expectedErrorCode)
+    {
+        // Act
+        var result = _parser.Parse(filter);
+        
+        // Assert
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe(expectedErrorCode);
     }
 
     // ==================== FILTER BUILDER (F class) TESTS ====================
@@ -474,7 +551,9 @@ public class FilterParserTests
     [Fact]
     public void Visitor_PrintsSimpleComparison()
     {
-        var ast = _parser.Parse("active eq true");
+        var result = _parser.Parse("active eq true");
+        result.IsError.ShouldBeFalse();
+        var ast = result.Value;
         var visitor = new PrintVisitor();
         var output = ast.Accept(visitor);
         output.ShouldContain("Comparison");
@@ -485,7 +564,9 @@ public class FilterParserTests
     [Fact]
     public void Visitor_PrintsPresence()
     {
-        var ast = _parser.Parse("phoneNumbers pr");
+        var result = _parser.Parse("phoneNumbers pr");
+        result.IsError.ShouldBeFalse();
+        var ast = result.Value;
         var visitor = new PrintVisitor();
         var output = ast.Accept(visitor);
         output.ShouldContain("Presence");
@@ -495,7 +576,9 @@ public class FilterParserTests
     [Fact]
     public void Visitor_PrintsAndFilter()
     {
-        var ast = _parser.Parse("active eq true and title eq \"Admin\"");
+        var result = _parser.Parse("active eq true and title eq \"Admin\"");
+        result.IsError.ShouldBeFalse();
+        var ast = result.Value;
         var visitor = new PrintVisitor();
         var output = ast.Accept(visitor);
         output.ShouldContain("AND");
@@ -505,7 +588,9 @@ public class FilterParserTests
     [Fact]
     public void Visitor_PrintsComplexNested()
     {
-        var ast = _parser.Parse("active eq true and (title eq \"Admin\" or title eq \"Manager\")");
+        var result = _parser.Parse("active eq true and (title eq \"Admin\" or title eq \"Manager\")");
+        result.IsError.ShouldBeFalse();
+        var ast = result.Value;
         var visitor = new PrintVisitor();
         var output = ast.Accept(visitor);
         output.ShouldContain("AND");
@@ -521,7 +606,9 @@ public class FilterParserTests
         var expected = F.GreaterThan("meta.created", DateTime.Parse("2024-01-15T10:00:00Z"));
         
         // Act
-        var actual = _parser.Parse("meta.created gt \"2024-01-15T10:00:00Z\"");
+        var result = _parser.Parse("meta.created gt \"2024-01-15T10:00:00Z\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -535,7 +622,9 @@ public class FilterParserTests
         var expected = F.GreaterThan("meta.created", dt);
         
         // Act
-        var actual = _parser.Parse($"meta.created gt \"{dt:O}\"");
+        var result = _parser.Parse($"meta.created gt \"{dt:O}\"");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -552,7 +641,9 @@ public class FilterParserTests
             .And(F.StartsWith("userName", "admin").Negate());
         
         // Act
-        var actual = _parser.Parse("active eq true and emails.value ew \"@company.com\" and not (userName sw \"admin\")");
+        var result = _parser.Parse("active eq true and emails.value ew \"@company.com\" and not (userName sw \"admin\")");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);
@@ -567,7 +658,9 @@ public class FilterParserTests
             .And(F.Contains("displayName", "Engineering").Or(F.Contains("displayName", "Architecture")));
         
         // Act
-        var actual = _parser.Parse("(displayName sw \"Team\" or displayName sw \"Department\") and (displayName co \"Engineering\" or displayName co \"Architecture\")");
+        var result = _parser.Parse("(displayName sw \"Team\" or displayName sw \"Department\") and (displayName co \"Engineering\" or displayName co \"Architecture\")");
+        result.IsError.ShouldBeFalse();
+        var actual = result.Value;
         
         // Assert
         FilterAssert.AreEqual(expected, actual);

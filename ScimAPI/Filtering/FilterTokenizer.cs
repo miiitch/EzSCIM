@@ -27,14 +27,16 @@ namespace ScimAPI.Filtering
     {
         public TokenType Type { get; set; }
         public string Value { get; set; }
+        public int Position { get; set; }
 
-        public Token(TokenType type, string value)
+        public Token(TokenType type, string value, int position = 0)
         {
             Type = type;
             Value = value;
+            Position = position;
         }
 
-        public override string ToString() => $"{Type}:{Value}";
+        public override string ToString() => $"{Type}:{Value} (pos:{Position})";
     }
 
     /// <summary>
@@ -64,28 +66,30 @@ namespace ScimAPI.Filtering
                 SkipWhitespace(filterSpan);
                 if (_position >= filterSpan.Length) break;
 
+                var tokenPosition = _position;
+                
                 switch (filterSpan[_position])
                 {
                     case '(':
-                        tokens.Add(new Token(TokenType.OpenParen, "("));
+                        tokens.Add(new Token(TokenType.OpenParen, "(", tokenPosition));
                         _position++;
                         break;
                     case ')':
-                        tokens.Add(new Token(TokenType.CloseParen, ")"));
+                        tokens.Add(new Token(TokenType.CloseParen, ")", tokenPosition));
                         _position++;
                         break;
                     case '"':
-                        tokens.Add(ParseStringToken(filterSpan));
+                        tokens.Add(ParseStringToken(filterSpan, tokenPosition));
                         break;
                     default:
                         var word = ParseWord(filterSpan);
                         if (word == null) break;
-                        tokens.Add(ClassifyToken(word));
+                        tokens.Add(ClassifyToken(word, tokenPosition));
                         break;
                 }
             }
 
-            tokens.Add(new Token(TokenType.Eof, ""));
+            tokens.Add(new Token(TokenType.Eof, "", _position));
             return tokens;
         }
 
@@ -101,7 +105,7 @@ namespace ScimAPI.Filtering
         /// <summary>
         /// Parses a string token (quoted value) using Span.Slice instead of Substring
         /// </summary>
-        private Token ParseStringToken(ReadOnlySpan<char> filterSpan)
+        private Token ParseStringToken(ReadOnlySpan<char> filterSpan, int startPosition)
         {
             _position++; // Skip opening quote
             var start = _position;
@@ -117,7 +121,7 @@ namespace ScimAPI.Filtering
             // Use Span.Slice instead of Substring - NO allocation!
             var value = filterSpan.Slice(start, _position - start).ToString();
             _position++; // Skip closing quote
-            return new Token(TokenType.Value, value);
+            return new Token(TokenType.Value, value, startPosition);
         }
 
         /// <summary>
@@ -145,19 +149,19 @@ namespace ScimAPI.Filtering
         /// <summary>
         /// Classifies a word token into its appropriate type
         /// </summary>
-        private Token ClassifyToken(string word)
+        private Token ClassifyToken(string word, int position)
         {
             return word.ToLower() switch
             {
-                "and" => new Token(TokenType.And, "and"),
-                "or" => new Token(TokenType.Or, "or"),
-                "not" => new Token(TokenType.Not, "not"),
-                "pr" => new Token(TokenType.Pr, "pr"),
+                "and" => new Token(TokenType.And, "and", position),
+                "or" => new Token(TokenType.Or, "or", position),
+                "not" => new Token(TokenType.Not, "not", position),
+                "pr" => new Token(TokenType.Pr, "pr", position),
                 "eq" or "ne" or "co" or "sw" or "ew" or "gt" or "ge" or "lt" or "le" =>
-                    new Token(TokenType.Operator, word.ToLower()),
-                "true" or "false" => new Token(TokenType.Value, word.ToLower()),
-                _ when decimal.TryParse(word, out _) => new Token(TokenType.Value, word),
-                _ => new Token(TokenType.AttributeName, word)
+                    new Token(TokenType.Operator, word.ToLower(), position),
+                "true" or "false" => new Token(TokenType.Value, word.ToLower(), position),
+                _ when decimal.TryParse(word, out _) => new Token(TokenType.Value, word, position),
+                _ => new Token(TokenType.AttributeName, word, position)
             };
         }
     }

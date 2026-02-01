@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using ErrorOr;
 using ScimAPI.Filtering.AST;
 
 namespace ScimAPI.Filtering
 {
     /// <summary>
-    /// Exception thrown when filter parsing fails
+    /// Exception thrown when filter parsing fails (DEPRECATED - use ErrorOr instead)
     /// </summary>
+    [Obsolete("Use ErrorOr<FilterExpression> instead of throwing exceptions. This will be removed in a future version.")]
     public class FilterParseException : Exception
     {
         public FilterParseException(string message) : base(message) { }
@@ -32,35 +34,52 @@ namespace ScimAPI.Filtering
         /// Parses a SCIM filter string into an AST
         /// </summary>
         /// <param name="filterString">The filter string to parse</param>
-        /// <returns>A FilterExpression tree representing the filter</returns>
-        public FilterExpression Parse(string filterString)
+        /// <returns>An ErrorOr containing either the FilterExpression tree or parsing errors</returns>
+        public ErrorOr<FilterExpression> Parse(string filterString)
         {
             if (string.IsNullOrWhiteSpace(filterString))
-                throw new FilterParseException("Filter string cannot be empty");
+                return FilterErrors.EmptyFilter;
 
-            var tokenizer = new FilterTokenizer(filterString);
-            _tokens = tokenizer.Tokenize();
+            try
+            {
+                var tokenizer = new FilterTokenizer(filterString);
+                _tokens = tokenizer.Tokenize();
+            }
+            catch (Exception ex)
+            {
+                return FilterErrors.TokenizationFailed(ex.Message);
+            }
+
             _current = 0;
 
-            var expression = ParseOrExpression();
+            var expressionResult = ParseOrExpression();
+            if (expressionResult.IsError)
+                return expressionResult.Errors;
 
             if (!IsAtEnd())
-                throw new FilterParseException("Unexpected tokens after filter expression");
+                return FilterErrors.UnexpectedTokensAfterExpression(Peek().Position);
 
-            return expression;
+            return expressionResult.Value;
         }
 
         /// <summary>
         /// Parses OR expressions (lowest precedence)
         /// </summary>
-        private FilterExpression ParseOrExpression()
+        private ErrorOr<FilterExpression> ParseOrExpression()
         {
-            var left = ParseAndExpression();
+            var leftResult = ParseAndExpression();
+            if (leftResult.IsError)
+                return leftResult.Errors;
+
+            var left = leftResult.Value;
 
             while (Match(TokenType.Or))
             {
-                var right = ParseAndExpression();
-                left = new OrFilter(left, right);
+                var rightResult = ParseAndExpression();
+                if (rightResult.IsError)
+                    return rightResult.Errors;
+
+                left = new OrFilter(left, rightResult.Value);
             }
 
             return left;
@@ -69,14 +88,21 @@ namespace ScimAPI.Filtering
         /// <summary>
         /// Parses AND expressions (medium precedence)
         /// </summary>
-        private FilterExpression ParseAndExpression()
+        private ErrorOr<FilterExpression> ParseAndExpression()
         {
-            var left = ParseNotExpression();
+            var leftResult = ParseNotExpression();
+            if (leftResult.IsError)
+                return leftResult.Errors;
+
+            var left = leftResult.Value;
 
             while (Match(TokenType.And))
             {
-                var right = ParseNotExpression();
-                left = new AndFilter(left, right);
+                var rightResult = ParseNotExpression();
+                if (rightResult.IsError)
+                    return rightResult.Errors;
+
+                left = new AndFilter(left, rightResult.Value);
             }
 
             return left;
@@ -85,12 +111,15 @@ namespace ScimAPI.Filtering
         /// <summary>
         /// Parses NOT expressions (highest precedence)
         /// </summary>
-        private FilterExpression ParseNotExpression()
+        private ErrorOr<FilterExpression> ParseNotExpression()
         {
             if (Match(TokenType.Not))
             {
-                var expression = ParseNotExpression();
-                return new NotFilter(expression);
+                var expressionResult = ParseNotExpression();
+                if (expressionResult.IsError)
+                    return expressionResult.Errors;
+
+                return new NotFilter(expressionResult.Value);
             }
 
             return ParseComparisonOrPresenceExpression();
@@ -100,20 +129,25 @@ namespace ScimAPI.Filtering
         /// Parses comparison (eq, ne, co, sw, ew, gt, ge, lt, le) or presence (pr) filters
         /// Also handles parenthesized expressions
         /// </summary>
-        private FilterExpression ParseComparisonOrPresenceExpression()
+        private ErrorOr<FilterExpression> ParseComparisonOrPresenceExpression()
         {
             // Handle parenthesized expressions
             if (Match(TokenType.OpenParen))
             {
-                var expression = ParseOrExpression();
+                var expressionResult = ParseOrExpression();
+                if (expressionResult.IsError)
+                    return expressionResult.Errors;
+
                 if (!Match(TokenType.CloseParen))
-                    throw new FilterParseException("Expected closing parenthesis");
-                return expression;
+                    return FilterErrors.MissingClosingParenthesis(Peek().Position);
+
+                return expressionResult.Value;
             }
 
             // Expect attribute name
-            if (Peek().Type != TokenType.AttributeName)
-                throw new FilterParseException($"Expected attribute name, got {Peek().Type}");
+            var currentToken = Peek();
+            if (currentToken.Type != TokenType.AttributeName)
+                return FilterErrors.ExpectedAttributeName(currentToken.Type.ToString(), currentToken.Position);
 
             var attributeName = Advance().Value;
 
@@ -124,26 +158,30 @@ namespace ScimAPI.Filtering
             }
 
             // Expect comparison operator
-            if (Peek().Type != TokenType.Operator)
-                throw new FilterParseException($"Expected operator, got {Peek().Type}");
+            currentToken = Peek();
+            if (currentToken.Type != TokenType.Operator)
+                return FilterErrors.ExpectedOperator(currentToken.Type.ToString(), currentToken.Position);
 
-            var operatorToken = Advance().Value;
-            var op = ParseOperator(operatorToken);
+            var operatorToken = Advance();
+            var opResult = ParseOperator(operatorToken.Value, operatorToken.Position);
+            if (opResult.IsError)
+                return opResult.Errors;
 
             // Expect value
-            if (Peek().Type != TokenType.Value)
-                throw new FilterParseException($"Expected value, got {Peek().Type}");
+            currentToken = Peek();
+            if (currentToken.Type != TokenType.Value)
+                return FilterErrors.ExpectedValue(currentToken.Type.ToString(), currentToken.Position);
 
             var valueToken = Advance();
             var value = ParseValue(valueToken.Value);
 
-            return new ComparisonFilter(attributeName, op, value);
+            return new ComparisonFilter(attributeName, opResult.Value, value);
         }
 
         /// <summary>
         /// Parses an operator string to FilterOperator enum
         /// </summary>
-        private FilterOperator ParseOperator(string op)
+        private ErrorOr<FilterOperator> ParseOperator(string op, int position)
         {
             return op switch
             {
@@ -156,7 +194,7 @@ namespace ScimAPI.Filtering
                 "ge" => FilterOperator.GreaterOrEqual,
                 "lt" => FilterOperator.LessThan,
                 "le" => FilterOperator.LessOrEqual,
-                _ => throw new FilterParseException($"Unknown operator: {op}")
+                _ => FilterErrors.UnknownOperator(op, position)
             };
         }
 
