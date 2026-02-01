@@ -15,81 +15,105 @@ public class FilterParserTests
     [Fact]
     public void Parse_SimpleEquals_WithString()
     {
-        var result = _parser.Parse("userName eq \"john.doe\"");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.AttributeName.ShouldBe("userName");
-        comp.Operator.ShouldBe(FilterOperator.Equals);
-        comp.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)comp.Value).Value.ShouldBe("john.doe");
+        // Arrange
+        var expected = F.Equals("userName", "john.doe");
+        
+        // Act
+        var actual = _parser.Parse("userName eq \"john.doe\"");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_SimpleEquals_WithBoolean()
     {
-        var result = _parser.Parse("active eq true");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.AttributeName.ShouldBe("active");
-        comp.Operator.ShouldBe(FilterOperator.Equals);
-        comp.Value.ShouldBeOfType<BooleanValue>();
-        ((BooleanValue)comp.Value).Value.ShouldBe(true);
+        // Arrange
+        var expected = F.Equals("active", true);
+        
+        // Act
+        var actual = _parser.Parse("active eq true");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_SimpleEquals_WithNumeric()
     {
-        var result = _parser.Parse("id eq 12345");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.Operator.ShouldBe(FilterOperator.Equals);
-        comp.Value.ShouldBeOfType<NumericValue>();
-        ((NumericValue)comp.Value).Value.ShouldBe(12345);
+        // Arrange
+        var expected = F.Equals("id", 12345);
+        
+        // Act
+        var actual = _parser.Parse("id eq 12345");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_Contains_Filter()
     {
-        var result = _parser.Parse("displayName co \"John\"");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.Operator.ShouldBe(FilterOperator.Contains);
+        // Arrange
+        var expected = F.Contains("displayName", "John");
+        
+        // Act
+        var actual = _parser.Parse("displayName co \"John\"");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_StartsWith_Filter()
     {
-        var result = _parser.Parse("userName sw \"admin\"");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.Operator.ShouldBe(FilterOperator.StartsWith);
+        // Arrange
+        var expected = F.StartsWith("userName", "admin");
+        
+        // Act
+        var actual = _parser.Parse("userName sw \"admin\"");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_EndsWith_Filter()
     {
-        var result = _parser.Parse("emails.value ew \"@company.com\"");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.Operator.ShouldBe(FilterOperator.EndsWith);
+        // Arrange
+        var expected = F.EndsWith("emails.value", "@company.com");
+        
+        // Act
+        var actual = _parser.Parse("emails.value ew \"@company.com\"");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_GreaterThan_Filter()
     {
-        var result = _parser.Parse("id gt 1000");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.Operator.ShouldBe(FilterOperator.GreaterThan);
+        // Arrange
+        var expected = F.GreaterThan("id", 1000);
+        
+        // Act
+        var actual = _parser.Parse("id gt 1000");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_LessOrEqual_Filter()
     {
-        var result = _parser.Parse("salary le 50000");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.Operator.ShouldBe(FilterOperator.LessOrEqual);
+        // Arrange
+        var expected = F.LessOrEqual("salary", 50000);
+        
+        // Act
+        var actual = _parser.Parse("salary le 50000");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     // ==================== PRESENCE FILTER TESTS ====================
@@ -97,19 +121,27 @@ public class FilterParserTests
     [Fact]
     public void Parse_Presence_Filter()
     {
-        var result = _parser.Parse("phoneNumbers pr");
-        result.ShouldBeOfType<PresenceFilter>();
-        var pres = (PresenceFilter)result;
-        pres.AttributeName.ShouldBe("phoneNumbers");
+        // Arrange
+        var expected = F.Present("phoneNumbers");
+        
+        // Act
+        var actual = _parser.Parse("phoneNumbers pr");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_Presence_WithDottedAttribute()
     {
-        var result = _parser.Parse("emails.value pr");
-        result.ShouldBeOfType<PresenceFilter>();
-        var pres = (PresenceFilter)result;
-        pres.AttributeName.ShouldBe("emails.value");
+        // Arrange
+        var expected = F.Present("emails.value");
+        
+        // Act
+        var actual = _parser.Parse("emails.value pr");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     // ==================== LOGICAL OPERATORS TESTS ====================
@@ -117,65 +149,40 @@ public class FilterParserTests
     [Fact]
     public void Parse_And_TwoFilters()
     {
-        var result = _parser.Parse("active eq true and userName eq \"john\"");
-        result.ShouldBeOfType<AndFilter>();
-        var and = (AndFilter)result;
+        // Arrange
+        var expected = F.Equals("active", true).And(F.Equals("userName", "john"));
         
-        // Verify Left side
-        and.Left.ShouldBeOfType<ComparisonFilter>();
-        var left = (ComparisonFilter)and.Left;
-        left.AttributeName.ShouldBe("active");
-        left.Operator.ShouldBe(FilterOperator.Equals);
-        left.Value.ShouldBeOfType<BooleanValue>();
-        ((BooleanValue)left.Value).Value.ShouldBe(true);
+        // Act
+        var actual = _parser.Parse("active eq true and userName eq \"john\"");
         
-        // Verify Right side
-        and.Right.ShouldBeOfType<ComparisonFilter>();
-        var right = (ComparisonFilter)and.Right;
-        right.AttributeName.ShouldBe("userName");
-        right.Operator.ShouldBe(FilterOperator.Equals);
-        right.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)right.Value).Value.ShouldBe("john");
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_Or_TwoFilters()
     {
-        var result = _parser.Parse("title eq \"Admin\" or title eq \"Manager\"");
-        result.ShouldBeOfType<OrFilter>();
-        var or = (OrFilter)result;
+        // Arrange
+        var expected = F.Equals("title", "Admin").Or(F.Equals("title", "Manager"));
         
-        // Verify Left side
-        or.Left.ShouldBeOfType<ComparisonFilter>();
-        var left = (ComparisonFilter)or.Left;
-        left.AttributeName.ShouldBe("title");
-        left.Operator.ShouldBe(FilterOperator.Equals);
-        left.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)left.Value).Value.ShouldBe("Admin");
+        // Act
+        var actual = _parser.Parse("title eq \"Admin\" or title eq \"Manager\"");
         
-        // Verify Right side
-        or.Right.ShouldBeOfType<ComparisonFilter>();
-        var right = (ComparisonFilter)or.Right;
-        right.AttributeName.ShouldBe("title");
-        right.Operator.ShouldBe(FilterOperator.Equals);
-        right.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)right.Value).Value.ShouldBe("Manager");
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_Not_Filter()
     {
-        var result = _parser.Parse("not (active eq false)");
-        result.ShouldBeOfType<NotFilter>();
-        var not = (NotFilter)result;
+        // Arrange
+        var expected = F.Equals("active", false).Negate();
         
-        // Verify Expression field
-        not.Expression.ShouldBeOfType<ComparisonFilter>();
-        var expr = (ComparisonFilter)not.Expression;
-        expr.AttributeName.ShouldBe("active");
-        expr.Operator.ShouldBe(FilterOperator.Equals);
-        expr.Value.ShouldBeOfType<BooleanValue>();
-        ((BooleanValue)expr.Value).Value.ShouldBe(false);
+        // Act
+        var actual = _parser.Parse("not (active eq false)");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     // ==================== NESTED EXPRESSIONS TESTS ====================
@@ -183,108 +190,44 @@ public class FilterParserTests
     [Fact]
     public void Parse_And_Or_Nested()
     {
-        var result = _parser.Parse("active eq true and (title eq \"Admin\" or title eq \"Manager\")");
-        result.ShouldBeOfType<AndFilter>();
-        var and = (AndFilter)result;
+        // Arrange
+        var expected = F.Equals("active", true)
+            .And(F.Equals("title", "Admin").Or(F.Equals("title", "Manager")));
         
-        // Verify Left side is a simple comparison
-        and.Left.ShouldBeOfType<ComparisonFilter>();
-        var left = (ComparisonFilter)and.Left;
-        left.AttributeName.ShouldBe("active");
-        left.Operator.ShouldBe(FilterOperator.Equals);
-        left.Value.ShouldBeOfType<BooleanValue>();
-        ((BooleanValue)left.Value).Value.ShouldBe(true);
+        // Act
+        var actual = _parser.Parse("active eq true and (title eq \"Admin\" or title eq \"Manager\")");
         
-        // Verify Right side is an OR filter
-        and.Right.ShouldBeOfType<OrFilter>();
-        var orFilter = (OrFilter)and.Right;
-        
-        // Verify OR left side
-        orFilter.Left.ShouldBeOfType<ComparisonFilter>();
-        var orLeft = (ComparisonFilter)orFilter.Left;
-        orLeft.AttributeName.ShouldBe("title");
-        orLeft.Operator.ShouldBe(FilterOperator.Equals);
-        orLeft.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)orLeft.Value).Value.ShouldBe("Admin");
-        
-        // Verify OR right side
-        orFilter.Right.ShouldBeOfType<ComparisonFilter>();
-        var orRight = (ComparisonFilter)orFilter.Right;
-        orRight.AttributeName.ShouldBe("title");
-        orRight.Operator.ShouldBe(FilterOperator.Equals);
-        orRight.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)orRight.Value).Value.ShouldBe("Manager");
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_Complex_Nested()
     {
-        var result = _parser.Parse("((active eq true and (title eq \"Admin\" or title eq \"Manager\")) or (active eq false and title eq \"Director\")) and department eq \"Engineering\"");
-        result.ShouldBeOfType<AndFilter>();
-        var rootAnd = (AndFilter)result;
+        // Arrange
+        var expected = F.Equals("active", true)
+            .And(F.Equals("title", "Admin").Or(F.Equals("title", "Manager")))
+            .Or(F.Equals("active", false).And(F.Equals("title", "Director")))
+            .And(F.Equals("department", "Engineering"));
         
-        // Verify Left side is an OR filter
-        rootAnd.Left.ShouldBeOfType<OrFilter>();
-        var leftOr = (OrFilter)rootAnd.Left;
+        // Act
+        var actual = _parser.Parse("((active eq true and (title eq \"Admin\" or title eq \"Manager\")) or (active eq false and title eq \"Director\")) and department eq \"Engineering\"");
         
-        // Verify Left OR's left side - (active eq true and (title eq "Admin" or title eq "Manager"))
-        leftOr.Left.ShouldBeOfType<AndFilter>();
-        var leftOrLeftAnd = (AndFilter)leftOr.Left;
-        leftOrLeftAnd.Left.ShouldBeOfType<ComparisonFilter>();
-        var activeTrue = (ComparisonFilter)leftOrLeftAnd.Left;
-        activeTrue.AttributeName.ShouldBe("active");
-        ((BooleanValue)activeTrue.Value).Value.ShouldBe(true);
-        
-        leftOrLeftAnd.Right.ShouldBeOfType<OrFilter>();
-        
-        // Verify Left OR's right side - (active eq false and title eq "Director")
-        leftOr.Right.ShouldBeOfType<AndFilter>();
-        var leftOrRightAnd = (AndFilter)leftOr.Right;
-        leftOrRightAnd.Left.ShouldBeOfType<ComparisonFilter>();
-        var activeFalse = (ComparisonFilter)leftOrRightAnd.Left;
-        activeFalse.AttributeName.ShouldBe("active");
-        ((BooleanValue)activeFalse.Value).Value.ShouldBe(false);
-        
-        leftOrRightAnd.Right.ShouldBeOfType<ComparisonFilter>();
-        var director = (ComparisonFilter)leftOrRightAnd.Right;
-        director.AttributeName.ShouldBe("title");
-        ((StringValue)director.Value).Value.ShouldBe("Director");
-        
-        // Verify Right side is a simple comparison
-        rootAnd.Right.ShouldBeOfType<ComparisonFilter>();
-        var department = (ComparisonFilter)rootAnd.Right;
-        department.AttributeName.ShouldBe("department");
-        department.Operator.ShouldBe(FilterOperator.Equals);
-        department.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)department.Value).Value.ShouldBe("Engineering");
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void Parse_Not_With_And()
     {
-        var result = _parser.Parse("active eq true and not (userName sw \"admin\")");
-        result.ShouldBeOfType<AndFilter>();
-        var and = (AndFilter)result;
+        // Arrange
+        var expected = F.Equals("active", true).And(F.StartsWith("userName", "admin").Negate());
         
-        // Verify Left side
-        and.Left.ShouldBeOfType<ComparisonFilter>();
-        var left = (ComparisonFilter)and.Left;
-        left.AttributeName.ShouldBe("active");
-        left.Operator.ShouldBe(FilterOperator.Equals);
-        left.Value.ShouldBeOfType<BooleanValue>();
-        ((BooleanValue)left.Value).Value.ShouldBe(true);
+        // Act
+        var actual = _parser.Parse("active eq true and not (userName sw \"admin\")");
         
-        // Verify Right side is NOT
-        and.Right.ShouldBeOfType<NotFilter>();
-        var notFilter = (NotFilter)and.Right;
-        
-        // Verify NOT's expression
-        notFilter.Expression.ShouldBeOfType<ComparisonFilter>();
-        var notExpr = (ComparisonFilter)notFilter.Expression;
-        notExpr.AttributeName.ShouldBe("userName");
-        notExpr.Operator.ShouldBe(FilterOperator.StartsWith);
-        notExpr.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)notExpr.Value).Value.ShouldBe("admin");
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     // ==================== OPERATOR PRECEDENCE TESTS ====================
@@ -294,37 +237,17 @@ public class FilterParserTests
     {
         // active eq true and title eq "Admin" or title eq "Manager"
         // Should parse as: (active eq true and title eq "Admin") or (title eq "Manager")
-        var result = _parser.Parse("active eq true and title eq \"Admin\" or title eq \"Manager\"");
-        result.ShouldBeOfType<OrFilter>();
-        var or = (OrFilter)result;
         
-        // Verify Left side is an AND
-        or.Left.ShouldBeOfType<AndFilter>();
-        var leftAnd = (AndFilter)or.Left;
+        // Arrange
+        var expected = F.Equals("active", true)
+            .And(F.Equals("title", "Admin"))
+            .Or(F.Equals("title", "Manager"));
         
-        // Verify AND's left side
-        leftAnd.Left.ShouldBeOfType<ComparisonFilter>();
-        var andLeft = (ComparisonFilter)leftAnd.Left;
-        andLeft.AttributeName.ShouldBe("active");
-        andLeft.Operator.ShouldBe(FilterOperator.Equals);
-        andLeft.Value.ShouldBeOfType<BooleanValue>();
-        ((BooleanValue)andLeft.Value).Value.ShouldBe(true);
+        // Act
+        var actual = _parser.Parse("active eq true and title eq \"Admin\" or title eq \"Manager\"");
         
-        // Verify AND's right side
-        leftAnd.Right.ShouldBeOfType<ComparisonFilter>();
-        var andRight = (ComparisonFilter)leftAnd.Right;
-        andRight.AttributeName.ShouldBe("title");
-        andRight.Operator.ShouldBe(FilterOperator.Equals);
-        andRight.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)andRight.Value).Value.ShouldBe("Admin");
-        
-        // Verify Right side is a simple comparison
-        or.Right.ShouldBeOfType<ComparisonFilter>();
-        var orRight = (ComparisonFilter)or.Right;
-        orRight.AttributeName.ShouldBe("title");
-        orRight.Operator.ShouldBe(FilterOperator.Equals);
-        orRight.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)orRight.Value).Value.ShouldBe("Manager");
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
@@ -332,29 +255,16 @@ public class FilterParserTests
     {
         // not active eq false and title eq "Admin"
         // Should parse as: (not (active eq false)) and (title eq "Admin")
-        var result = _parser.Parse("not active eq false and title eq \"Admin\"");
-        result.ShouldBeOfType<AndFilter>();
-        var and = (AndFilter)result;
         
-        // Verify Left side is NOT
-        and.Left.ShouldBeOfType<NotFilter>();
-        var notFilter = (NotFilter)and.Left;
+        // Arrange
+        var expected = F.Equals("active", false).Negate()
+            .And(F.Equals("title", "Admin"));
         
-        // Verify NOT's expression
-        notFilter.Expression.ShouldBeOfType<ComparisonFilter>();
-        var notExpr = (ComparisonFilter)notFilter.Expression;
-        notExpr.AttributeName.ShouldBe("active");
-        notExpr.Operator.ShouldBe(FilterOperator.Equals);
-        notExpr.Value.ShouldBeOfType<BooleanValue>();
-        ((BooleanValue)notExpr.Value).Value.ShouldBe(false);
+        // Act
+        var actual = _parser.Parse("not active eq false and title eq \"Admin\"");
         
-        // Verify Right side is simple comparison
-        and.Right.ShouldBeOfType<ComparisonFilter>();
-        var right = (ComparisonFilter)and.Right;
-        right.AttributeName.ShouldBe("title");
-        right.Operator.ShouldBe(FilterOperator.Equals);
-        right.Value.ShouldBeOfType<StringValue>();
-        ((StringValue)right.Value).Value.ShouldBe("Admin");
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     // ==================== ERROR HANDLING TESTS ====================
@@ -391,7 +301,10 @@ public class FilterParserTests
         var filter = F.Equals("userName", "john");
         filter.ShouldBeOfType<ComparisonFilter>();
         var comp = (ComparisonFilter)filter;
+        comp.AttributeName.ShouldBe("userName");
         comp.Operator.ShouldBe(FilterOperator.Equals);
+        comp.Value.ShouldBeOfType<StringValue>();
+        ((StringValue)comp.Value).Value.ShouldBe("john");
     }
 
     [Fact]
@@ -400,7 +313,10 @@ public class FilterParserTests
         var filter = F.Equals("active", true);
         filter.ShouldBeOfType<ComparisonFilter>();
         var comp = (ComparisonFilter)filter;
+        comp.AttributeName.ShouldBe("active");
+        comp.Operator.ShouldBe(FilterOperator.Equals);
         comp.Value.ShouldBeOfType<BooleanValue>();
+        ((BooleanValue)comp.Value).Value.ShouldBe(true);
     }
 
     [Fact]
@@ -409,7 +325,10 @@ public class FilterParserTests
         var filter = F.Contains("displayName", "John");
         filter.ShouldBeOfType<ComparisonFilter>();
         var comp = (ComparisonFilter)filter;
+        comp.AttributeName.ShouldBe("displayName");
         comp.Operator.ShouldBe(FilterOperator.Contains);
+        comp.Value.ShouldBeOfType<StringValue>();
+        ((StringValue)comp.Value).Value.ShouldBe("John");
     }
 
     [Fact]
@@ -417,6 +336,8 @@ public class FilterParserTests
     {
         var filter = F.Present("phoneNumbers");
         filter.ShouldBeOfType<PresenceFilter>();
+        var pres = (PresenceFilter)filter;
+        pres.AttributeName.ShouldBe("phoneNumbers");
     }
 
     [Fact]
@@ -426,6 +347,23 @@ public class FilterParserTests
         var f2 = F.Equals("title", "Admin");
         var result = f1.And(f2); // Use fluent syntax
         result.ShouldBeOfType<AndFilter>();
+        var and = (AndFilter)result;
+        
+        // Verify Left side
+        and.Left.ShouldBeOfType<ComparisonFilter>();
+        var left = (ComparisonFilter)and.Left;
+        left.AttributeName.ShouldBe("active");
+        left.Operator.ShouldBe(FilterOperator.Equals);
+        left.Value.ShouldBeOfType<BooleanValue>();
+        ((BooleanValue)left.Value).Value.ShouldBe(true);
+        
+        // Verify Right side
+        and.Right.ShouldBeOfType<ComparisonFilter>();
+        var right = (ComparisonFilter)and.Right;
+        right.AttributeName.ShouldBe("title");
+        right.Operator.ShouldBe(FilterOperator.Equals);
+        right.Value.ShouldBeOfType<StringValue>();
+        ((StringValue)right.Value).Value.ShouldBe("Admin");
     }
 
     [Fact]
@@ -434,6 +372,23 @@ public class FilterParserTests
         var result = F.Equals("active", true)
             .And(F.Equals("title", "Admin"));
         result.ShouldBeOfType<AndFilter>();
+        var and = (AndFilter)result;
+        
+        // Verify Left side
+        and.Left.ShouldBeOfType<ComparisonFilter>();
+        var left = (ComparisonFilter)and.Left;
+        left.AttributeName.ShouldBe("active");
+        left.Operator.ShouldBe(FilterOperator.Equals);
+        left.Value.ShouldBeOfType<BooleanValue>();
+        ((BooleanValue)left.Value).Value.ShouldBe(true);
+        
+        // Verify Right side
+        and.Right.ShouldBeOfType<ComparisonFilter>();
+        var right = (ComparisonFilter)and.Right;
+        right.AttributeName.ShouldBe("title");
+        right.Operator.ShouldBe(FilterOperator.Equals);
+        right.Value.ShouldBeOfType<StringValue>();
+        ((StringValue)right.Value).Value.ShouldBe("Admin");
     }
 
     [Fact]
@@ -442,6 +397,23 @@ public class FilterParserTests
         var result = F.Equals("title", "Admin")
             .Or(F.Equals("title", "Manager"));
         result.ShouldBeOfType<OrFilter>();
+        var or = (OrFilter)result;
+        
+        // Verify Left side
+        or.Left.ShouldBeOfType<ComparisonFilter>();
+        var left = (ComparisonFilter)or.Left;
+        left.AttributeName.ShouldBe("title");
+        left.Operator.ShouldBe(FilterOperator.Equals);
+        left.Value.ShouldBeOfType<StringValue>();
+        ((StringValue)left.Value).Value.ShouldBe("Admin");
+        
+        // Verify Right side
+        or.Right.ShouldBeOfType<ComparisonFilter>();
+        var right = (ComparisonFilter)or.Right;
+        right.AttributeName.ShouldBe("title");
+        right.Operator.ShouldBe(FilterOperator.Equals);
+        right.Value.ShouldBeOfType<StringValue>();
+        ((StringValue)right.Value).Value.ShouldBe("Manager");
     }
 
     [Fact]
@@ -449,6 +421,15 @@ public class FilterParserTests
     {
         var result = F.Equals("active", false).Negate();
         result.ShouldBeOfType<NotFilter>();
+        var not = (NotFilter)result;
+        
+        // Verify Expression
+        not.Expression.ShouldBeOfType<ComparisonFilter>();
+        var expr = (ComparisonFilter)not.Expression;
+        expr.AttributeName.ShouldBe("active");
+        expr.Operator.ShouldBe(FilterOperator.Equals);
+        expr.Value.ShouldBeOfType<BooleanValue>();
+        ((BooleanValue)expr.Value).Value.ShouldBe(false);
     }
 
     [Fact]
@@ -536,18 +517,28 @@ public class FilterParserTests
     [Fact]
     public void Parse_DateTime_Filter()
     {
-        var result = _parser.Parse("meta.created gt \"2024-01-15T10:00:00Z\"");
-        result.ShouldBeOfType<ComparisonFilter>();
-        var comp = (ComparisonFilter)result;
-        comp.Value.ShouldBeOfType<DateTimeValue>();
+        // Arrange
+        var expected = F.GreaterThan("meta.created", DateTime.Parse("2024-01-15T10:00:00Z"));
+        
+        // Act
+        var actual = _parser.Parse("meta.created gt \"2024-01-15T10:00:00Z\"");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void FilterBuilder_GreaterThan_DateTime()
     {
+        // Arrange
         var dt = new DateTime(2024, 1, 15, 10, 0, 0);
-        var filter = F.GreaterThan("meta.created", dt);
-        filter.ShouldBeOfType<ComparisonFilter>();
+        var expected = F.GreaterThan("meta.created", dt);
+        
+        // Act
+        var actual = _parser.Parse($"meta.created gt \"{dt:O}\"");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     // ==================== REAL-WORLD EXAMPLES ====================
@@ -555,29 +546,82 @@ public class FilterParserTests
     [Fact]
     public void RealWorld_AzureAD_UserProvisioning()
     {
-        var filter = "active eq true and emails.value ew \"@company.com\" and not (userName sw \"admin\")";
-        var ast = _parser.Parse(filter);
-        ast.ShouldNotBeNull();
-        ast.ShouldBeOfType<AndFilter>();
+        // Arrange
+        var expected = F.Equals("active", true)
+            .And(F.EndsWith("emails.value", "@company.com"))
+            .And(F.StartsWith("userName", "admin").Negate());
+        
+        // Act
+        var actual = _parser.Parse("active eq true and emails.value ew \"@company.com\" and not (userName sw \"admin\")");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void RealWorld_GroupManagement()
     {
-        var filter = "(displayName sw \"Team\" or displayName sw \"Department\") and (displayName co \"Engineering\" or displayName co \"Architecture\")";
-        var ast = _parser.Parse(filter);
-        ast.ShouldNotBeNull();
-        ast.ShouldBeOfType<AndFilter>();
+        // Arrange
+        var expected = F.StartsWith("displayName", "Team")
+            .Or(F.StartsWith("displayName", "Department"))
+            .And(F.Contains("displayName", "Engineering").Or(F.Contains("displayName", "Architecture")));
+        
+        // Act
+        var actual = _parser.Parse("(displayName sw \"Team\" or displayName sw \"Department\") and (displayName co \"Engineering\" or displayName co \"Architecture\")");
+        
+        // Assert
+        FilterAssert.AreEqual(expected, actual);
     }
 
     [Fact]
     public void RealWorld_Complex_UserFilter()
     {
-        var ast = F.Equals("active", true)
+        // Arrange - Building the filter using the fluent API
+        var expected = F.Equals("active", true)
             .And(F.EndsWith("emails.value", "@company.com"))
             .And(F.GreaterOrEqual("meta.created", DateTime.Parse("2024-01-01T00:00:00Z")))
             .And(F.Present("phoneNumbers"));
         
-        ast.ShouldNotBeNull();
+        // Act - No parsing needed, just verifying the structure
+        var actual = expected;
+        
+        // Assert - Verify the structure
+        actual.ShouldNotBeNull();
+        actual.ShouldBeOfType<AndFilter>();
+        
+        // Verify nested AND structure
+        var topAnd = (AndFilter)actual;
+        topAnd.Left.ShouldBeOfType<AndFilter>();
+        var midAnd = (AndFilter)topAnd.Left;
+        midAnd.Left.ShouldBeOfType<AndFilter>();
+        var bottomAnd = (AndFilter)midAnd.Left;
+        
+        // Verify first condition: active eq true
+        bottomAnd.Left.ShouldBeOfType<ComparisonFilter>();
+        var active = (ComparisonFilter)bottomAnd.Left;
+        active.AttributeName.ShouldBe("active");
+        active.Operator.ShouldBe(FilterOperator.Equals);
+        active.Value.ShouldBeOfType<BooleanValue>();
+        ((BooleanValue)active.Value).Value.ShouldBe(true);
+        
+        // Verify second condition: emails.value ew "@company.com"
+        bottomAnd.Right.ShouldBeOfType<ComparisonFilter>();
+        var email = (ComparisonFilter)bottomAnd.Right;
+        email.AttributeName.ShouldBe("emails.value");
+        email.Operator.ShouldBe(FilterOperator.EndsWith);
+        email.Value.ShouldBeOfType<StringValue>();
+        ((StringValue)email.Value).Value.ShouldBe("@company.com");
+        
+        // Verify third condition: meta.created ge "2024-01-01T00:00:00Z"
+        midAnd.Right.ShouldBeOfType<ComparisonFilter>();
+        var metaCreated = (ComparisonFilter)midAnd.Right;
+        metaCreated.AttributeName.ShouldBe("meta.created");
+        metaCreated.Operator.ShouldBe(FilterOperator.GreaterOrEqual);
+        metaCreated.Value.ShouldBeOfType<DateTimeValue>();
+        
+        // Verify fourth condition: phoneNumbers pr
+        topAnd.Right.ShouldBeOfType<PresenceFilter>();
+        var presence = (PresenceFilter)topAnd.Right;
+        presence.AttributeName.ShouldBe("phoneNumbers");
     }
 }
