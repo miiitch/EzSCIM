@@ -10,8 +10,6 @@ namespace ScimAPI.Repositories
     {
         private readonly ConcurrentDictionary<string, ScimUser> _users = new();
         private readonly ConcurrentDictionary<string, ScimGroup> _groups = new();
-        private readonly List<ScimSchema> _customSchemas = new();
-        private readonly object _schemaLock = new();
 
         public Task<ScimUser?> GetUserAsync(string id)
         {
@@ -179,25 +177,6 @@ namespace ScimAPI.Repositories
             return Task.FromResult(_groups.TryRemove(id, out _));
         }
 
-        public Task<List<ScimSchema>> GetCustomSchemasAsync()
-        {
-            lock (_schemaLock)
-            {
-                return Task.FromResult(new List<ScimSchema>(_customSchemas));
-            }
-        }
-
-        public Task AddCustomSchemaAsync(ScimSchema schema)
-        {
-            lock (_schemaLock)
-            {
-                var existing = _customSchemas.FirstOrDefault(s => s.Id == schema.Id);
-                if (existing != null)
-                    _customSchemas.Remove(existing);
-                _customSchemas.Add(schema);
-            }
-            return Task.CompletedTask;
-        }
 
         // Obsolete string-based filter methods removed - now using FilterExpression AST pattern
         // See ApplyUserFilter(IEnumerable<ScimUser>, FilterExpression) at line ~792

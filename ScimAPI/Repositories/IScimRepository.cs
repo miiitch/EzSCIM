@@ -7,37 +7,38 @@ namespace ScimAPI.Repositories
     /// Repository interface for SCIM User resource management.
     /// Handles all User CRUD operations and queries.
     /// </summary>
-    public interface IScimUserRepository
+    /// <typeparam name="TUser">The user type, must inherit from ScimUser</typeparam>
+    public interface IScimUserRepository<TUser> where TUser : ScimUser
     {
         /// <summary>
         /// Gets a user by unique identifier.
         /// </summary>
-        Task<ScimUser?> GetUserAsync(string id);
+        Task<TUser?> GetUserAsync(string id);
         
         /// <summary>
         /// Gets a user by username.
         /// </summary>
-        Task<ScimUser?> GetUserByUserNameAsync(string userName);
+        Task<TUser?> GetUserByUserNameAsync(string userName);
         
         /// <summary>
         /// Gets a paginated list of users with optional filtering using FilterExpression AST.
         /// </summary>
-        Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100);
+        Task<ScimListResponse<TUser>> GetUsersAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100);
         
         /// <summary>
         /// Creates a new user.
         /// </summary>
-        Task<ScimUser> CreateUserAsync(ScimUser user);
+        Task<TUser> CreateUserAsync(TUser user);
         
         /// <summary>
         /// Updates an existing user (full replacement - PUT operation).
         /// </summary>
-        Task<ScimUser?> UpdateUserAsync(string id, ScimUser user);
+        Task<TUser?> UpdateUserAsync(string id, TUser user);
         
         /// <summary>
         /// Partially updates a user (PATCH operation).
         /// </summary>
-        Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest);
+        Task<TUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest);
         
         /// <summary>
         /// Deletes a user.
@@ -49,37 +50,38 @@ namespace ScimAPI.Repositories
     /// Repository interface for SCIM Group resource management.
     /// Handles all Group CRUD operations and queries.
     /// </summary>
-    public interface IScimGroupRepository
+    /// <typeparam name="TGroup">The group type, must inherit from ScimGroup</typeparam>
+    public interface IScimGroupRepository<TGroup> where TGroup : ScimGroup
     {
         /// <summary>
         /// Gets a group by unique identifier.
         /// </summary>
-        Task<ScimGroup?> GetGroupAsync(string id);
+        Task<TGroup?> GetGroupAsync(string id);
         
         /// <summary>
         /// Gets a group by display name.
         /// </summary>
-        Task<ScimGroup?> GetGroupByDisplayNameAsync(string displayName);
+        Task<TGroup?> GetGroupByDisplayNameAsync(string displayName);
         
         /// <summary>
         /// Gets a paginated list of groups with optional filtering using FilterExpression AST.
         /// </summary>
-        Task<ScimListResponse<ScimGroup>> GetGroupsAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100);
+        Task<ScimListResponse<TGroup>> GetGroupsAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100);
         
         /// <summary>
         /// Creates a new group.
         /// </summary>
-        Task<ScimGroup> CreateGroupAsync(ScimGroup group);
+        Task<TGroup> CreateGroupAsync(TGroup group);
         
         /// <summary>
         /// Updates an existing group (full replacement - PUT operation).
         /// </summary>
-        Task<ScimGroup?> UpdateGroupAsync(string id, ScimGroup group);
+        Task<TGroup?> UpdateGroupAsync(string id, TGroup group);
         
         /// <summary>
         /// Partially updates a group (PATCH operation).
         /// </summary>
-        Task<ScimGroup?> PatchGroupAsync(string id, ScimPatchRequest patchRequest);
+        Task<TGroup?> PatchGroupAsync(string id, ScimPatchRequest patchRequest);
         
         /// <summary>
         /// Deletes a group.
@@ -88,28 +90,12 @@ namespace ScimAPI.Repositories
     }
 
     /// <summary>
-    /// Repository interface for SCIM Schema management.
-    /// Handles custom schema storage and retrieval.
-    /// </summary>
-    public interface IScimSchemaRepository
-    {
-        /// <summary>
-        /// Gets all custom SCIM schemas.
-        /// </summary>
-        Task<List<ScimSchema>> GetCustomSchemasAsync();
-        
-        /// <summary>
-        /// Adds or updates a custom SCIM schema.
-        /// </summary>
-        Task AddCustomSchemaAsync(ScimSchema schema);
-    }
-
-    /// <summary>
-    /// Main SCIM repository interface that combines User, Group, and Schema management.
+    /// Main SCIM repository interface that combines User and Group management.
     /// This interface indicates that the provider supports both User and Group resources.
     /// Inherit from this interface if your implementation supports both Users and Groups.
+    /// Uses concrete types (ScimUser, ScimGroup) to maintain DI compatibility.
     /// </summary>
-    public interface IScimRepository : IScimUserRepository, IScimGroupRepository, IScimSchemaRepository
+    public interface IScimRepository : IScimUserRepository<ScimUser>, IScimGroupRepository<ScimGroup>
     {
     }
 }

@@ -9,7 +9,7 @@ namespace ScimAPI.Repositories
     /// This shows how to implement only IScimUserRepository when your provider
     /// only supports User resources (no Groups or Schemas).
     /// </summary>
-    public class UsersOnlyRepository : IScimUserRepository
+    public class UsersOnlyRepository : IScimUserRepository<ScimUser>
     {
         private readonly ILogger<UsersOnlyRepository> _logger;
         private readonly Dictionary<string, ScimUser> _users = new();

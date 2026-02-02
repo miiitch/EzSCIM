@@ -40,8 +40,6 @@ builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
 // Register JWT token service
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
-// Register schema initialization service
-builder.Services.AddHostedService<ScimSchemaInitializer>();
 
 // Configure JWT authentication
 builder.Services.AddAuthentication()
@@ -62,6 +60,45 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Load test data if configured
+if (app.Configuration.GetValue("Scim:LoadTestData", false))
+{
+    var repository = app.Services.GetRequiredService<IScimRepository>();
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    
+    logger.LogInformation("Chargement des données de test...");
+    
+    var testUser = new ScimAPI.Models.ScimUser
+    {
+        UserName = "test.user@example.com",
+        ExternalId = "test-001",
+        Name = new ScimAPI.Models.ScimName
+        {
+            GivenName = "Test",
+            FamilyName = "User",
+            Formatted = "Test User"
+        },
+        DisplayName = "Test User",
+        Active = true,
+        Emails = new List<ScimAPI.Models.ScimEmail>
+        {
+            new() { Value = "test.user@example.com", Type = "work", Primary = true }
+        }
+    };
+    
+    await repository.CreateUserAsync(testUser);
+    logger.LogInformation("Utilisateur de test créé");
+    
+    var testGroup = new ScimAPI.Models.ScimGroup
+    {
+        DisplayName = "Test Group",
+        ExternalId = "test-group-001"
+    };
+    
+    await repository.CreateGroupAsync(testGroup);
+    logger.LogInformation("Groupe de test créé");
+}
 
 app.MapDefaultEndpoints();
 

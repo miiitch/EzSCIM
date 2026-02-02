@@ -688,43 +688,6 @@ public class InMemoryScimRepositoryTests
 
     #endregion
 
-    #region Schema Tests
-
-    [Fact]
-    public async Task AddCustomSchema_ShouldStoreSchema()
-    {
-        // Arrange
-        var schema = new ScimSchema
-        {
-            Id = "urn:ietf:params:scim:schemas:extension:custom:2.0:User",
-            Name = "CustomUser",
-            Description = "Custom User Extension",
-            Attributes = new List<ScimSchemaAttribute>
-            {
-                new ScimSchemaAttribute { Name = "customField", Type = "string" }
-            }
-        };
-
-        // Act
-        await _repository.AddCustomSchemaAsync(schema);
-        var schemas = await _repository.GetCustomSchemasAsync();
-
-        // Assert
-        schemas.Count.ShouldBe(1);
-        schemas.First().Id.ShouldBe(schema.Id);
-    }
-
-    [Fact]
-    public async Task GetCustomSchemas_WhenEmpty_ShouldReturnEmptyList()
-    {
-        // Act
-        var schemas = await _repository.GetCustomSchemasAsync();
-
-        // Assert
-        schemas.ShouldBeEmpty();
-    }
-
-    #endregion
 
     #region Edge Cases Tests
 
