@@ -2,11 +2,14 @@
 
 namespace ScimAPI.Models
 {
+    /// <summary>
+    /// Base class with REQUIRED attributes for SCIM User (RFC 7643)
+    /// </summary>
     [ScimResource(
         "urn:ietf:params:scim:schemas:core:2.0:User",
         "User",
         "User Account")]
-    public class ScimUser
+    public class ScimUserBase
     {
         // ==================== REQUIRED ATTRIBUTES (RFC 7643) ====================
         
@@ -30,7 +33,13 @@ namespace ScimAPI.Models
         /// Resource metadata (REQUIRED)
         /// </summary>
         public ScimMeta Meta { get; set; } = new();
+    }
 
+    /// <summary>
+    /// Complete SCIM User with optional attributes
+    /// </summary>
+    public class ScimUser : ScimUserBase
+    {
         // ==================== OPTIONAL ATTRIBUTES ====================
         
         /// <summary>

@@ -2,11 +2,14 @@
 
 namespace ScimAPI.Models
 {
+    /// <summary>
+    /// Base class with REQUIRED attributes for SCIM Group (RFC 7643)
+    /// </summary>
     [ScimResource(
         "urn:ietf:params:scim:schemas:core:2.0:Group",
         "Group",
         "Group")]
-    public class ScimGroup
+    public class ScimGroupBase
     {
         // ==================== REQUIRED ATTRIBUTES (RFC 7643) ====================
         
@@ -30,7 +33,13 @@ namespace ScimAPI.Models
         /// Resource metadata (REQUIRED)
         /// </summary>
         public ScimMeta Meta { get; set; } = new();
+    }
 
+    /// <summary>
+    /// Complete SCIM Group with optional attributes
+    /// </summary>
+    public class ScimGroup : ScimGroupBase
+    {
         // ==================== OPTIONAL ATTRIBUTES ====================
         
         /// <summary>
