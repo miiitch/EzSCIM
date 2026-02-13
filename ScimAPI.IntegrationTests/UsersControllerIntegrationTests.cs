@@ -306,7 +306,7 @@ public class UsersControllerIntegrationTests : IClassFixture<ScimWebApplicationF
 
     #region PatchUser Tests
 
-    [Fact(Skip = "PATCH operations not implemented for EF Core repositories")]
+    [Fact]
     public async Task PatchUser_WhenValid_ShouldReturnUpdatedUser()
     {
         // Arrange
@@ -333,7 +333,7 @@ public class UsersControllerIntegrationTests : IClassFixture<ScimWebApplicationF
         patchedUser.Active.ShouldBeFalse();
     }
 
-    [Fact(Skip = "PATCH operations not implemented for EF Core repositories")]
+    [Fact]
     public async Task PatchUser_WhenNotExists_ShouldReturn404()
     {
         // Arrange
@@ -354,6 +354,164 @@ public class UsersControllerIntegrationTests : IClassFixture<ScimWebApplicationF
         var error = await response.Content.ReadFromJsonAsync<ScimError>();
         error.ShouldNotBeNull();
         error.Status.ShouldBe(404);
+    }
+
+    [Fact]
+    public async Task PatchUser_CustomStringField_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var userId = "user-001";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation 
+                { 
+                    Op = "replace", 
+                    Path = "urn:scim:custom:User:customField1", 
+                    Value = "CustomValue123" 
+                }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Users/{userId} with custom field");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Users/{userId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedUser = await response.Content.ReadFromJsonAsync<ScimUser>();
+        patchedUser.ShouldNotBeNull();
+        patchedUser.Id.ShouldBe(userId);
+    }
+
+    [Fact]
+    public async Task PatchUser_CustomBooleanField_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var userId = "user-002";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation 
+                { 
+                    Op = "replace", 
+                    Path = "urn:scim:custom:User:isVip", 
+                    Value = true 
+                }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Users/{userId} with custom boolean field");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Users/{userId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedUser = await response.Content.ReadFromJsonAsync<ScimUser>();
+        patchedUser.ShouldNotBeNull();
+        patchedUser.Id.ShouldBe(userId);
+    }
+
+    [Fact]
+    public async Task PatchUser_EnterpriseExtensionField_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var userId = "user-001";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation 
+                { 
+                    Op = "replace", 
+                    Path = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department", 
+                    Value = "Engineering" 
+                },
+                new ScimPatchOperation 
+                { 
+                    Op = "add", 
+                    Path = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber", 
+                    Value = "EMP-12345" 
+                }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Users/{userId} with enterprise extension fields");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Users/{userId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedUser = await response.Content.ReadFromJsonAsync<ScimUser>();
+        patchedUser.ShouldNotBeNull();
+        patchedUser.Id.ShouldBe(userId);
+    }
+
+    [Fact]
+    public async Task PatchUser_MultipleFieldsAtOnce_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var userId = "user-001";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation { Op = "replace", Path = "nickName", Value = "Johnny" },
+                new ScimPatchOperation { Op = "replace", Path = "preferredLanguage", Value = "en-US" },
+                new ScimPatchOperation { Op = "replace", Path = "timezone", Value = "America/New_York" },
+                new ScimPatchOperation { Op = "replace", Path = "urn:scim:custom:User:customField1", Value = "Test Value" }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Users/{userId} with multiple fields");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Users/{userId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedUser = await response.Content.ReadFromJsonAsync<ScimUser>();
+        patchedUser.ShouldNotBeNull();
+        patchedUser.Id.ShouldBe(userId);
+    }
+
+    [Fact]
+    public async Task PatchUser_RemoveCustomField_ShouldClearValue()
+    {
+        // Arrange
+        var userId = "user-001";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation 
+                { 
+                    Op = "remove", 
+                    Path = "urn:scim:custom:User:customField1"
+                }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Users/{userId} remove custom field");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Users/{userId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedUser = await response.Content.ReadFromJsonAsync<ScimUser>();
+        patchedUser.ShouldNotBeNull();
+        patchedUser.Id.ShouldBe(userId);
     }
 
     #endregion

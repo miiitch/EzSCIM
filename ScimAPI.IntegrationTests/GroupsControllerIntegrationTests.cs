@@ -277,7 +277,7 @@ public class GroupsControllerIntegrationTests : IClassFixture<ScimWebApplication
 
     #region PatchGroup Tests
 
-    [Fact(Skip = "PATCH operations not implemented for EF Core repositories")]
+    [Fact]
     public async Task PatchGroup_AddMember_ShouldReturnUpdatedGroup()
     {
         // Arrange
@@ -312,7 +312,7 @@ public class GroupsControllerIntegrationTests : IClassFixture<ScimWebApplication
         patchedGroup.Members.ShouldNotBeNull();
     }
 
-    [Fact(Skip = "PATCH operations not implemented for EF Core repositories")]
+    [Fact]
     public async Task PatchGroup_WhenNotExists_ShouldReturn404()
     {
         // Arrange
@@ -333,6 +333,127 @@ public class GroupsControllerIntegrationTests : IClassFixture<ScimWebApplication
         var error = await response.Content.ReadFromJsonAsync<ScimError>();
         error.ShouldNotBeNull();
         error.Status.ShouldBe(404);
+    }
+
+    [Fact]
+    public async Task PatchGroup_CustomStringField_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var groupId = "group-001";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation 
+                { 
+                    Op = "replace", 
+                    Path = "urn:scim:custom:Group:customField1", 
+                    Value = "CustomGroupValue" 
+                }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Groups/{groupId} with custom field");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Groups/{groupId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedGroup = await response.Content.ReadFromJsonAsync<ScimGroup>();
+        patchedGroup.ShouldNotBeNull();
+        patchedGroup.Id.ShouldBe(groupId);
+    }
+
+    [Fact]
+    public async Task PatchGroup_CustomBooleanField_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var groupId = "group-001";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation 
+                { 
+                    Op = "replace", 
+                    Path = "urn:scim:custom:Group:isAdminGroup", 
+                    Value = true 
+                }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Groups/{groupId} with custom boolean field");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Groups/{groupId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedGroup = await response.Content.ReadFromJsonAsync<ScimGroup>();
+        patchedGroup.ShouldNotBeNull();
+        patchedGroup.Id.ShouldBe(groupId);
+    }
+
+    [Fact]
+    public async Task PatchGroup_DescriptionField_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var groupId = "group-002";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation 
+                { 
+                    Op = "add", 
+                    Path = "description", 
+                    Value = "This is the developers group" 
+                }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Groups/{groupId} with description");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Groups/{groupId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedGroup = await response.Content.ReadFromJsonAsync<ScimGroup>();
+        patchedGroup.ShouldNotBeNull();
+        patchedGroup.Id.ShouldBe(groupId);
+    }
+
+    [Fact]
+    public async Task PatchGroup_MultipleFieldsAtOnce_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        var groupId = "group-002";
+        var patchRequest = new ScimPatchRequest
+        {
+            Operations = new List<ScimPatchOperation>
+            {
+                new ScimPatchOperation { Op = "replace", Path = "description", Value = "Updated description" },
+                new ScimPatchOperation { Op = "add", Path = "urn:scim:custom:Group:customField1", Value = "Value1" },
+                new ScimPatchOperation { Op = "add", Path = "urn:scim:custom:Group:customField2", Value = "Value2" }
+            }
+        };
+        _output.WriteLine($"[REQUEST] PATCH /scim/Groups/{groupId} with multiple fields");
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/scim/Groups/{groupId}", patchRequest);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine($"[RESPONSE] {response.StatusCode} - {responseBody}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var patchedGroup = await response.Content.ReadFromJsonAsync<ScimGroup>();
+        patchedGroup.ShouldNotBeNull();
+        patchedGroup.Id.ShouldBe(groupId);
     }
 
     #endregion
