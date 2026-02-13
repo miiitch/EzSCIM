@@ -1,7 +1,7 @@
 ﻿using ScimAPI.Filtering.AST;
 using Shouldly;
 
-namespace ScimAPI.Tests.Filtering;
+namespace ScimAPI.UnitTests.Filtering;
 
 /// <summary>
 /// Helper class for comparing filter expressions in tests

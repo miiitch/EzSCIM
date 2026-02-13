@@ -7,7 +7,7 @@ using ScimAPI.Models;
 using ScimAPI.Repositories;
 using Shouldly;
 
-namespace ScimAPI.Tests;
+namespace ScimAPI.UnitTests;
 
 public class UsersControllerTests
 {

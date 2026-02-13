@@ -4,7 +4,7 @@ using ScimAPI.Filtering;
 using ScimAPI.Filtering.AST;
 using ScimAPI.Filtering.Visitors;
 
-namespace ScimAPI.Tests.Filtering;
+namespace ScimAPI.UnitTests.Filtering;
 
 public class FilterParserTests
 {

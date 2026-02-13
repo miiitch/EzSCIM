@@ -5,7 +5,7 @@ using ScimAPI.Models;
 using Shouldly;
 using Xunit;
 
-namespace ScimAPI.Tests.Filtering
+namespace ScimAPI.UnitTests.Filtering
 {
     /// <summary>
     /// Tests for ScimGroupFilterTranslator - AST to LINQ Expression conversion.

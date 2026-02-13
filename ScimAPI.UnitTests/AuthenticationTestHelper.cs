@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ScimAPI.Tests
+namespace ScimAPI.UnitTests
 {
     /// <summary>
     /// Classe utilitaire pour configurer l'authentification dans les tests

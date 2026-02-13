@@ -4,6 +4,7 @@ using ScimAPI.Models;
 using System.Reflection;
 using ScimAPI.Attributes;
 using ScimAPI.Constants;
+using ScimAPI.DataRepositories;
 
 namespace ScimAPI.Repositories
 {

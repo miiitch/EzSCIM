@@ -6,7 +6,7 @@ using ScimAPI.Repositories;
 using Shouldly;
 using Xunit;
 
-namespace ScimAPI.Tests.Integration
+namespace ScimAPI.UnitTests.Integration
 {
     /// <summary>
     /// End-to-end integration test: CustomUser repository → SCIM adapter → filtering.

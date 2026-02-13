@@ -2,7 +2,7 @@
 using Xunit;
 using ScimAPI.Filtering;
 
-namespace ScimAPI.Tests.Filtering;
+namespace ScimAPI.UnitTests.Filtering;
 
 /// <summary>
 /// Comprehensive tests for FilterParser error handling using ErrorOr

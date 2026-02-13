@@ -64,8 +64,9 @@ var app = builder.Build();
 // Load test data if configured
 if (app.Configuration.GetValue("Scim:LoadTestData", false))
 {
-    var repository = app.Services.GetRequiredService<IScimRepository>();
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    using var scope = app.Services.CreateScope();
+    var repository = scope.ServiceProvider.GetRequiredService<IScimRepository>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     
     logger.LogInformation("Chargement des données de test...");
     

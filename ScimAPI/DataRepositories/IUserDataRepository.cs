@@ -1,6 +1,4 @@
-﻿using ScimAPI.Attributes;
-
-namespace ScimAPI.Repositories
+﻿namespace ScimAPI.DataRepositories
 {
     /// <summary>
     /// Generic repository interface for user data sources.

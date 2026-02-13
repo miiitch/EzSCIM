@@ -4,6 +4,7 @@ using ScimAPI.Filtering.AST;
 using ScimAPI.Models;
 using System.Reflection;
 using ScimAPI.Attributes;
+using ScimAPI.DataRepositories;
 
 namespace ScimAPI.Repositories
 {

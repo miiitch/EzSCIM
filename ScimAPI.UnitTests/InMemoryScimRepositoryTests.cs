@@ -5,7 +5,7 @@ using ScimAPI.Models;
 using ScimAPI.Repositories;
 using Xunit;
 
-namespace ScimAPI.Tests;
+namespace ScimAPI.UnitTests;
 
 public class InMemoryScimRepositoryTests
 {

@@ -4,7 +4,7 @@ using ScimAPI.Models;
 using Shouldly;
 using Xunit;
 
-namespace ScimAPI.Tests;
+namespace ScimAPI.UnitTests;
 
 /// <summary>
 /// Tests for the ScimSchemaGenerator with different configurations of User and Group models.

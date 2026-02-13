@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+﻿﻿using System.Linq.Expressions;
 using System.Reflection;
 using ScimAPI.Attributes;
 using ScimAPI.Filtering.AST;
@@ -241,15 +241,13 @@ namespace ScimAPI.Filtering
         {
             if (rawValue is string)
             {
-                // Case-insensitive string comparison
-                var equalsMethod = typeof(string).GetMethod(nameof(string.Equals), 
-                    new[] { typeof(string), typeof(string), typeof(StringComparison) })!;
+                // Case-insensitive string comparison using ToLower() for EF Core compatibility
+                var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
                 
-                return Expression.Call(
-                    equalsMethod,
-                    property,
-                    value,
-                    Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                var propertyToLower = Expression.Call(property, toLowerMethod);
+                var valueToLower = Expression.Call(value, toLowerMethod);
+                
+                return Expression.Equal(propertyToLower, valueToLower);
             }
 
             // Handle nullable type conversions
@@ -284,13 +282,14 @@ namespace ScimAPI.Filtering
                 throw new InvalidOperationException($"Contains operator only supported on string properties");
             }
 
-            var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string), typeof(StringComparison) })!;
+            // Use ToLower() for case-insensitive comparison compatible with EF Core
+            var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+            var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
             
-            return Expression.Call(
-                property,
-                containsMethod,
-                value,
-                Expression.Constant(StringComparison.OrdinalIgnoreCase));
+            var propertyToLower = Expression.Call(property, toLowerMethod);
+            var valueToLower = Expression.Call(value, toLowerMethod);
+            
+            return Expression.Call(propertyToLower, containsMethod, valueToLower);
         }
 
         /// <summary>
@@ -303,13 +302,14 @@ namespace ScimAPI.Filtering
                 throw new InvalidOperationException($"StartsWith operator only supported on string properties");
             }
 
-            var startsWithMethod = typeof(string).GetMethod(nameof(string.StartsWith), new[] { typeof(string), typeof(StringComparison) })!;
+            // Use ToLower() for case-insensitive comparison compatible with EF Core
+            var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+            var startsWithMethod = typeof(string).GetMethod(nameof(string.StartsWith), new[] { typeof(string) })!;
             
-            return Expression.Call(
-                property,
-                startsWithMethod,
-                value,
-                Expression.Constant(StringComparison.OrdinalIgnoreCase));
+            var propertyToLower = Expression.Call(property, toLowerMethod);
+            var valueToLower = Expression.Call(value, toLowerMethod);
+            
+            return Expression.Call(propertyToLower, startsWithMethod, valueToLower);
         }
 
         /// <summary>
@@ -322,13 +322,14 @@ namespace ScimAPI.Filtering
                 throw new InvalidOperationException($"EndsWith operator only supported on string properties");
             }
 
-            var endsWithMethod = typeof(string).GetMethod(nameof(string.EndsWith), new[] { typeof(string), typeof(StringComparison) })!;
+            // Use ToLower() for case-insensitive comparison compatible with EF Core
+            var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+            var endsWithMethod = typeof(string).GetMethod(nameof(string.EndsWith), new[] { typeof(string) })!;
             
-            return Expression.Call(
-                property,
-                endsWithMethod,
-                value,
-                Expression.Constant(StringComparison.OrdinalIgnoreCase));
+            var propertyToLower = Expression.Call(property, toLowerMethod);
+            var valueToLower = Expression.Call(value, toLowerMethod);
+            
+            return Expression.Call(propertyToLower, endsWithMethod, valueToLower);
         }
 
         /// <summary>

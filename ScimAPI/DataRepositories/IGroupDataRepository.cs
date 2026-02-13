@@ -1,4 +1,4 @@
-﻿namespace ScimAPI.Repositories
+﻿namespace ScimAPI.DataRepositories
 {
     /// <summary>
     /// Generic repository interface for group data sources.

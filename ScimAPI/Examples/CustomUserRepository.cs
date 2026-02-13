@@ -1,4 +1,5 @@
-﻿using ScimAPI.Repositories;
+﻿using ScimAPI.DataRepositories;
+using ScimAPI.Repositories;
 
 namespace ScimAPI.Examples
 {

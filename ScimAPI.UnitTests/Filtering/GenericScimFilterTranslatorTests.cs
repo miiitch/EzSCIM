@@ -5,7 +5,7 @@ using ScimAPI.Filtering.AST;
 using Shouldly;
 using Xunit;
 
-namespace ScimAPI.Tests.Filtering
+namespace ScimAPI.UnitTests.Filtering
 {
     /// <summary>
     /// Tests for GenericScimFilterTranslator with custom user types.

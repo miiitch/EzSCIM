@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env pwsh
+﻿﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     SCIM API Test Runner - Comprehensive test automation script
@@ -202,20 +202,39 @@ if ($TestFilters -or $FullValidation) {
     }
 }
 
-# ============ STEP 8: FULL TEST SUITE ============
+# ============ STEP 8: INTEGRATION TESTS ============
 if ($FullValidation) {
-    Write-Section "STEP 8: Full Test Suite"
-    Write-Host "`nRunning ALL tests..." -ForegroundColor $colors.Info
+    Write-Section "STEP 8: Integration Tests (Testcontainers + PostgreSQL)"
+    Write-Host "`nNote: Container startup may take 5-10 seconds per collection" -ForegroundColor $colors.Warning
+    Write-Host "`nRunning Integration Tests..." -ForegroundColor $colors.Info
+    
+    $result = & dotnet test ScimAPI.IntegrationTests/ScimAPI.IntegrationTests.csproj `
+        --configuration Debug `
+        --logger "console;verbosity=minimal" 2>&1
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Result "Integration Tests Passed" $true
+    }
+    else {
+        Write-Result "Integration Tests Failed" $false
+        $allPassed = $false
+    }
+}
+
+# ============ STEP 9: FULL TEST SUITE ============
+if ($FullValidation) {
+    Write-Section "STEP 9: Full Test Suite Summary"
+    Write-Host "`nRunning ALL unit tests..." -ForegroundColor $colors.Info
     
     $result = & dotnet test ScimAPI.Tests/ScimAPI.Tests.csproj `
         --configuration Debug `
         --logger "console;verbosity=normal" 2>&1
     
     if ($LASTEXITCODE -eq 0) {
-        Write-Result "Full Test Suite Passed" $true
+        Write-Result "Full Unit Test Suite Passed" $true
     }
     else {
-        Write-Result "Full Test Suite Failed" $false
+        Write-Result "Full Unit Test Suite Failed" $false
         $allPassed = $false
     }
 }
