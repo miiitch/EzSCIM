@@ -1,87 +1,87 @@
-﻿# Tests des Classes de Base SCIM
+﻿# SCIM Base Classes Tests
 
-## Résumé
+## Summary
 
-J'ai ajouté **10 nouveaux tests** dans `ScimAPI.Tests\ScimSchemaGeneratorTests.cs` pour vérifier que les classes de base `ScimUserBase` et `ScimGroupBase` contiennent bien les champs minimums requis conformément à la RFC 7643.
+This document describes **10 new tests** added in `ScimAPI.Tests\ScimSchemaGeneratorTests.cs` to verify that the base classes `ScimUserBase` and `ScimGroupBase` contain the minimum required fields according to RFC 7643.
 
-## Tests Ajoutés
+## Added Tests
 
-### Tests pour ScimUserBase
+### Tests for ScimUserBase
 
 #### 1. `ScimUserBase_ShouldHaveRequiredAttributesOnly()`
-- **Objectif** : Vérifier que `ScimUserBase` ne contient que les attributs REQUIS
-- **Vérifie** :
-  - Le schéma a l'ID correct : `urn:ietf:params:scim:schemas:core:2.0:User`
-  - Le nom du schéma est "User"
-  - Un seul attribut est présent (userName)
-  - L'attribut userName est bien présent
+- **Goal**: Verify that `ScimUserBase` contains only the REQUIRED attributes
+- **Verifies**:
+  - The schema has the correct ID: `urn:ietf:params:scim:schemas:core:2.0:User`
+  - The schema name is "User"
+  - Only one attribute is present (`userName`)
+  - The `userName` attribute is present
 
 #### 2. `ScimUserBase_UserName_ShouldBeRequired()`
-- **Objectif** : Vérifier que l'attribut `userName` est correctement configuré
-- **Vérifie** :
-  - userName est marqué comme REQUIS (`Required = true`)
-  - Type est "string"
-  - Unicité est définie à "server"
+- **Goal**: Verify that the `userName` attribute is correctly configured
+- **Verifies**:
+  - `userName` is marked as REQUIRED (`Required = true`)
+  - Type is `"string"`
+  - Uniqueness is set to `"server"`
 
 #### 3. `ScimUserBase_ShouldHaveSystemProperties()`
-- **Objectif** : Vérifier que les propriétés système sont initialisées
-- **Vérifie** :
-  - `Id` est généré automatiquement
-  - `Schemas` contient le bon URI
-  - `Meta` est initialisé
+- **Goal**: Verify that system properties are initialized
+- **Verifies**:
+  - `Id` is generated automatically
+  - `Schemas` contains the correct URI
+  - `Meta` is initialized
 
-### Tests pour ScimGroupBase
+### Tests for ScimGroupBase
 
 #### 4. `ScimGroupBase_ShouldHaveRequiredAttributesOnly()`
-- **Objectif** : Vérifier que `ScimGroupBase` ne contient que les attributs REQUIS
-- **Vérifie** :
-  - Le schéma a l'ID correct : `urn:ietf:params:scim:schemas:core:2.0:Group`
-  - Le nom du schéma est "Group"
-  - Un seul attribut est présent (displayName)
-  - L'attribut displayName est bien présent
+- **Goal**: Verify that `ScimGroupBase` contains only the REQUIRED attributes
+- **Verifies**:
+  - The schema has the correct ID: `urn:ietf:params:scim:schemas:core:2.0:Group`
+  - The schema name is "Group"
+  - Only one attribute is present (`displayName`)
+  - The `displayName` attribute is present
 
 #### 5. `ScimGroupBase_DisplayName_ShouldBeRequired()`
-- **Objectif** : Vérifier que l'attribut `displayName` est correctement configuré
-- **Vérifie** :
-  - displayName est marqué comme REQUIS (`Required = true`)
-  - Type est "string"
+- **Goal**: Verify that the `displayName` attribute is correctly configured
+- **Verifies**:
+  - `displayName` is marked as REQUIRED (`Required = true`)
+  - Type is `"string"`
 
 #### 6. `ScimGroupBase_ShouldHaveSystemProperties()`
-- **Objectif** : Vérifier que les propriétés système sont initialisées
-- **Vérifie** :
-  - `Id` est généré automatiquement
-  - `Schemas` contient le bon URI
-  - `Meta` est initialisé
+- **Goal**: Verify that system properties are initialized
+- **Verifies**:
+  - `Id` is generated automatically
+  - `Schemas` contains the correct URI
+  - `Meta` is initialized
 
-### Tests de Comparaison Base vs Complète
+### Base vs Full Class Comparison Tests
 
 #### 7. `ScimUser_ShouldHaveMoreAttributesThanBase()`
-- **Objectif** : Vérifier que `ScimUser` contient plus d'attributs que `ScimUserBase`
-- **Vérifie** :
-  - ScimUser a plus d'attributs que ScimUserBase
-  - ScimUser a au moins 10 attributs (incluant les optionnels)
+- **Goal**: Verify that `ScimUser` contains more attributes than `ScimUserBase`
+- **Verifies**:
+  - `ScimUser` has more attributes than `ScimUserBase`
+  - `ScimUser` has at least 10 attributes (including optional ones)
 
 #### 8. `ScimGroup_ShouldHaveMoreAttributesThanBase()`
-- **Objectif** : Vérifier que `ScimGroup` contient plus d'attributs que `ScimGroupBase`
-- **Vérifie** :
-  - ScimGroup a plus d'attributs que ScimGroupBase
-  - ScimGroup contient les attributs optionnels : externalId, members
+- **Goal**: Verify that `ScimGroup` contains more attributes than `ScimGroupBase`
+- **Verifies**:
+  - `ScimGroup` has more attributes than `ScimGroupBase`
+  - `ScimGroup` contains optional attributes: `externalId`, `members`
 
 #### 9. `ScimUserBase_And_ScimUser_ShouldHaveSameSchemaId()`
-- **Objectif** : Vérifier que la base et la classe complète partagent le même schéma
-- **Vérifie** :
-  - Les deux ont le même ID de schéma
-  - Les deux ont le même nom de schéma
+- **Goal**: Verify that the base and full class share the same schema
+- **Verifies**:
+  - Both have the same schema ID
+  - Both have the same schema name
 
 #### 10. `ScimGroupBase_And_ScimGroup_ShouldHaveSameSchemaId()`
-- **Objectif** : Vérifier que la base et la classe complète partagent le même schéma
-- **Vérifie** :
-  - Les deux ont le même ID de schéma
-  - Les deux ont le même nom de schéma
+- **Goal**: Verify that the base and full class share the same schema
+- **Verifies**:
+  - Both have the same schema ID
+  - Both have the same schema name
 
-## Structure des Classes
+## Class Structure
 
-### ScimUserBase (Attributs REQUIS uniquement)
+### ScimUserBase (Required Attributes Only)
 ```csharp
 [ScimResource("urn:ietf:params:scim:schemas:core:2.0:User", "User", "User Account")]
 public class ScimUserBase
@@ -94,11 +94,11 @@ public class ScimUserBase
 }
 ```
 
-### ScimUser (Attributs REQUIS + OPTIONNELS)
+### ScimUser (Required + Optional Attributes)
 ```csharp
 public class ScimUser : ScimUserBase
 {
-    // +15 attributs optionnels
+    // +15 optional attributes
     public string? ExternalId { get; set; }
     public ScimName Name { get; set; }
     public string? DisplayName { get; set; }
@@ -106,7 +106,7 @@ public class ScimUser : ScimUserBase
 }
 ```
 
-### ScimGroupBase (Attributs REQUIS uniquement)
+### ScimGroupBase (Required Attributes Only)
 ```csharp
 [ScimResource("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", "Group")]
 public class ScimGroupBase
@@ -119,18 +119,18 @@ public class ScimGroupBase
 }
 ```
 
-### ScimGroup (Attributs REQUIS + OPTIONNELS)
+### ScimGroup (Required + Optional Attributes)
 ```csharp
 public class ScimGroup : ScimGroupBase
 {
-    // +2 attributs optionnels
+    // +2 optional attributes
     public string? ExternalId { get; set; }
     public List<ScimMember> Members { get; set; }
     public Dictionary<string, object> CustomAttributes { get; set; }
 }
 ```
 
-## Exécution des Tests
+## Running the Tests
 
 ### Via PowerShell Script
 ```powershell
@@ -139,50 +139,50 @@ public class ScimGroup : ScimGroupBase
 
 ### Via dotnet CLI
 ```powershell
-# Tous les tests des classes de base
+# All base class tests
 dotnet test --filter "FullyQualifiedName~Base"
 
-# Test spécifique
+# Specific test
 dotnet test --filter "FullyQualifiedName~ScimUserBase_ShouldHaveRequiredAttributesOnly"
 
-# Tous les tests de schéma
+# All schema tests
 dotnet test ScimAPI.Tests/ScimAPI.Tests.csproj --filter "FullyQualifiedName~ScimSchemaGeneratorTests"
 ```
 
 ### Via Visual Studio / Rider
-- Ouvrir `ScimSchemaGeneratorTests.cs`
-- Naviguer vers la section `#region Base Classes Schema Tests`
-- Exécuter les tests individuellement ou en groupe
+- Open `ScimSchemaGeneratorTests.cs`
+- Navigate to the `#region Base Classes Schema Tests` section
+- Run tests individually or as a group
 
-## Fichiers Modifiés
+## Modified Files
 
 1. **ScimAPI.Tests\ScimSchemaGeneratorTests.cs**
-   - Ajout de 10 nouveaux tests dans une nouvelle région `#region Base Classes Schema Tests`
-   - Ligne 507-657
+   - Added 10 new tests in a new `#region Base Classes Schema Tests`
+   - Lines 507–657
 
-2. **Run-BaseClassesTests.ps1** (nouveau fichier)
-   - Script PowerShell pour exécuter facilement tous les tests des classes de base
-   - Affiche un résumé coloré des résultats
+2. **Run-BaseClassesTests.ps1** (new file)
+   - PowerShell script to easily run all base class tests
+   - Displays a colorized summary of results
 
-## Conformité RFC 7643
+## RFC 7643 Compliance
 
-Ces tests garantissent que :
+These tests ensure that:
 
-✅ **ScimUserBase** contient uniquement l'attribut REQUIS `userName`
-✅ **ScimGroupBase** contient uniquement l'attribut REQUIS `displayName`
-✅ Les propriétés système (Id, Schemas, Meta) sont présentes dans les classes de base
-✅ Les classes complètes (ScimUser, ScimGroup) héritent des bases et ajoutent les attributs optionnels
-✅ L'attribut `[ScimResource]` est sur les classes de base (héritable)
-✅ Les schémas générés reflètent correctement la hiérarchie
+✅ **ScimUserBase** contains only the REQUIRED attribute `userName`
+✅ **ScimGroupBase** contains only the REQUIRED attribute `displayName`
+✅ System properties (Id, Schemas, Meta) are present in the base classes
+✅ Full classes (`ScimUser`, `ScimGroup`) inherit from the base and add optional attributes
+✅ The `[ScimResource]` attribute is on the base classes (inheritable)
+✅ Generated schemas correctly reflect the hierarchy
 
-## Avantages de cette Architecture
+## Benefits of This Architecture
 
-1. **Séparation claire** entre attributs requis et optionnels
-2. **Flexibilité** : possibilité d'utiliser la classe de base pour les opérations minimales
-3. **Validation** : les tests garantissent la conformité SCIM
-4. **Évolutivité** : facile d'ajouter de nouveaux attributs optionnels
-5. **Type-safety** : le compilateur garantit la présence des attributs requis
+1. **Clear separation** between required and optional attributes
+2. **Flexibility**: ability to use the base class for minimal operations
+3. **Validation**: tests guarantee SCIM compliance
+4. **Extensibility**: easy to add new optional attributes
+5. **Type-safety**: the compiler enforces presence of required attributes
 
-## Date de Création
+## Creation Date
 
 2026-02-02

@@ -1,53 +1,53 @@
-﻿﻿# Guide d'Intégration Microsoft Entra (Azure AD)
+﻿# Microsoft Entra (Azure AD) Integration Guide
 
-Ce guide explique comment configurer l'approvisionnement automatique des utilisateurs et groupes depuis Microsoft Entra (anciennement Azure Active Directory) vers votre application via SCIM 2.0.
+This guide explains how to configure automatic provisioning of users and groups from Microsoft Entra (formerly Azure Active Directory) to your application via SCIM 2.0.
 
-## 📋 Prérequis
+## 📋 Prerequisites
 
-- Application enregistrée dans Microsoft Entra
-- API SCIM déployée et accessible (HTTPS requis pour la production)
-- Token d'authentification Bearer (recommandé)
+- Application registered in Microsoft Entra
+- SCIM API deployed and reachable (HTTPS required for production)
+- Bearer authentication token (recommended)
 
-## 🔧 Configuration dans Microsoft Entra
+## 🔧 Configuration in Microsoft Entra
 
-### Étape 1 : Accéder aux Applications d'Entreprise
+### Step 1: Go to Enterprise Applications
 
-1. Connectez-vous au [Portail Azure](https://portal.azure.com)
-2. Allez dans **Microsoft Entra ID** (anciennement Azure Active Directory)
-3. Cliquez sur **Applications d'entreprise**
-4. Créez une nouvelle application ou sélectionnez une application existante
+1. Sign in to the [Azure Portal](https://portal.azure.com)
+2. Go to **Microsoft Entra ID** (formerly Azure Active Directory)
+3. Click **Enterprise Applications**
+4. Create a new application or select an existing one
 
-### Étape 2 : Configurer l'Approvisionnement
+### Step 2: Configure Provisioning
 
-1. Dans votre application, allez dans **Approvisionnement** (Provisioning)
-2. Cliquez sur **Prise en main** (Get started)
-3. Sélectionnez le mode d'approvisionnement : **Automatique**
+1. In your application, go to **Provisioning**
+2. Click **Get started**
+3. Set Provisioning Mode to **Automatic**
 
-### Étape 3 : Configurer l'URL du Tenant et l'Authentification
+### Step 3: Configure Tenant URL and Authentication
 
-#### URL du Tenant
+#### Tenant URL
+```text
+https://your-server.com/scim
 ```
-https://votre-serveur.com/scim
-```
 
-Pour le développement local avec ngrok :
-```
+For local development with ngrok:
+```text
 https://your-subdomain.ngrok.io/scim
 ```
 
-#### Token Secret - JWT Bearer Token
+#### Secret Token - JWT Bearer Token
 
-L'API SCIM utilise des tokens JWT Bearer pour sécuriser les endpoints. Voici comment générer et utiliser un token:
+The SCIM API uses JWT Bearer tokens to secure endpoints. Here is how to generate and use a token:
 
-##### Générer un Token (Développement uniquement)
+##### Generate a Token (Development Only)
 
-En développement, appelez l'endpoint de test pour obtenir un token valide:
+In development, call the test endpoint to obtain a valid token:
 
 ```bash
 curl -X GET "https://localhost:7001/scim/auth/token"
 ```
 
-Réponse:
+Response:
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -55,35 +55,35 @@ Réponse:
 }
 ```
 
-**⚠️ NOTE:** Cet endpoint est disponible **UNIQUEMENT en développement** et retourne un HTTP 403 en production.
+**⚠️ NOTE:** This endpoint is available **ONLY in development** and returns HTTP 403 in production.
 
-##### Utiliser le Token dans les Requêtes
+##### Use the Token in Requests
 
-Incluez le token dans le header `Authorization`:
+Include the token in the `Authorization` header:
 
 ```bash
-curl -X GET "https://votre-serveur.com/scim/Users" \
+curl -X GET "https://your-server.com/scim/Users" \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
-##### Configuration du Token pour Entra
+##### Configure the Token in Entra
 
-1. Générez un token JWT avec le secret configuré en production
-2. Copier le token complet (y compris le prefix `Bearer `)
-3. Dans Microsoft Entra, allez à **Approvisionnement → Admin Credentials**
-4. Collez le token dans le champ **Secret Token**
-5. Cliquez sur **Test Connection**
+1. Generate a JWT token with the secret configured in production
+2. Copy the full token (including the `Bearer ` prefix)
+3. In Microsoft Entra, go to **Provisioning → Admin Credentials**
+4. Paste the token into the **Secret Token** field
+5. Click **Test Connection**
 
-##### Sécurité en Production
+##### Security in Production
 
-- Les tokens JWT sont générés avec une clé secrète HS256 stockée dans **Azure Key Vault**
-- Les tokens expirent après 60 minutes par défaut
-- Chaque intégration doit disposer de sa propre clé secrète unique
-- Les clés secrètes ne doivent JAMAIS être commitées dans le contrôle de version
+- JWT tokens are generated with an HS256 secret key stored in **Azure Key Vault**
+- Tokens expire after 60 minutes by default
+- Each integration should have its own unique secret key
+- Secret keys must NEVER be committed to source control
 
-##### Format du JWT (Développement)
+##### JWT Format (Development)
 
-Payload minimal:
+Minimal payload:
 ```json
 {
   "sub": "scim-client",
@@ -92,84 +92,84 @@ Payload minimal:
 }
 ```
 
-Pas de claims supplémentaires requises. La validation ne vérifie que la signature et l'expiration.
+No additional claims are required. Validation only checks the signature and expiration.
 
-### Étape 4 : Tester la Connexion
+### Step 4: Test the Connection
 
-1. Cliquez sur **Tester la connexion**
-2. Azure va appeler les endpoints suivants :
+1. Click **Test Connection**
+2. Azure will call the following endpoints:
    - `GET /scim/ServiceProviderConfig`
    - `GET /scim/Schemas`
    - `GET /scim/Users?filter=userName eq "testuser@domain.com"`
 
-Si tout est correct, vous verrez un message de succès ✅
+If everything is correct, you will see a success message ✅
 
-### Étape 5 : Configurer les Mappages d'Attributs
+### Step 5: Configure Attribute Mappings
 
-#### Mappages Utilisateur (User)
+#### User Mappings
 
-Mappages recommandés :
+Recommended mappings:
 
-| Attribut Azure AD | Attribut SCIM | Type |
-|-------------------|---------------|------|
-| userPrincipalName | userName | Direct |
-| objectId | externalId | Direct |
-| displayName | displayName | Direct |
-| givenName | name.givenName | Direct |
-| surname | name.familyName | Direct |
-| mail | emails[type eq "work"].value | Direct |
-| accountEnabled | active | Direct |
-| jobTitle | title | Direct |
-| department | urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department | Direct |
-| employeeId | urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber | Direct |
+| Azure AD Attribute | SCIM Attribute | Type |
+|--------------------|----------------|------|
+| userPrincipalName  | userName       | Direct |
+| objectId           | externalId     | Direct |
+| displayName        | displayName    | Direct |
+| givenName          | name.givenName | Direct |
+| surname            | name.familyName | Direct |
+| mail               | emails[type eq "work"].value | Direct |
+| accountEnabled     | active         | Direct |
+| jobTitle           | title          | Direct |
+| department         | urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department | Direct |
+| employeeId         | urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber | Direct |
 
-#### Mappages Groupe (Group)
+#### Group Mappings
 
-| Attribut Azure AD | Attribut SCIM | Type |
-|-------------------|---------------|------|
-| objectId | externalId | Direct |
-| displayName | displayName | Direct |
-| members | members | Direct |
+| Azure AD Attribute | SCIM Attribute | Type |
+|--------------------|----------------|------|
+| objectId           | externalId     | Direct |
+| displayName        | displayName    | Direct |
+| members            | members        | Direct |
 
-### Étape 6 : Définir l'Étendue d'Approvisionnement
+### Step 6: Set Provisioning Scope
 
-Choisissez qui sera approvisionné :
+Choose who will be provisioned:
 
-1. **Synchroniser uniquement les utilisateurs et groupes attribués** (recommandé)
-   - Vous assignez manuellement les utilisateurs/groupes à synchroniser
+1. **Sync only assigned users and groups** (recommended)
+   - You manually assign the users/groups to be synchronized
    
-2. **Synchroniser tous les utilisateurs et groupes**
-   - Tous les utilisateurs de l'annuaire seront synchronisés
+2. **Sync all users and groups**
+   - All users in the directory will be synchronized
 
-### Étape 7 : Lancer l'Approvisionnement
+### Step 7: Start Provisioning
 
-1. Sauvegardez la configuration
-2. Activez l'approvisionnement
-3. Cliquez sur **Démarrer l'approvisionnement**
+1. Save the configuration
+2. Enable provisioning
+3. Click **Start provisioning**
 
-Le premier cycle de synchronisation commence (peut prendre 20-40 minutes).
+The initial sync cycle will start (can take 20–40 minutes).
 
-## 🔄 Cycles d'Approvisionnement
+## 🔄 Provisioning Cycles
 
-### Synchronisation Initiale
-- Durée : 20-40 minutes (dépend du nombre d'utilisateurs)
-- Microsoft Entra lit tous les utilisateurs/groupes dans l'étendue
-- Compare avec les utilisateurs existants dans votre API SCIM
-- Crée/met à jour les utilisateurs nécessaires
+### Initial Sync
+- Duration: 20–40 minutes (depends on number of users)
+- Microsoft Entra reads all users/groups in scope
+- Compares with existing users in your SCIM API
+- Creates/updates the necessary users
 
-### Synchronisation Incrémentielle
-- Fréquence : Toutes les 40 minutes par défaut
-- Synchronise uniquement les changements depuis la dernière synchronisation
+### Incremental Sync
+- Frequency: Every 40 minutes by default
+- Synchronizes only changes since the last sync
 
-## 🔍 Opérations SCIM Utilisées par Microsoft Entra
+## 🔎 SCIM Operations Used by Microsoft Entra
 
-### 1. Vérification d'Existence Utilisateur
+### 1. User Existence Check
 ```http
 GET /scim/Users?filter=userName eq "user@domain.com"
 ```
-Microsoft Entra vérifie si l'utilisateur existe avant de le créer.
+Microsoft Entra checks if the user exists before creating it.
 
-### 2. Création d'Utilisateur
+### 2. User Creation
 ```http
 POST /scim/Users
 Content-Type: application/scim+json
@@ -196,7 +196,7 @@ Content-Type: application/scim+json
 }
 ```
 
-### 3. Mise à Jour d'Utilisateur (PATCH)
+### 3. User Update (PATCH)
 ```http
 PATCH /scim/Users/{id}
 Content-Type: application/scim+json
@@ -213,12 +213,12 @@ Content-Type: application/scim+json
 }
 ```
 
-### 4. Vérification d'Existence Groupe
+### 4. Group Existence Check
 ```http
 GET /scim/Groups?filter=displayName eq "GroupName"
 ```
 
-### 5. Création de Groupe
+### 5. Group Creation
 ```http
 POST /scim/Groups
 Content-Type: application/scim+json
@@ -236,7 +236,7 @@ Content-Type: application/scim+json
 }
 ```
 
-### 6. Ajout de Membre à un Groupe
+### 6. Add Member to Group
 ```http
 PATCH /scim/Groups/{groupId}
 Content-Type: application/scim+json
@@ -257,7 +257,7 @@ Content-Type: application/scim+json
 }
 ```
 
-### 7. Retrait de Membre d'un Groupe
+### 7. Remove Member from Group
 ```http
 PATCH /scim/Groups/{groupId}
 Content-Type: application/scim+json
@@ -273,48 +273,65 @@ Content-Type: application/scim+json
 }
 ```
 
-### 8. Suppression d'Utilisateur
+### 8. Deactivate User
+```http
+PATCH /scim/Users/{id}
+Content-Type: application/scim+json
+
+{
+  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+  "Operations": [
+    {
+      "op": "replace",
+      "path": "active",
+      "value": false
+    }
+  ]
+}
+```
+
+### 9. Delete User
 ```http
 DELETE /scim/Users/{id}
 ```
 
-## 📊 Surveillance et Journaux
+## 📊 Monitoring and Logs
 
-### Journaux d'Approvisionnement dans Azure
+### Provisioning Logs in Azure
 
-1. Allez dans votre application d'entreprise
-2. Cliquez sur **Journaux d'approvisionnement** (Provisioning logs)
-3. Vous verrez toutes les opérations :
-   - ✅ Succès
-   - ⚠️ Avertissements
-   - ❌ Échecs
+1. Go to your enterprise application
+2. Click on **Provisioning logs**
+3. You will see all operations:
+   - ✅ Success
+   - ⚠️ Warnings
+   - ❌ Failures
 
-### Codes de Retour Attendus
+### Expected Response Codes
 
-| Code | Signification | Action Azure |
-|------|---------------|--------------|
-| 200 | OK | Opération réussie |
-| 201 | Created | Ressource créée avec succès |
-| 204 | No Content | Suppression réussie |
-| 404 | Not Found | Ressource non trouvée |
-| 409 | Conflict | Ressource existe déjà (userName/displayName dupliqué) |
-| 500 | Server Error | Erreur interne, Azure va réessayer |
+| Code | Meaning | Azure Action |
+|------|---------|--------------|
+| 200 | OK | Operation successful |
+| 201 | Created | Resource created successfully |
+| 204 | No Content | Deletion successful |
+| 404 | Not Found | Resource not found |
+| 409 | Conflict | Resource already exists (duplicate userName/displayName) |
+| 500 | Server Error | Internal error, Azure will retry |
 
-## 🔐 Sécurité
+## 🔐 Security
 
 ### Production
-Pour la production, implémentez :
+For production, implement:
 
-1. **HTTPS obligatoire**
-2. **Authentification Bearer Token JWT**
-3. **Rate limiting** pour éviter les abus
-4. **Validation stricte des entrées**
-5. **Audit logging** de toutes les opérations
+1. **HTTPS mandatory**
+2. **Bearer Token JWT Authentication**
+3. **Rate limiting** to prevent abuse
+4. **Strict input validation**
+5. **Audit logging** of all operations
 
-### Exemple d'Authentification Bearer
+### Example of Bearer Authentication
 
 ```csharp
-// Dans Program.cs
+// In Program.cs
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -322,71 +339,70 @@ builder.Services.AddAuthentication("Bearer")
         options.Audience = "api://your-api-id";
     });
 
-// Ajouter [Authorize] sur vos controllers
+// Add [Authorize] to your controllers
 [Authorize]
 [ApiController]
 [Route("scim/[controller]")]
 public class UsersController : ControllerBase
 ```
 
-## 🐛 Dépannage
+## 🐛 Troubleshooting
 
-### Erreur : "Test connection failed"
+### Error: "Test connection failed"
 
-**Causes possibles :**
-1. URL du tenant incorrecte
-2. Token d'authentification invalide
-3. API non accessible (firewall, HTTPS requis)
-4. Endpoints SCIM non conformes
+**Possible causes:**
+1. Incorrect tenant URL
+2. Invalid authentication token
+3. API not reachable (firewall, HTTPS required)
+4. Non-compliant SCIM endpoints
 
-**Solutions :**
-- Vérifiez l'URL : doit se terminer par `/scim`
-- Testez manuellement avec Postman/curl
-- Vérifiez les logs de votre API
+**Solutions:**
+- Check the URL: must end with `/scim`
+- Test manually with Postman/curl
+- Check your API logs
 
-### Erreur : "userName already exists" (409)
+### Error: "userName already exists" (409)
 
-**Cause :** Un utilisateur avec le même `userName` existe déjà.
+**Cause:** A user with the same `userName` already exists.
 
-**Solution :** Microsoft Entra utilisera PATCH pour mettre à jour l'utilisateur existant.
+**Solution:** Microsoft Entra will use PATCH to update the existing user.
 
-### Erreur : "Schema not found"
+### Error: "Schema not found"
 
-**Cause :** Les schémas customs ne sont pas chargés correctement.
+**Cause:** Custom schemas are not loaded correctly.
 
-**Solution :** Vérifiez `appsettings.Scim.json` et les logs au démarrage.
+**Solution:** Check `appsettings.Scim.json` and the logs on startup.
 
-### Les utilisateurs ne se synchronisent pas
+### Users are not syncing
 
-**Causes possibles :**
-1. Utilisateurs pas dans l'étendue d'approvisionnement
-2. Mappages d'attributs incorrects
-3. Filtres de groupe/utilisateur restrictifs
+**Possible causes:**
+1. Users not in the provisioning scope
+2. Incorrect attribute mappings
+3. Restrictive group/user filters
 
-**Solutions :**
-- Vérifiez l'affectation des utilisateurs à l'application
-- Consultez les journaux d'approvisionnement
-- Vérifiez les règles d'étendue
+**Solutions:**
+- Check user assignment to the application
+- Review provisioning logs
+- Check scope rules
 
-## 📚 Références
+## 📚 References
 
-- [Documentation Microsoft SCIM](https://learn.microsoft.com/en-us/azure/active-directory/app-provisioning/use-scim-to-provision-users-and-groups)
-- [Spécification SCIM 2.0 (RFC 7644)](https://datatracker.ietf.org/doc/html/rfc7644)
+- [Microsoft SCIM Documentation](https://learn.microsoft.com/en-us/azure/active-directory/app-provisioning/use-scim-to-provision-users-and-groups)
+- [SCIM 2.0 Specification (RFC 7644)](https://datatracker.ietf.org/doc/html/rfc7644)
 - [SCIM Protocol (RFC 7644)](https://datatracker.ietf.org/doc/html/rfc7644)
 - [SCIM Schema (RFC 7643)](https://datatracker.ietf.org/doc/html/rfc7643)
 
-## 🎯 Checklist de Production
+## 🎯 Production Checklist
 
-Avant de déployer en production, assurez-vous que :
+Before deploying to production, ensure that:
 
-- [ ] HTTPS est activé avec certificat valide
-- [ ] Authentification Bearer Token JWT implémentée
-- [ ] Rate limiting configuré
-- [ ] Logs d'audit activés
-- [ ] Base de données persistante (remplacer InMemory)
-- [ ] Tests de charge effectués
-- [ ] Sauvegarde et restauration configurées
-- [ ] Monitoring et alertes en place
-- [ ] Documentation API mise à jour
-- [ ] Tests end-to-end avec Azure passés avec succès
-
+- [ ] HTTPS is enabled with a valid certificate
+- [ ] Bearer Token JWT Authentication is implemented
+- [ ] Rate limiting is configured
+- [ ] Audit logs are enabled
+- [ ] Persistent database (replace InMemory)
+- [ ] Load testing is completed
+- [ ] Backup and restore are configured
+- [ ] Monitoring and alerts are in place
+- [ ] API documentation is updated
+- [ ] End-to-end tests with Azure passed successfully

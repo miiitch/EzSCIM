@@ -1,26 +1,26 @@
-﻿# Guide de Configuration de l'Authentification JWT
+﻿# JWT Authentication Setup Guide
 
-## Vue d'ensemble
+## Overview
 
-L'API SCIM utilise l'authentification **JWT Bearer Token** pour sécuriser tous les endpoints. Les tokens JWT sont signés avec une clé secrète HS256.
+The SCIM API uses **JWT Bearer Token** authentication to secure all endpoints. JWT tokens are signed with an HS256 secret key.
 
-- **Développement**: Les tokens sont générés via l'endpoint `/scim/auth/token`
-- **Production**: Les tokens doivent être générés et stockés sécurisés (la clé secrète est dans Azure Key Vault)
+- **Development**: Tokens are generated via the `/scim/auth/token` endpoint
+- **Production**: Tokens must be generated and stored securely (the secret key is stored in Azure Key Vault)
 
-## Configuration Développement
+## Development Configuration
 
-### 1. Démarrer l'Application
+### 1. Start the Application
 
 ```bash
 cd ScimAPI
 dotnet run
 ```
 
-L'application démarre avec la configuration `appsettings.Development.json`:
-- Clé secrète de développement: `dev-secret-key-12345678901234567890`
-- Durée d'expiration: 1440 minutes (24 heures)
+The application starts with the `appsettings.Development.json` configuration:
+- Development secret key: `dev-secret-key-12345678901234567890`
+- Expiration duration: 1440 minutes (24 hours)
 
-### 2. Générer un Token
+### 2. Generate a Token
 
 #### Via PowerShell (Windows)
 
@@ -39,15 +39,15 @@ TOKEN=$(curl -s "$API_URL/scim/auth/token" | jq -r '.token')
 echo "Token: $TOKEN"
 ```
 
-#### Via PowerShell Script Fourni
+#### Via Provided PowerShell Script
 
 ```powershell
 .\test-auth.ps1 -ApiBaseUrl "https://localhost:7001"
 ```
 
-### 3. Utiliser le Token
+### 3. Use the Token
 
-Inclure le token dans le header `Authorization`:
+Include the token in the `Authorization` header:
 
 ```powershell
 $headers = @{
@@ -60,7 +60,7 @@ Invoke-RestMethod -Uri "https://localhost:7001/scim/Users" `
     -Method Get
 ```
 
-ou avec cURL:
+Or with cURL:
 
 ```bash
 curl -X GET "https://localhost:7001/scim/Users" \
@@ -68,11 +68,11 @@ curl -X GET "https://localhost:7001/scim/Users" \
   -H "Content-Type: application/scim+json"
 ```
 
-## Configuration Production
+## Production Configuration
 
-### 1. Préparer la Clé Secrète
+### 1. Prepare the Secret Key
 
-Générer une clé secrète sécurisée (minimum 32 caractères):
+Generate a secure secret key (minimum 32 characters):
 
 ```bash
 # Linux/macOS
@@ -82,9 +82,9 @@ openssl rand -hex 32
 [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((New-Guid).Guid + (New-Guid).Guid))
 ```
 
-Résultat: `abc123def456789012345678901234567890...`
+Result: `abc123def456789012345678901234567890...`
 
-### 2. Stocker dans Azure Key Vault
+### 2. Store in Azure Key Vault
 
 ```bash
 az login
@@ -94,9 +94,9 @@ az keyvault secret set \
   --value "abc123def456..."
 ```
 
-### 3. Configurer l'Application
+### 3. Configure the Application
 
-Créer/mettre à jour `appsettings.Production.json`:
+Create or update `appsettings.Production.json`:
 
 ```json
 {
@@ -117,26 +117,26 @@ Créer/mettre à jour `appsettings.Production.json`:
 }
 ```
 
-### 4. Configurer Managed Identity (Azure)
+### 4. Configure Managed Identity (Azure)
 
-L'application doit avoir accès à Key Vault via Managed Identity:
+The application must have access to Key Vault via Managed Identity:
 
 ```bash
-# Créer Managed Identity
+# Create Managed Identity
 az identity create -g your-resource-group -n scim-api-identity
 
-# Assigner accès à Key Vault
+# Assign access to Key Vault
 az keyvault set-policy \
   --name your-keyvault-name \
   --object-id <MANAGED_IDENTITY_PRINCIPAL_ID> \
   --secret-permissions get list
 ```
 
-### 5. Générer JWT pour Entra ID
+### 5. Generate JWT for Entra ID
 
-**Option A**: Via Application CLI (recommandée)
+**Option A**: Via CLI application (recommended)
 
-Créer un petit script/application pour générer le JWT:
+Create a small script/application to generate the JWT:
 
 ```csharp
 using System;
@@ -166,95 +166,95 @@ var jwt = handler.WriteToken(token);
 Console.WriteLine($"Bearer {jwt}");
 ```
 
-**Option B**: Via JWT.io (développement uniquement)
+**Option B**: Via JWT.io (development only)
 
-1. Aller à https://jwt.io
+1. Go to https://jwt.io
 2. Header: `{"alg":"HS256","typ":"JWT"}`
 3. Payload: `{"sub":"scim-client","jti":"unique-id","exp":1234567890}`
 4. Secret: `your-secret-key`
-5. Copier le token complet
+5. Copy the complete token
 
-### 6. Configurer Entra ID
+### 6. Configure Entra ID
 
-1. Allez à **Azure Portal → Microsoft Entra ID → Applications d'entreprise**
-2. Sélectionnez votre application SCIM
-3. **Approvisionnement → Admin Credentials**
+1. Go to **Azure Portal → Microsoft Entra ID → Enterprise Applications**
+2. Select your SCIM application
+3. **Provisioning → Admin Credentials**
 4. **Tenant URL**: `https://your-domain.com/scim`
-5. **Secret Token**: `Bearer eyJ...` (le JWT complet)
-6. Cliquez **Test Connection**
+5. **Secret Token**: `Bearer eyJ...` (the full JWT)
+6. Click **Test Connection**
 
-## Problèmes Courants
+## Common Issues
 
-### Token invalide/expiré en production
+### Invalid/Expired Token in Production
 
-**Cause**: La clé secrète stockée en Key Vault ne correspond pas à celle utilisée pour signer le JWT
+**Cause**: The secret key stored in Key Vault does not match the key used to sign the JWT.
 
-**Solution**: 
-- Vérifier que le JWT a été signé avec la même clé secrète
-- Régénérer et redéployer le JWT dans Entra
+**Solution**:
+- Verify that the JWT was signed with the same secret key
+- Regenerate and redeploy the JWT in Entra
 
-### HTTP 401 Unauthorized partout
+### HTTP 401 Unauthorized Everywhere
 
-**Causes possibles**:
-1. Token manquant du header Authorization
-2. Format incorrect: doit être `Bearer <token>` (avec espace)
-3. Token expiré
-4. Token invalide/tampered
+**Possible Causes**:
+1. Token missing from the Authorization header
+2. Incorrect format: must be `Bearer <token>` (with a space)
+3. Token expired
+4. Token invalid or tampered
 
-**Vérification**:
+**Verification**:
 ```bash
 curl -v https://localhost:7001/scim/Users \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-Regarder:
-- Header `Authorization` est présent
-- Token commence par `eyJ` (base64)
+Check:
+- `Authorization` header is present
+- Token starts with `eyJ` (base64)
 - Format: `Authorization: Bearer eyJ...`
 
-### Endpoint /scim/auth/token retourne 403 en production
+### /scim/auth/token Endpoint Returns 403 in Production
 
-**C'est normal**. Cet endpoint est accessible uniquement en développement. En production, générer le token via une application CLI sécurisée.
+**This is expected behavior.** This endpoint is only accessible in development. In production, generate the token via a secure CLI application.
 
-### La clé secrète n'est pas chargée depuis Key Vault
+### Secret Key Is Not Loaded from Key Vault
 
-**Vérifier**:
-1. Variable d'environnement `ASPNETCORE_ENVIRONMENT=Production`
-2. Managed Identity a accès à Key Vault
-3. URI Key Vault correct dans `appsettings.Production.json`
-4. Logs pour erreurs de connexion Key Vault
+**Check**:
+1. Environment variable `ASPNETCORE_ENVIRONMENT=Production`
+2. Managed Identity has access to Key Vault
+3. Correct Key Vault URI in `appsettings.Production.json`
+4. Logs for Key Vault connection errors
 
 ```bash
-# Vérifier accès Key Vault
+# Verify Key Vault access
 az keyvault secret list --vault-name your-keyvault-name
 ```
 
-## Tests Unitaires
+## Unit Tests
 
-Les tests incluent le mock de l'authentification via `AuthenticationTestHelper`:
+Tests include authentication mocking via `AuthenticationTestHelper`:
 
 ```bash
 cd ScimAPI.Tests
 dotnet test
 ```
 
-Tous les tests passent avec l'authentification mocée (sans besoin de tokens réels).
+All tests pass with mocked authentication (no need for real tokens).
 
-## Sécurité - Checklist
+## Security Checklist
 
-- [ ] Clé secrète minimum 32 caractères
-- [ ] Clé secrète ne jamais commitée dans Git
-- [ ] Clé secrète stockée dans Azure Key Vault en production
-- [ ] Managed Identity configurée pour accès Key Vault
-- [ ] Tokens expirent après 60 minutes par défaut
-- [ ] HTTPS requis en production
-- [ ] HTTP 401 retourné pour requêtes non authentifiées
-- [ ] Logs d'erreurs JWT activés pour audit
-- [ ] Token JWT ne contient pas d'infos sensibles
+- [ ] Secret key minimum 32 characters
+- [ ] Secret key never committed to Git
+- [ ] Secret key stored in Azure Key Vault in production
+- [ ] Managed Identity configured for Key Vault access
+- [ ] Tokens expire after 60 minutes by default
+- [ ] HTTPS required in production
+- [ ] HTTP 401 returned for unauthenticated requests
+- [ ] JWT error logs enabled for audit
+- [ ] JWT token does not contain sensitive information
 
-## Références
+## References
 
-- [JWT.io](https://jwt.io) - Décodeur/validateur JWT
+- [JWT.io](https://jwt.io) - JWT decoder/validator
 - [Microsoft.IdentityModel.Tokens](https://www.nuget.org/packages/Microsoft.IdentityModel.Tokens/)
 - [Azure Key Vault](https://docs.microsoft.com/azure/key-vault/)
 - [SCIM 2.0 Specification](https://tools.ietf.org/html/rfc7644)
