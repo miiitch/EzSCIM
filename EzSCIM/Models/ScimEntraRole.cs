@@ -1,4 +1,6 @@
 using EzSCIM.Attributes;
+using EzSCIM.Helpers;
+using System.Text.Json.Serialization;
 
 namespace EzSCIM.Models;
 
@@ -14,5 +16,6 @@ public class ScimEntraRole
     public string? Type { get; set; }
 
     [ScimProperty("primary", "boolean", Description = "Indicates if this is the primary role")]
+    [JsonConverter(typeof(FlexibleBooleanJsonConverter))]
     public bool Primary { get; set; }
 }

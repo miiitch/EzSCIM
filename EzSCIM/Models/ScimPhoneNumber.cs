@@ -1,4 +1,6 @@
 using EzSCIM.Attributes;
+using EzSCIM.Helpers;
+using System.Text.Json.Serialization;
 
 namespace EzSCIM.Models;
 
@@ -11,5 +13,6 @@ public class ScimPhoneNumber
     public string? Type { get; set; }
         
     [ScimProperty("primary", "boolean", Description = "Indicates if this is the primary phone number")]
+    [JsonConverter(typeof(FlexibleBooleanJsonConverter))]
     public bool Primary { get; set; }
 }

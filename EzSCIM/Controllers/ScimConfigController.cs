@@ -44,7 +44,26 @@ namespace EzSCIM.Controllers
                 ScimSchemaGenerator.UserSchema, 
                 ScimSchemaGenerator.GroupSchema 
             };
-            return Ok(schemas);
+
+            // Add Meta information to each schema
+            foreach (var schema in schemas)
+            {
+                schema.Meta = new ScimMeta
+                {
+                    ResourceType = "Schema",
+                    Location = $"{Request.Scheme}://{Request.Host}/scim/Schemas/{Uri.EscapeDataString(schema.Id)}"
+                };
+            }
+
+            var response = new ScimListResponse<ScimSchema>
+            {
+                TotalResults = schemas.Count,
+                StartIndex = 1,
+                ItemsPerPage = schemas.Count,
+                Resources = schemas
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("Schemas/{id}")]
@@ -59,6 +78,13 @@ namespace EzSCIM.Controllers
 
             if (schema == null)
                 return NotFound(new ScimError { Detail = $"Schema {id} not found", Status = 404 });
+
+            // Add Meta information to the schema
+            schema.Meta = new ScimMeta
+            {
+                ResourceType = "Schema",
+                Location = $"{Request.Scheme}://{Request.Host}/scim/Schemas/{Uri.EscapeDataString(schema.Id)}"
+            };
 
             return Ok(schema);
         }

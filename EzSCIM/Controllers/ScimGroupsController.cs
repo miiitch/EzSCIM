@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using EzSCIM.Filtering;
@@ -16,7 +16,7 @@ namespace EzSCIM.Controllers
         : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetGroups([FromQuery] string? filter, [FromQuery] int startIndex = 1, [FromQuery] int count = 100)
+        public async Task<IActionResult> GetGroups([FromQuery] string? filter, [FromQuery] int startIndex = 1, [FromQuery] int count = 100, [FromQuery] string? excludedAttributes = null)
         {
             try
             {
@@ -40,6 +40,12 @@ namespace EzSCIM.Controllers
                 }
 
                 var response = await repository.GetGroupsAsync(filterExpression, startIndex, count);
+                
+                if (!string.IsNullOrWhiteSpace(excludedAttributes))
+                {
+                    response.Resources = response.Resources.Select(g => FilterGroupAttributes(g, excludedAttributes)).ToList();
+                }
+                
                 return Ok(response);
             }
             catch (Exception ex)
@@ -100,8 +106,21 @@ namespace EzSCIM.Controllers
         {
             var deleted = await repository.DeleteGroupAsync(id);
             if (!deleted)
-                return NotFound(new ScimError { Detail = $"Groupe {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"Group {id} not found", Status = 404 });
             return NoContent();
+        }
+
+        private ScimGroup FilterGroupAttributes(ScimGroup group, string excludedAttributes)
+        {
+            var attributesToExclude = excludedAttributes
+                .Split(',')
+                .Select(a => a.Trim().ToLowerInvariant())
+                .ToHashSet();
+
+            if (attributesToExclude.Contains("members"))
+                group.Members = new List<ScimMember>();
+
+            return group;
         }
     }
 }

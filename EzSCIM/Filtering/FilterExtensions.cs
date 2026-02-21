@@ -43,9 +43,9 @@ public static class FilterExtensions
             },
             "externalid" => comp.Operator switch
             {
-                FilterOperator.Equals => users.Where(u => u.ExternalId.Equals(value, StringComparison.OrdinalIgnoreCase)),
-                FilterOperator.StartsWith => users.Where(u => u.ExternalId.StartsWith(value, StringComparison.OrdinalIgnoreCase)),
-                FilterOperator.Contains => users.Where(u => u.ExternalId.Contains(value, StringComparison.OrdinalIgnoreCase)),
+                FilterOperator.Equals => users.Where(u => u.ExternalId?.Equals(value, StringComparison.OrdinalIgnoreCase) == true),
+                FilterOperator.StartsWith => users.Where(u => u.ExternalId?.StartsWith(value, StringComparison.OrdinalIgnoreCase) == true),
+                FilterOperator.Contains => users.Where(u => u.ExternalId?.Contains(value, StringComparison.OrdinalIgnoreCase) == true),
                 _ => users
             },
             "displayname" => comp.Operator switch

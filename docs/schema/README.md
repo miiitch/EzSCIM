@@ -1,4 +1,4 @@
-﻿# Schema System Documentation
+﻿﻿# Schema System Documentation
 
 Comprehensive documentation for the SCIM schema system, including system overview, extensions, and models.
 
@@ -9,7 +9,8 @@ Comprehensive documentation for the SCIM schema system, including system overvie
 - **[Extension Guide](./extension-guide.md)** - Creating custom schema extensions
 - **[Models Reference](./models-required-optional.md)** - Required and optional attributes
 
-### Advanced Topics
+### Troubleshooting & Validation
+- **[SCIM Validator Fix](./scim-validator-fix.md)** - Fix for Microsoft SCIM Validator JSON parsing errors
 - **[Expected/Actual Pattern](./expected-actual-pattern.md)** - Data pattern explanation
 
 ---

@@ -1,4 +1,22 @@
-﻿# Récapitulatif des Améliorations - Filtres SCIM
+﻿﻿# Change Log
+
+## [Unreleased]
+
+### Fixed
+- Fixed Microsoft SCIM Validator JSON parsing error ("The node must be of type 'JsonObject'")
+  - Added `Meta` property to `ScimSchema` model for RFC 7643 compliance
+  - Updated `/scim/Schemas` endpoint to return `ScimListResponse<ScimSchema>` wrapper instead of raw array
+  - Updated `/scim/Schemas/{id}` endpoint to include metadata in schema objects
+  - Added proper JSON serialization attributes (`JsonPropertyName`, `JsonIgnore`) for camelCase serialization
+  - Ensured null values are properly omitted from JSON responses per SCIM 2.0 spec
+
+### Added
+- New test class `SchemaJsonSerializationTests` for validating schema JSON output
+- Documentation guide for SCIM Validator fix: `docs/schema/scim-validator-fix.md`
+
+---
+
+# Récapitulatif des Améliorations - Filtres SCIM
 
 ## 📋 Résumé
 

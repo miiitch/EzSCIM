@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using EzSCIM.Filtering;
@@ -16,7 +16,7 @@ namespace EzSCIM.Controllers
         : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetUsers([FromQuery] string? filter, [FromQuery] int startIndex = 1, [FromQuery] int count = 100)
+        public async Task<IActionResult> GetUsers([FromQuery] string? filter, [FromQuery] int startIndex = 1, [FromQuery] int count = 100, [FromQuery] string? excludedAttributes = null)
         {
             try
             {
@@ -40,6 +40,12 @@ namespace EzSCIM.Controllers
                 }
 
                 var response = await repository.GetUsersAsync(filterExpression, startIndex, count);
+                
+                if (!string.IsNullOrWhiteSpace(excludedAttributes))
+                {
+                    response.Resources = response.Resources.Select(u => FilterUserAttributes(u, excludedAttributes)).ToList();
+                }
+                
                 return Ok(response);
             }
             catch (Exception ex)
@@ -91,7 +97,7 @@ namespace EzSCIM.Controllers
         {
             var patchedUser = await repository.PatchUserAsync(id, patchRequest);
             if (patchedUser == null)
-                return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"User {id} not found", Status = 404 });
             return Ok(patchedUser);
         }
 
@@ -100,8 +106,33 @@ namespace EzSCIM.Controllers
         {
             var deleted = await repository.DeleteUserAsync(id);
             if (!deleted)
-                return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"User {id} not found", Status = 404 });
             return NoContent();
+        }
+
+        private ScimUser FilterUserAttributes(ScimUser user, string excludedAttributes)
+        {
+            var attributesToExclude = excludedAttributes
+                .Split(',')
+                .Select(a => a.Trim().ToLowerInvariant())
+                .ToHashSet();
+
+            if (attributesToExclude.Contains("emails"))
+                user.Emails = new List<ScimEmail>();
+
+            if (attributesToExclude.Contains("phonenumbers"))
+                user.PhoneNumbers = new List<ScimPhoneNumber>();
+
+            if (attributesToExclude.Contains("addresses"))
+                user.Addresses = new List<ScimAddress>();
+
+            if (attributesToExclude.Contains("name"))
+                user.Name = new ScimName();
+
+            if (attributesToExclude.Contains("groups"))
+                user.Groups = new List<ScimGroupMembership>();
+
+            return user;
         }
     }
 }

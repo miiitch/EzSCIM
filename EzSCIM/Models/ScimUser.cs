@@ -1,4 +1,6 @@
 using EzSCIM.Attributes;
+using EzSCIM.Helpers;
+using System.Text.Json.Serialization;
 
 namespace EzSCIM.Models
 {
@@ -73,6 +75,7 @@ namespace EzSCIM.Models
         /// Whether the user is active (OPTIONAL, default: true)
         /// </summary>
         [ScimProperty("active", "boolean", Description = "Whether the user is active")]
+        [JsonConverter(typeof(FlexibleBooleanJsonConverter))]
         public bool Active { get; set; } = true;
         
         /// <summary>

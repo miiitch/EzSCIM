@@ -1,4 +1,4 @@
-﻿using EzSCIM.Filtering;
+﻿﻿using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
 using EzSCIM.Models;
 using System.Collections.Concurrent;
@@ -380,9 +380,21 @@ namespace EzSCIM.Repositories
 
         private void ApplyGroupPatchOperation(ScimGroup group, ScimPatchOperation operation)
         {
+            var path = operation.Path?.ToLower() ?? string.Empty;
             var op = operation.Op.ToLower();
 
-            if (op == "add" && operation.Value != null)
+            if (op == "replace" && operation.Value != null)
+            {
+                if (path == "externalid")
+                {
+                    group.ExternalId = operation.Value.ToString() ?? string.Empty;
+                }
+                else if (path == "displayname")
+                {
+                    group.DisplayName = operation.Value.ToString() ?? string.Empty;
+                }
+            }
+            else if (op == "add" && operation.Value != null)
             {
                 var members = ParseMembers(operation.Value);
                 foreach (var member in members)

@@ -1,0 +1,25 @@
+opencollection: 1.0.0
+
+info:
+  name: SCIM
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzY2ltLWNsaWVudCIsImp0aSI6IjQxNmE4NDdmLTNiYWItNDhiOS04ODFmLTYwYTBlYzFkMWY5NSIsImV4cCI6MTc3MTcxMjA0MX0.EsL98jvDsv5pdx4xl41_zWHLXWQXvU2P5HTkg14qyGw
+bundled: false
+extensions:
+  ignore:
+    - node_modules
+    - .git
