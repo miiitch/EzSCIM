@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EzSCIM.Models;
 using EzSCIM.Helpers;
+using EzSCIM.Services;
 
 namespace EzSCIM.Controllers
 {
@@ -11,6 +12,14 @@ namespace EzSCIM.Controllers
     [Authorize]
     public class ScimConfigController : ControllerBase
     {
+        private readonly IJwtTokenService _tokenService;
+        private readonly IWebHostEnvironment _environment;
+
+        public ScimConfigController(IJwtTokenService tokenService, IWebHostEnvironment environment)
+        {
+            _tokenService = tokenService;
+            _environment = environment;
+        }
         [HttpGet("ServiceProviderConfig")]
         public IActionResult GetServiceProviderConfig()
         {
@@ -61,6 +70,45 @@ namespace EzSCIM.Controllers
                 return NotFound(new ScimError { Detail = $"Schema {id} not found", Status = 404 });
 
             return Ok(schema);
+        }
+
+        /// <summary>
+        /// Generate a JWT Bearer Token for SCIM API testing
+        /// Only available in development environment
+        /// </summary>
+        /// <returns>JWT token and expiration information</returns>
+        [AllowAnonymous]
+        [HttpGet("auth/token")]
+        public IActionResult GenerateToken()
+        {
+            // Deny access in production
+            if (!_environment.IsDevelopment())
+            {
+                return StatusCode(403, new ScimError 
+                { 
+                    Detail = "Token generation is only available in development environment",
+                    Status = 403 
+                });
+            }
+
+            try
+            {
+                var token = _tokenService.GenerateToken(60); // 60 minutes expiration
+                return Ok(new 
+                { 
+                    token = token,
+                    expiresIn = "60 minutes",
+                    tokenType = "Bearer"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ScimError 
+                { 
+                    Detail = $"Error generating token: {ex.Message}",
+                    Status = 500 
+                });
+            }
         }
     }
 }

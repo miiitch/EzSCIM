@@ -40,7 +40,7 @@ if (!builder.Environment.IsDevelopment())
 builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
 
 // Register JWT token service
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+builder.Services.AddJwtTokenService();
 
 
 // Configure JWT authentication
@@ -65,7 +65,7 @@ if (app.Configuration.GetValue("Scim:LoadTestData", false))
     var repository = scope.ServiceProvider.GetRequiredService<IScimRepository>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     
-    logger.LogInformation("Chargement des données de test...");
+    logger.LogInformation("Loading test data...");
     
     var testUser = new ScimUser
     {
@@ -86,7 +86,7 @@ if (app.Configuration.GetValue("Scim:LoadTestData", false))
     };
     
     await repository.CreateUserAsync(testUser);
-    logger.LogInformation("Utilisateur de test créé");
+    logger.LogInformation("Test user created successfully");
     
     var testGroup = new ScimGroup
     {
@@ -95,7 +95,7 @@ if (app.Configuration.GetValue("Scim:LoadTestData", false))
     };
     
     await repository.CreateGroupAsync(testGroup);
-    logger.LogInformation("Groupe de test créé");
+    logger.LogInformation("Test group created successfully");
 }
 
 app.MapDefaultEndpoints();
