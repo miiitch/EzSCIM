@@ -232,45 +232,45 @@ Fichier de tests HTTP (38 tests) incluant :
 ✅ Support des schémas Enterprise User
 ✅ Support des attributs personnalisés
 
-## 🎯 Cas d'Usage Microsoft Entra
+## 🎯 Microsoft Entra Use Cases
 
-L'implémentation supporte maintenant tous les filtres utilisés par Microsoft Entra :
+The implementation now supports all filters used by Microsoft Entra:
 
-1. ✅ Vérification d'existence : `userName eq "user@domain.com"`
-2. ✅ Recherche par external ID : `externalId eq "azure-object-id"`
-3. ✅ Recherche de groupe : `displayName eq "GroupName"`
-4. ✅ Filtrage des actifs : `active eq true`
-5. ✅ Recherche par nom : `name.givenName eq "John" and name.familyName eq "Doe"`
-6. ✅ Recherche floue : `displayName co "Admin"`
-7. ✅ Combinaisons complexes : `(userName sw "test" or externalId pr) and active eq true`
+1. ✅ Existence check: `userName eq "user@domain.com"`
+2. ✅ Search by external ID: `externalId eq "azure-object-id"`
+3. ✅ Group search: `displayName eq "GroupName"`
+4. ✅ Active filtering: `active eq true`
+5. ✅ Name search: `name.givenName eq "John" and name.familyName eq "Doe"`
+6. ✅ Fuzzy search: `displayName co "Admin"`
+7. ✅ Complex combinations: `(userName sw "test" or externalId pr) and active eq true`
 
 ## 🚀 Performance
 
-Les améliorations incluent :
-- Utilisation de `ToList()` pour éviter les énumérations multiples
-- Filtrage en mémoire optimisé avec LINQ
-- Support des requêtes complexes sans dégradation
+Improvements include:
+- Use of `ToList()` to avoid multiple enumerations
+- Optimized in-memory filtering with LINQ
+- Support for complex queries without degradation
 
-## 🔜 Améliorations Futures Possibles
+## 🔜 Possible Future Improvements
 
-1. **Opérateurs supplémentaires**
+1. **Additional operators**
    - `ew` (ends with)
-   - `gt`, `ge`, `lt`, `le` (comparaisons numériques/dates)
+   - `gt`, `ge`, `lt`, `le` (numeric/date comparisons)
    - `ne` (not equal)
 
-2. **Filtres sur attributs personnalisés**
-   - Support complet des extensions custom schemas
-   - Filtrage sur `urn:ietf:params:scim:schemas:extension:*`
+2. **Filters on custom attributes**
+   - Full support for custom schema extensions
+   - Filtering on `urn:ietf:params:scim:schemas:extension:*`
 
-3. **Optimisations**
-   - Indexation pour recherches plus rapides
-   - Cache des résultats de filtres fréquents
-   - Support de bases de données (EF Core)
+3. **Optimizations**
+   - Indexing for faster searches
+   - Caching of frequent filter results
+   - Database support (EF Core)
 
-4. **Tests unitaires**
-   - Couverture complète des filtres
-   - Tests de régression
-   - Tests de performance
+4. **Unit tests**
+   - Complete filter coverage
+   - Regression tests
+   - Performance tests
 
 ## 📊 Statistiques du Code
 

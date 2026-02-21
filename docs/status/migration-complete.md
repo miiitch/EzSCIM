@@ -1,40 +1,40 @@
-﻿# ✅ Migration Complète vers Shouldly - Résumé Final
+﻿# ✅ Complete Migration to Shouldly - Final Summary
 
-## 🎯 Objectif Atteint
+## 🎯 Objective Achieved
 
-**FluentAssertions a été complètement supprimé et remplacé par Shouldly**, une bibliothèque 100% gratuite et open-source (MIT License).
+**FluentAssertions has been completely removed and replaced with Shouldly**, a 100% free and open-source library (MIT License).
 
-## 📋 Actions Effectuées
+## 📋 Actions Performed
 
-### 1. Suppression de FluentAssertions
+### 1. Remove FluentAssertions
 ```bash
 dotnet remove package FluentAssertions
 ```
 
-### 2. Installation de Shouldly
+### 2. Install Shouldly
 ```bash
 dotnet add package Shouldly
 ```
 
-### 3. Migration du Code
+### 3. Code Migration
 
-**Fichiers modifiés** :
-- ✅ `InMemoryScimRepositoryTests.cs` - 60+ tests migrés
-- ✅ `UsersControllerTests.cs` - 25 tests migrés
-- ✅ `GroupsControllerTests.cs` - 18 tests migrés
+**Modified Files**:
+- ✅ `InMemoryScimRepositoryTests.cs` - 60+ tests migrated
+- ✅ `UsersControllerTests.cs` - 25 tests migrated
+- ✅ `GroupsControllerTests.cs` - 18 tests migrated
 
-**Total** : 103 tests migrés avec succès !
+**Total**: 103 tests successfully migrated!
 
-### 4. Mise à Jour de la Documentation
+### 4. Documentation Update
 
-**Fichiers mis à jour** :
-- ✅ `ScimAPI.Tests/README.md` - Exemples mis à jour
-- ✅ `TESTS_SUMMARY.md` - Frameworks mis à jour
-- ✅ `MIGRATION_SHOULDLY.md` - Guide complet créé
+**Updated Files**:
+- ✅ `ScimAPI.Tests/README.md` - Examples updated
+- ✅ `TESTS_SUMMARY.md` - Frameworks updated
+- ✅ `MIGRATION_SHOULDLY.md` - Complete guide created
 
-## 🔄 Changements de Syntaxe
+## 🔄 Syntax Changes
 
-### Les Plus Courants
+### Most Common
 
 ```csharp
 // FluentAssertions → Shouldly
@@ -45,55 +45,54 @@ collection.Should().HaveCount(5)     → collection.Count.ShouldBe(5)
 result.Should().BeOfType<T>().Subject → (T)result
 ```
 
-## 🎉 Bénéfices
+## 🎉 Benefits
 
-1. **100% Gratuit** - MIT License sans restrictions
-2. **Syntaxe Plus Simple** - Moins verbeux que FluentAssertions
-3. **Messages d'Erreur Clairs** - Shouldly excelle dans ce domaine
-4. **Conformité** - Aucun risque de licence dans un contexte commercial
-5. **Performance** - Bibliothèque plus légère
+1. **100% Free** - MIT License with no restrictions
+2. **Simpler Syntax** - Less verbose than FluentAssertions
+3. **Clear Error Messages** - Shouldly excels in this area
+4. **Compliance** - No license risk in commercial contexts
+5. **Performance** - Lighter weight library
 
-## 📦 Packages du Projet (Tous Gratuits)
+## 📦 Project Packages (All Free)
 
-| Package | License | Statut |
+| Package | License | Status |
 |---------|---------|--------|
-| **xUnit** | Apache 2.0 | ✅ Gratuit |
-| **Shouldly** | MIT | ✅ Gratuit |
-| **Moq** | BSD | ✅ Gratuit |
+| **xUnit** | Apache 2.0 | ✅ Free |
+| **Shouldly** | MIT | ✅ Free |
+| **Moq** | BSD | ✅ Free |
 
-**Aucune dépendance propriétaire ou payante !**
+**No proprietary or commercial dependencies!**
 
 ## ✅ Validation
 
-- ✅ Compilation réussie sans erreurs
-- ✅ Tous les tests existent et sont reconnus
-- ✅ Syntaxe Shouldly correctement appliquée
-- ✅ Documentation mise à jour
+- ✅ Compilation successful without errors
+- ✅ All tests exist and are recognized
+- ✅ Shouldly syntax correctly applied
+- ✅ Documentation updated
 
-## 📝 Note pour l'Avenir
+## 📝 Note for the Future
 
-**Recommandation** : À l'avenir, privilégier les bibliothèques avec des licences permissives :
-- ✅ **MIT License** - La plus permissive
-- ✅ **Apache 2.0** - Très permissive
+**Recommendation**: In the future, prefer libraries with permissive licenses:
+- ✅ **MIT License** - Most permissive
+- ✅ **Apache 2.0** - Very permissive
 - ✅ **BSD** - Permissive
-- ⚠️ Éviter les licenses propriétaires ou commerciales
+- ⚠️ Avoid proprietary or commercial licenses
 
-## 🚀 Prochaines Étapes
+## 🚀 Next Steps
 
-Le projet de tests est maintenant :
-1. ✅ 100% gratuit et open-source
-2. ✅ Conforme aux meilleures pratiques
-3. ✅ Prêt pour la production
-4. ✅ Prêt pour l'intégration continue (CI/CD)
+The test project is now:
+1. ✅ 100% free and open-source
+2. ✅ Compliant with best practices
+3. ✅ Production ready
+4. ✅ Ready for CI/CD integration
 
-Vous pouvez exécuter les tests avec :
+You can run the tests with:
 ```bash
 dotnet test
 ```
 
 ## 🎊 Conclusion
 
-La migration vers Shouldly est **complète et réussie**. Le projet n'utilise maintenant que des bibliothèques gratuites et open-source, éliminant tout risque de licence dans un contexte commercial.
+The migration to Shouldly is **complete and successful**. The project now uses only free and open-source libraries, eliminating any license risk in commercial contexts.
 
-**Shouldly est une excellente alternative à FluentAssertions** avec une syntaxe plus simple et des messages d'erreur encore meilleurs !
-
+**Shouldly is an excellent alternative to FluentAssertions** with simpler syntax and even better error messages!

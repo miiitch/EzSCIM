@@ -1,60 +1,60 @@
-﻿# ✅ Tests d'Intégration - Résumé des Corrections
+﻿# ✅ Integration Tests - Summary of Fixes
 
 **Date**: 2026-02-13  
-**Session**: Correction des erreurs identifiées
+**Session**: Fixes for identified errors
 
 ---
 
-## 🔧 Corrections Effectuées
+## 🔧 Fixes Implemented
 
 ### 1. ✅ Program.cs - Scoped Service Resolution
 
-**Problème**: `Cannot resolve scoped service 'IScimRepository' from root provider`
+**Issue**: `Cannot resolve scoped service 'IScimRepository' from root provider`
 
-**Fichier**: `ScimAPI/Program.cs` ligne 67
+**File**: `ScimAPI/Program.cs` line 67
 
-**Correction**:
+**Fix**:
 ```csharp
-// AVANT
+// BEFORE
 var repository = app.Services.GetRequiredService<IScimRepository>();
 
-// APRÈS
+// AFTER
 using var scope = app.Services.CreateScope();
 var repository = scope.ServiceProvider.GetRequiredService<IScimRepository>();
 ```
 
-**Impact**: ✅ Résout l'erreur de démarrage - tous les tests peuvent maintenant s'exécuter
+**Impact**: ✅ Resolves startup error - all tests can now run
 
 ---
 
-### 2. ✅ GenericScimFilterTranslator.cs - StringComparison pour EF Core
+### 2. ✅ GenericScimFilterTranslator.cs - StringComparison for EF Core
 
-**Problème**: `StringComparison.OrdinalIgnoreCase` ne peut pas être traduit en SQL par EF Core PostgreSQL
+**Issue**: `StringComparison.OrdinalIgnoreCase` cannot be translated to SQL by EF Core PostgreSQL
 
-**Fichier**: `ScimAPI/Filtering/GenericScimFilterTranslator.cs`
+**File**: `ScimAPI/Filtering/GenericScimFilterTranslator.cs`
 
-**Lignes modifiées**: 4 méthodes
-- `BuildEqualsExpression` (lignes 240-252)
-- `BuildContainsExpression` (lignes 285-291)
-- `BuildStartsWithExpression` (lignes 305-311)
-- `BuildEndsWithExpression` (lignes 324-330)
+**Modified lines**: 4 methods
+- `BuildEqualsExpression` (lines 240-252)
+- `BuildContainsExpression` (lines 285-291)
+- `BuildStartsWithExpression` (lines 305-311)
+- `BuildEndsWithExpression` (lines 324-330)
 
-**Correction**:
+**Fix**:
 ```csharp
-// AVANT - Ne fonctionne pas avec EF Core
+// BEFORE - Does not work with EF Core
 var equalsMethod = typeof(string).GetMethod(nameof(string.Equals), 
     new[] { typeof(string), typeof(string), typeof(StringComparison) })!;
 return Expression.Call(equalsMethod, property, value, 
     Expression.Constant(StringComparison.OrdinalIgnoreCase));
 
-// APRÈS - Compatible EF Core
+// AFTER - EF Core compatible
 var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
 var propertyToLower = Expression.Call(property, toLowerMethod);
 var valueToLower = Expression.Call(value, toLowerMethod);
 return Expression.Equal(propertyToLower, valueToLower);
 ```
 
-**Impact**: ✅ Résout 7 tests qui utilisent des filtres avec comparaison de chaînes
+**Impact**: ✅ Fixes 7 tests that use string comparison filters
 - CreateUser_WhenValid_ShouldReturnCreated
 - CreateUser_WhenAlreadyExists_ShouldReturn409
 - GetUsers_WithFilter_ShouldReturnFilteredUsers
@@ -65,118 +65,117 @@ return Expression.Equal(propertyToLower, valueToLower);
 
 ---
 
-## 📊 Résultat Attendu
+## 📊 Expected Results
 
-### Avant Corrections
-- **Tests réussis**: 20/35 (57%)
-- **Tests échoués**: 15/35 (43%)
-- **Problèmes**: Scoped service, StringComparison, PATCH, Seed data
+### Before Fixes
+- **Passing tests**: 20/35 (57%)
+- **Failing tests**: 15/35 (43%)
+- **Issues**: Scoped service, StringComparison, PATCH, Seed data
 
-### Après Corrections (Estimation)
-- **Tests réussis attendus**: 27/35 (77%) ✅
-  - +7 tests grâce au fix StringComparison
-- **Tests échoués attendus**: 8/35 (23%)
-  - 4 tests PATCH (NotImplementedException)
-  - 1 test seed data (groupe supplémentaire)
-  - 3 tests divers à analyser
+### After Fixes (Estimated)
+- **Expected passing tests**: 27/35 (77%) ✅
+  - +7 tests thanks to StringComparison fix
+- **Expected failing tests**: 8/35 (23%)
+  - 4 PATCH tests (NotImplementedException)
+  - 1 seed data test (additional group)
+  - 3 miscellaneous tests to analyze
 
 ---
 
-## ⚠️ Problèmes Restants
+## ⚠️ Remaining Issues
 
 ### 1. PATCH Operations (4 tests) - NotImplementedException
 
-**Tests affectés**:
+**Affected tests**:
 - PatchUser_WhenValid_ShouldReturnUpdatedUser
 - PatchUser_WhenNotExists_ShouldReturn404
 - PatchGroup_AddMember_ShouldReturnUpdatedGroup
 - PatchGroup_WhenNotExists_ShouldReturn404
 
-**Fichiers**:
-- `ScimUserRepositoryAdapter.cs` ligne 106
-- `ScimGroupRepositoryAdapter.cs` ligne 107
+**Files**:
+- `ScimUserRepositoryAdapter.cs` line 106
+- `ScimGroupRepositoryAdapter.cs` line 107
 
 **Options**:
-- **Option A**: Implémenter PATCH pour UserEntity et GroupEntity
-- **Option B**: Désactiver les tests avec `[Fact(Skip = "PATCH not implemented for integration tests")]`
-- **Option C**: Laisser échouer pour l'instant (documenter comme limitation connue)
+- **Option A**: Implement PATCH for UserEntity and GroupEntity
+- **Option B**: Disable tests with `[Fact(Skip = "PATCH not implemented for integration tests")]`
+- **Option C**: Leave failing for now (document as known limitation)
 
-**Recommandation**: Option B ou C pour l'instant
+**Recommendation**: Option B or C for now
 
-### 2. Seed Data Supplémentaire (1 test)
+### 2. Additional Seed Data (1 test)
 
-**Test affecté**:
-- GetGroups_WithNoFilter_ShouldReturnAllGroups (attendait 3, reçu 4)
+**Affected test**:
+- GetGroups_WithNoFilter_ShouldReturnAllGroups (expected 3, received 4)
 
-**Problème**: Un groupe "Test Group" supplémentaire apparaît
+**Issue**: An additional "Test Group" appears
 
-**Investigation nécessaire**: Vérifier d'où vient ce groupe
+**Investigation needed**: Determine where this group comes from
 
-### 3. Autres Tests (3 tests)
+### 3. Other Tests (3 tests)
 
-**À analyser** après avoir vérifié les résultats des tests
-
----
-
-## 🎯 Prochaines Actions Recommandées
-
-### Immédiat
-1. ✅ Compiler le projet
-2. ✅ Relancer les tests d'intégration
-3. ✅ Vérifier que les 7 tests StringComparison passent maintenant
-
-### Court terme
-4. Décider pour les tests PATCH (Skip ou Implement)
-5. Investiguer le groupe "Test Group" supplémentaire
-6. Analyser les 3 autres tests échoués
-
-### Moyen terme
-7. Implémenter PATCH si nécessaire
-8. Ajouter plus de tests d'intégration
-9. Documenter les limitations connues
+**To be analyzed** after verifying test results
 
 ---
 
-## 📝 Fichiers Modifiés
+## 🎯 Recommended Next Actions
 
-| Fichier | Lignes | Changements |
-|---------|--------|-------------|
-| ScimAPI/Program.cs | ~5 | Ajout scope pour IScimRepository |
-| ScimAPI/Filtering/GenericScimFilterTranslator.cs | ~40 | 4 méthodes converties ToLower() |
+### Immediate
+1. ✅ Compile the project
+2. ✅ Re-run integration tests
+3. ✅ Verify that the 7 StringComparison tests now pass
 
-**Total**: 2 fichiers, ~45 lignes modifiées
+### Short term
+4. Decide for PATCH tests (Skip or Implement)
+5. Investigate the additional "Test Group"
+6. Analyze the 3 other failing tests
+
+### Medium term
+7. Implement PATCH if necessary
+8. Add more integration tests
+9. Document known limitations
 
 ---
 
-## ✅ Vérification
+## 📝 Modified Files
 
-Pour vérifier que les corrections fonctionnent :
+| File | Lines | Changes |
+|------|-------|---------|
+| ScimAPI/Program.cs | ~5 | Add scope for IScimRepository |
+| ScimAPI/Filtering/GenericScimFilterTranslator.cs | ~40 | 4 methods converted to ToLower() |
+
+**Total**: 2 files, ~45 lines modified
+
+---
+
+## ✅ Verification
+
+To verify that the fixes work:
 
 ```powershell
-# Compiler
+# Compile
 cd c:\Users\MichelPerfetti\src\private\scimwork
 dotnet build ScimAPI.IntegrationTests/ScimAPI.IntegrationTests.csproj
 
-# Exécuter les tests
+# Run tests
 dotnet test ScimAPI.IntegrationTests/ScimAPI.IntegrationTests.csproj
 ```
 
-**Résultats attendus**:
-- Aucune erreur de compilation
-- ~27 tests passent
-- ~8 tests échouent (PATCH + seed data + divers)
+**Expected results**:
+- No compilation errors
+- ~27 tests pass
+- ~8 tests fail (PATCH + seed data + miscellaneous)
 
 ---
 
-## 📚 Documentation Créée
+## 📚 Documentation Created
 
-1. ✅ `INTEGRATION-TESTS-STATUS.md` - Rapport d'état détaillé
-2. ✅ `INTEGRATION-TESTS-FIX-SCOPED-SERVICE.md` - Documentation du fix scoped service
-3. ✅ Ce fichier - Résumé des corrections
+1. ✅ `INTEGRATION-TESTS-STATUS.md` - Detailed status report
+2. ✅ `INTEGRATION-TESTS-FIX-SCOPED-SERVICE.md` - Scoped service fix documentation
+3. ✅ This file - Summary of fixes
 
 ---
 
-**Statut**: ✅ **Corrections majeures effectuées**  
-**Tests fonctionnels**: Oui  
-**Prêt pour validation**: Oui
-
+**Status**: ✅ **Major fixes implemented**  
+**Tests functional**: Yes  
+**Ready for validation**: Yes
