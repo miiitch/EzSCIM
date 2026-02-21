@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using EzSCIM.Services;
 
 namespace EzSCIM.Controllers
 {
@@ -29,6 +31,11 @@ namespace EzSCIM.Controllers
         /// Whether to include ServiceProviderConfig endpoint. Default is true.
         /// </summary>
         public bool IncludeServiceProviderConfig { get; set; } = true;
+
+        /// <summary>
+        /// Whether to include the token generation endpoint. Default is false.
+        /// </summary>
+        public bool IncludeTokenEndpoint { get; set; } = false;
     }
 
     /// <summary>
@@ -36,31 +43,39 @@ namespace EzSCIM.Controllers
     /// </summary>
     internal class ScimRouteConvention : IApplicationModelConvention
     {
-        private readonly ScimControllerOptions _options;
+        private readonly IOptionsMonitor<ScimControllerOptions> _optionsMonitor;
 
-        public ScimRouteConvention(ScimControllerOptions options)
+        public ScimRouteConvention(IOptionsMonitor<ScimControllerOptions> optionsMonitor)
         {
-            _options = options;
+            _optionsMonitor = optionsMonitor;
         }
 
         public void Apply(ApplicationModel application)
         {
+            var options = _optionsMonitor.CurrentValue;
+
             for (int i = application.Controllers.Count - 1; i >= 0; i--)
             {
                 var controller = application.Controllers[i];
-                
+
                 // Only apply to SCIM controllers
                 if (controller.ControllerType.Namespace != "EzSCIM.Controllers")
                     continue;
 
                 // Check if we should exclude this controller
-                if (!_options.IncludeGroups && controller.ControllerName == "ScimGroups")
+                if (!options.IncludeGroups && controller.ControllerName == "ScimGroups")
                 {
                     application.Controllers.RemoveAt(i);
                     continue;
                 }
 
-                if (!_options.IncludeServiceProviderConfig && controller.ControllerName == "ScimConfig")
+                if (!options.IncludeServiceProviderConfig && controller.ControllerName == "ScimConfig")
+                {
+                    application.Controllers.RemoveAt(i);
+                    continue;
+                }
+
+                if (!options.IncludeTokenEndpoint && controller.ControllerName == "ScimToken")
                 {
                     application.Controllers.RemoveAt(i);
                     continue;
@@ -75,15 +90,30 @@ namespace EzSCIM.Controllers
                         if (template.StartsWith("scim/"))
                         {
                             selector.AttributeRouteModel.Template = 
-                                template.Replace("scim/", $"{_options.RoutePrefix}/");
+                                template.Replace("scim/", $"{options.RoutePrefix}/");
                         }
                         else if (template == "scim")
                         {
-                            selector.AttributeRouteModel.Template = _options.RoutePrefix;
+                            selector.AttributeRouteModel.Template = options.RoutePrefix;
                         }
                     }
                 }
             }
+        }
+    }
+
+    internal sealed class ScimMvcOptionsSetup : IConfigureOptions<MvcOptions>
+    {
+        private readonly IOptionsMonitor<ScimControllerOptions> _optionsMonitor;
+
+        public ScimMvcOptionsSetup(IOptionsMonitor<ScimControllerOptions> optionsMonitor)
+        {
+            _optionsMonitor = optionsMonitor;
+        }
+
+        public void Configure(MvcOptions options)
+        {
+            options.Conventions.Add(new ScimRouteConvention(_optionsMonitor));
         }
     }
 
@@ -124,22 +154,16 @@ namespace EzSCIM.Controllers
             this IServiceCollection services, 
             Action<ScimControllerOptions> configure)
         {
-            // Configure options
-            var options = new ScimControllerOptions();
-            configure(options);
             services.Configure(configure);
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<MvcOptions>, ScimMvcOptionsSetup>());
 
-            // Add controllers with custom convention
-            services.AddControllers(mvcOptions =>
-            {
-                mvcOptions.Conventions.Add(new ScimRouteConvention(options));
-            })
-            .AddApplicationPart(typeof(ScimUsersController).Assembly)
-            .AddJsonOptions(jsonOptions =>
-            {
-                jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                jsonOptions.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            });
+            services.AddControllers()
+                .AddApplicationPart(typeof(ScimUsersController).Assembly)
+                .AddJsonOptions(jsonOptions =>
+                {
+                    jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    jsonOptions.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                });
 
             return services;
         }
@@ -171,16 +195,8 @@ namespace EzSCIM.Controllers
             this IMvcBuilder builder, 
             Action<ScimControllerOptions> configure)
         {
-            // Configure options
-            var options = new ScimControllerOptions();
-            configure(options);
             builder.Services.Configure(configure);
-
-            // Add convention
-            builder.Services.Configure<MvcOptions>(mvcOptions =>
-            {
-                mvcOptions.Conventions.Add(new ScimRouteConvention(options));
-            });
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<MvcOptions>, ScimMvcOptionsSetup>());
 
             return builder
                 .AddApplicationPart(typeof(ScimUsersController).Assembly)
@@ -190,7 +206,55 @@ namespace EzSCIM.Controllers
                     jsonOptions.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 });
         }
+
+        /// <summary>
+        /// Enables the token generation endpoint for SCIM API testing.
+        /// </summary>
+        public static IServiceCollection AddScimTokenGeneratorEndpoint(this IServiceCollection services)
+        {
+            return services.AddScimTokenGeneratorEndpoint(true);
+        }
+
+        /// <summary>
+        /// Enables or disables the token generation endpoint for SCIM API testing.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="enabled">Whether the token endpoint is enabled.</param>
+        public static IServiceCollection AddScimTokenGeneratorEndpoint(this IServiceCollection services, bool enabled)
+        {
+            services.AddSingleton<ITokenEndpointFeature>(new TokenEndpointFeature(enabled));
+
+            services.PostConfigure<ScimControllerOptions>(options =>
+            {
+                options.IncludeTokenEndpoint = enabled;
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Enables the token generation endpoint for SCIM API testing.
+        /// </summary>
+        public static IMvcBuilder AddScimTokenGeneratorEndpoint(this IMvcBuilder builder)
+        {
+            return builder.AddScimTokenGeneratorEndpoint(true);
+        }
+
+        /// <summary>
+        /// Enables or disables the token generation endpoint for SCIM API testing.
+        /// </summary>
+        /// <param name="builder">The MVC builder.</param>
+        /// <param name="enabled">Whether the token endpoint is enabled.</param>
+        public static IMvcBuilder AddScimTokenGeneratorEndpoint(this IMvcBuilder builder, bool enabled)
+        {
+            builder.Services.AddSingleton<ITokenEndpointFeature>(new TokenEndpointFeature(enabled));
+
+            builder.Services.PostConfigure<ScimControllerOptions>(options =>
+            {
+                options.IncludeTokenEndpoint = enabled;
+            });
+
+            return builder;
+        }
     }
 }
-
-

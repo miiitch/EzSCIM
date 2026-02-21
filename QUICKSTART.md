@@ -1,4 +1,4 @@
-﻿# 🚀 Quick Start - Authentification JWT
+﻿﻿# 🚀 Quick Start - Authentification JWT
 
 ## Démarrage Rapide (5 minutes)
 
@@ -12,6 +12,13 @@ dotnet run
 L'application démarre sur: `https://localhost:7001`
 
 ### 2️⃣ Générer un Token (PowerShell)
+
+Avant d'utiliser le point de terminaison, activez-le dans le démarrage de votre application:
+
+```csharp
+builder.Services.AddScimControllers();
+builder.Services.AddScimTokenGeneratorEndpoint();
+```
 
 ```powershell
 $response = Invoke-RestMethod -Uri "https://localhost:7001/scim/auth/token" -Method Get
@@ -147,7 +154,7 @@ HMACSHA256(base64(header) + "." + base64(payload), secretKey)
 
 | URL | Auth | Description |
 |-----|------|-------------|
-| `GET /scim/auth/token` | ✗ Non | Générer token (dev only) |
+| `GET /scim/auth/token` | ✗ Non | Generate token (dev-only, opt-in via `AddScimTokenGeneratorEndpoint()`) |
 | `GET /scim/ServiceProviderConfig` | ✓ Oui | Config du serveur SCIM |
 | `GET /scim/Schemas` | ✓ Oui | Schémas disponibles |
 | `GET /scim/Users` | ✓ Oui | Liste utilisateurs |
@@ -161,7 +168,7 @@ HMACSHA256(base64(header) + "." + base64(payload), secretKey)
 |----------|----------|
 | **HTTP 401** | Vérifier `Authorization: Bearer <token>` |
 | **Token invalide** | Régénérer avec `/scim/auth/token` |
-| **403 sur /scim/auth/token** | Normal en prod! Générer via CLI |
+| **403 sur /scim/auth/token** | Endpoint is opt-in; enable via `AddScimTokenGeneratorEndpoint()` |
 | **Key Vault erreur** | Vérifier Managed Identity + URI |
 
 ---

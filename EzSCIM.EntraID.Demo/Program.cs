@@ -42,7 +42,6 @@ builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
 // Register JWT token service
 builder.Services.AddJwtTokenService();
 
-
 // Configure JWT authentication
 builder.Services.AddAuthentication()
     .AddScheme<JwtBearerTokenAuthenticationOptions, JwtBearerTokenAuthenticationHandler>(
@@ -52,6 +51,9 @@ builder.Services.AddAuthorization();
 
 // Add SCIM controllers with default configuration (scim/Users, scim/Groups)
 builder.Services.AddScimControllers();
+
+// Enable token generation endpoint in the demo app
+builder.Services.AddScimTokenGeneratorEndpoint();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

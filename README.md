@@ -1,86 +1,90 @@
-﻿﻿# API SCIM 2.0 pour Microsoft Entra (Azure AD)
+﻿﻿﻿# SCIM 2.0 API for Microsoft Entra (Azure AD)
 
-Cette API implémente le protocole SCIM 2.0 (System for Cross-domain Identity Management) conforme aux exigences de Microsoft Entra (anciennement Azure AD) pour la synchronisation automatique des utilisateurs et groupes.
+This API implements the SCIM 2.0 (System for Cross-domain Identity Management) protocol in compliance with Microsoft Entra (formerly Azure AD) requirements for automatic user and group synchronization.
 
-## 🎯 Fonctionnalités
+> **📚 Full Documentation**: See [docs/README.md](./docs/README.md) for complete guides, references, and tutorials.  
+> **🚀 Quick Start**: New to the project? Start with [Quick Start Guide](./docs/guides/quickstart.md) (5 minutes).  
+> **🔐 Authentication**: Configure JWT authentication in [Authentication Setup](./docs/auth/setup.md).
 
-- ✅ **Gestion des utilisateurs** (création, lecture, mise à jour, suppression, patch)
-- ✅ **Gestion des groupes** (création, lecture, mise à jour, suppression, patch)
-- ✅ **Support des membres de groupe** (ajout/retrait via PATCH)
-- ✅ **Filtrage SCIM avancé** avec opérateurs logiques (AND, OR, NOT)
-- ✅ **Opérateurs de comparaison** (eq, ne, co, sw, ew, pr, gt, ge, lt, le)
-- ✅ **Filtres sur attributs complexes** (name.givenName, emails.value, etc.)
-- ✅ **Pagination** des résultats
-- ✅ **Endpoints de découverte** (ServiceProviderConfig, Schemas)
-- ✅ **Schémas customs extensibles** (Enterprise User, Custom attributes)
-- ✅ **Implémentation en mémoire** avec interface IScimRepository
-- ✅ **Compatible Microsoft Entra** (Azure AD provisioning)
+## 🎯 Features
+
+- ✅ **User Management** (create, read, update, delete, patch)
+- ✅ **Group Management** (create, read, update, delete, patch)
+- ✅ **Group Members Support** (add/remove via PATCH)
+- ✅ **Advanced SCIM Filtering** with logical operators (AND, OR, NOT)
+- ✅ **Comparison Operators** (eq, ne, co, sw, ew, pr, gt, ge, lt, le)
+- ✅ **Filters on Complex Attributes** (name.givenName, emails.value, etc.)
+- ✅ **Result Pagination**
+- ✅ **Discovery Endpoints** (ServiceProviderConfig, Schemas)
+- ✅ **Extensible Custom Schemas** (Enterprise User, Custom attributes)
+- ✅ **In-Memory Implementation** with IScimRepository interface
+- ✅ **Microsoft Entra Compatible** (Azure AD provisioning)
 
 ## 🏗️ Architecture
 
-### Structure du projet
+### Project Structure
 
 ```
-ScimAPI/
+EzSCIM/
 ├── Controllers/
-│   ├── UsersController.cs           # Endpoints SCIM pour les utilisateurs
-│   ├── GroupsController.cs          # Endpoints SCIM pour les groupes
-│   └── ScimConfigController.cs      # Endpoints de découverte SCIM
+│   ├── UsersController.cs           # SCIM endpoints for users
+│   ├── GroupsController.cs          # SCIM endpoints for groups
+│   └── ScimConfigController.cs      # SCIM discovery endpoints
 ├── Models/
-│   ├── ScimUser.cs                  # Modèle utilisateur SCIM
-│   ├── ScimGroup.cs                 # Modèle groupe SCIM
-│   ├── ScimMeta.cs                  # Métadonnées SCIM
-│   ├── ScimListResponse.cs          # Réponse de liste paginée
-│   ├── ScimError.cs                 # Réponse d'erreur
-│   ├── ScimPatchRequest.cs          # Requête PATCH SCIM
-│   ├── ScimServiceProviderConfig.cs # Configuration du fournisseur
-│   └── ScimSchema.cs                # Définition de schéma
+│   ├── ScimUser.cs                  # SCIM user model
+│   ├── ScimGroup.cs                 # SCIM group model
+│   ├── ScimMeta.cs                  # SCIM metadata
+│   ├── ScimListResponse.cs          # Paginated list response
+│   ├── ScimError.cs                 # Error response
+│   ├── ScimPatchRequest.cs          # SCIM PATCH request
+│   ├── ScimServiceProviderConfig.cs # Provider configuration
+│   └── ScimSchema.cs                # Schema definition
 ├── Repositories/
-│   ├── IScimRepository.cs           # Interface du repository
-│   └── InMemoryScimRepository.cs    # Implémentation en mémoire
+│   ├── IScimRepository.cs           # Repository interface
+│   └── InMemoryScimRepository.cs    # In-memory implementation
 ├── Services/
-│   └── ScimSchemaInitializer.cs     # Initialisation des schémas au démarrage
-└── appsettings.Scim.json            # Configuration des schémas customs
+│   └── ScimSchemaInitializer.cs     # Schema initialization on startup
+└── appsettings.Scim.json            # Custom schema configuration
 ```
 
-## 🚀 Démarrage rapide
+## 🚀 Quick Start
 
-### 1. Lancer l'application
+### 1. Start the Application
 
 ```bash
-cd ScimAPI
+cd EzSCIM
 dotnet run
 ```
 
-L'API sera accessible sur `https://localhost:7091`
+The API will be accessible on `https://localhost:7001`
 
-### 2. Tester les endpoints
+### 2. Test the Endpoints
 
-Utilisez le fichier `ScimAPI.http` avec l'extension REST Client de VS Code ou Rider.
+Use the `ScimAPI.http` file with the VS Code REST Client extension or Rider.
 
-### 3. Endpoints disponibles
+### 3. Available Endpoints
 
-#### Découverte SCIM
-- `GET /scim/ServiceProviderConfig` - Configuration du fournisseur SCIM
-- `GET /scim/Schemas` - Liste de tous les schémas
-- `GET /scim/Schemas/{id}` - Détails d'un schéma spécifique
-- `POST /scim/Schemas` - Ajouter un schéma custom
+#### SCIM Discovery
+- `GET /scim/ServiceProviderConfig` - SCIM provider configuration
+- `GET /scim/Schemas` - List all schemas
+- `GET /scim/Schemas/{id}` - Get specific schema details
+- `POST /scim/Schemas` - Add custom schema
 
-#### Utilisateurs
-- `GET /scim/Users` - Lister les utilisateurs (avec filtrage et pagination)
-- `GET /scim/Users/{id}` - Obtenir un utilisateur
-- `POST /scim/Users` - Créer un utilisateur
-- `PUT /scim/Users/{id}` - Mettre à jour un utilisateur (complet)
-- `PATCH /scim/Users/{id}` - Mettre à jour partiellement un utilisateur
-- `DELETE /scim/Users/{id}` - Supprimer un utilisateur
+#### Users
+- `GET /scim/Users` - List users (with filtering and pagination)
+- `GET /scim/Users/{id}` - Get a user
+- `POST /scim/Users` - Create a user
+- `PUT /scim/Users/{id}` - Update a user (complete)
+- `PATCH /scim/Users/{id}` - Partially update a user
+- `DELETE /scim/Users/{id}` - Delete a user
 
-#### Groupes
-- `GET /scim/Groups` - Lister les groupes (avec filtrage et pagination)
-- `GET /scim/Groups/{id}` - Obtenir un groupe
-- `POST /scim/Groups` - Créer un groupe
-- `PUT /scim/Groups/{id}` - Mettre à jour un groupe (complet)
-- `PATCH /scim/Groups/{id}` - Mettre à jour partiellement un groupe (membres)
-- `DELETE /scim/Groups/{id}` - Supprimer un groupe
+#### Groups
+- `GET /scim/Groups` - List groups (with filtering and pagination)
+- `GET /scim/Groups/{id}` - Get a group
+- `POST /scim/Groups` - Create a group
+- `PUT /scim/Groups/{id}` - Update a group (complete)
+- `PATCH /scim/Groups/{id}` - Partially update a group (members)
+- `DELETE /scim/Groups/{id}` - Delete a group
 
 ## 📋 Exemples d'utilisation
 

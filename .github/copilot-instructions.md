@@ -1,4 +1,4 @@
-﻿# Global Instructions for EzSCIM Repository
+﻿﻿# Global Instructions for EzSCIM Repository
 
 This document outlines the global coding and documentation standards for this repository.
 
@@ -187,21 +187,102 @@ _logger.LogError(ex, "Unexpected error processing request {RequestId}", requestI
 
 ```
 scimwork/
-├── .github/               # GitHub configuration and workflows
+├── .github/                    # GitHub configuration and workflows
 │   └── copilot-instructions.md
-├── EzSCIM/                # Core SCIM library
+├── docs/                       # Documentation (organized by theme)
+│   ├── README.md              # Documentation index and guide
+│   ├── auth/                  # Authentication & Security
+│   │   ├── setup.md
+│   │   ├── index.md
+│   │   └── pre-production-checklist.md
+│   ├── filters/               # SCIM Filtering system
+│   │   ├── overview.md
+│   │   ├── reference.md
+│   │   └── examples.md
+│   ├── guides/                # General guides and tutorials
+│   │   ├── quickstart.md
+│   │   ├── development-setup.md
+│   │   └── ...
+│   ├── migration/             # Repository integration & migration
+│   ├── schema/                # Schema system documentation
+│   ├── tests/                 # Testing documentation
+│   ├── status/                # Status reports and summaries
+│   └── archive/               # Historical/completed documentation
+├── EzSCIM/                    # Core SCIM library
 │   ├── Controllers/
 │   ├── Services/
 │   ├── Models/
 │   └── Repositories/
-├── EzSCIM.EntraID.Demo/   # Demo SCIM API service
-├── EzSCIM.EntraID.AppHost/ # Aspire orchestration
-├── EzSCIM.ServiceDefaults/ # Shared service configuration
-├── EzSCIM.UnitTests/      # Unit tests
-├── EzSCIM.IntegrationTests/ # Integration tests
-├── Documentation files    # Guides and specifications
-└── README.md             # Main project documentation
+├── EzSCIM.EntraID.Demo/       # Demo SCIM API service
+├── EzSCIM.EntraID.AppHost/    # Aspire orchestration
+├── EzSCIM.ServiceDefaults/    # Shared service configuration
+├── EzSCIM.UnitTests/          # Unit tests
+├── EzSCIM.IntegrationTests/   # Integration tests
+├── README.md                  # Main project documentation
+└── CHANGELOG.md               # Version history
 ```
+
+## Documentation Organization
+
+### File Placement Rules
+
+**All new Markdown documentation files must be placed in `docs/<theme>/` directory, NOT at repository root.**
+
+Theme categories:
+- `docs/auth/` - Authentication, security, JWT configuration
+- `docs/filters/` - SCIM filter system documentation
+- `docs/guides/` - Getting started, tutorials, how-to guides
+- `docs/migration/` - Repository integration, data migration
+- `docs/schema/` - Schema system, extensions, models
+- `docs/tests/` - Testing guides, test documentation
+- `docs/status/` - Status reports, completion reports, summaries
+- `docs/archive/` - Historical/completed documentation
+
+### Naming Convention
+
+File naming pattern: `<topic>-<context>.md` (lowercase with hyphens)
+
+Examples:
+- `docs/auth/jwt-service-quick-fix.md`
+- `docs/filters/implementation-guide.md`
+- `docs/guides/development-setup.md`
+- `docs/migration/quick-start-repository.md`
+
+### Creating New Documentation
+
+When creating new Markdown files:
+
+1. **Choose the appropriate `docs/<theme>/` folder**
+2. **Use lowercase filenames with hyphens** (e.g., `my-new-guide.md`)
+3. **Write in English only** (no French or other languages)
+4. **Include a clear title/header** at the top
+5. **Update `docs/README.md`** to include a reference to the new file
+6. **Use relative paths** for internal links (e.g., `./other-file.md` or `../../main-readme.md`)
+7. **No content duplication** - consolidate related information instead of duplicating files
+
+### Link Format Standards
+
+Internal links must use relative paths:
+
+```markdown
+# ✅ Correct
+See [Quick Start](./quickstart.md)
+See [Authentication](../auth/setup.md)
+
+# ❌ Incorrect (do not use absolute paths or root references)
+See [Quick Start](../guides/quickstart.md)
+```
+
+### Documentation Quality Checklist
+
+- [ ] File is in correct `docs/<theme>/` folder
+- [ ] Filename uses lowercase with hyphens
+- [ ] Language is 100% English (no French, no code comments in French)
+- [ ] Includes clear title and structure
+- [ ] All internal links are relative paths
+- [ ] File is referenced in `docs/README.md`
+- [ ] No duplicate content from other documentation files
+- [ ] Follows Microsoft writing style (clear, concise, technical)
 
 ## Breaking Changes
 
@@ -223,6 +304,11 @@ scimwork/
 
 ---
 
-**Last Updated**: February 20, 2026  
-**Version**: 1.0
-
+**Last Updated**: February 21, 2026  
+**Version**: 1.1  
+**Notable Changes**: 
+- Added `docs/` directory structure for organized documentation
+- Established documentation naming conventions and file placement rules
+- Added documentation quality checklist for new files
+- Enforced relative path linking standards
+- Clarified English-only language requirement for documentation
