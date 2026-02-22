@@ -1,4 +1,4 @@
-﻿﻿# Global Instructions for EzSCIM Repository
+﻿﻿﻿# Global Instructions for EzSCIM Repository
 
 This document outlines the global coding and documentation standards for this repository.
 
@@ -136,6 +136,28 @@ Closes #45
 - Write tests in English (method names, assertions)
 - Include comments explaining complex test logic
 - Use descriptive assertion messages
+
+### Bug-First Testing Methodology (MANDATORY)
+
+When the user reports an anomaly or bug:
+
+1. **ALWAYS create a regression test FIRST** before writing any fix
+2. The test must **reproduce the failure** (red) before the fix is applied
+3. Place compliance/regression tests in `EzSCIM.IntegrationTests/ScimValidatorComplianceTests.cs`
+4. Each test must document:
+   - The validator test name (e.g., "Patch User - Replace Attributes")
+   - Which validation runs were affected (e.g., runs 01, 02, 03, 04)
+   - The exact error message from the validator
+   - The root cause explanation
+5. Test names should follow the pattern: `<Endpoint>_<Operation>_Should<ExpectedBehavior>`
+6. After creating the test, verify it fails, then implement the fix, then verify it passes
+
+### SCIM Validator Compliance
+
+- Validation results from https://scimvalidator.microsoft.com/ are stored in `docs/scim-test-results/`
+- Each validation run is saved as `scim-results-XX.json`
+- For every failure reported by the validator, a corresponding integration test MUST exist
+- Tests must verify both the PATCH response AND a subsequent GET (the validator checks persistence)
 
 ### Example
 

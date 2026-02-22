@@ -1,8 +1,9 @@
-﻿﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
+using EzSCIM.Helpers;
 using EzSCIM.Models;
 using EzSCIM.Repositories;
 
@@ -43,7 +44,10 @@ namespace EzSCIM.Controllers
                 
                 if (!string.IsNullOrWhiteSpace(excludedAttributes))
                 {
-                    response.Resources = response.Resources.Select(g => FilterGroupAttributes(g, excludedAttributes)).ToList();
+                    var excludeSet = AttributeFilterHelper.ParseAttributeList(excludedAttributes);
+                    response.Resources = response.Resources
+                        .Select(g => AttributeFilterHelper.FilterGroupAttributes(g, excludeSet))
+                        .ToList();
                 }
                 
                 return Ok(response);
@@ -56,11 +60,18 @@ namespace EzSCIM.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetGroup(string id)
+        public async Task<IActionResult> GetGroup(string id, [FromQuery] string? excludedAttributes = null)
         {
             var group = await repository.GetGroupAsync(id);
             if (group == null)
-                return NotFound(new ScimError { Detail = $"Groupe {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"Group {id} not found", Status = 404 });
+            
+            if (!string.IsNullOrWhiteSpace(excludedAttributes))
+            {
+                var excludeSet = AttributeFilterHelper.ParseAttributeList(excludedAttributes);
+                group = AttributeFilterHelper.FilterGroupAttributes(group, excludeSet);
+            }
+            
             return Ok(group);
         }
 
@@ -71,15 +82,15 @@ namespace EzSCIM.Controllers
             {
                 var existing = await repository.GetGroupByDisplayNameAsync(group.DisplayName);
                 if (existing != null)
-                    return Conflict(new ScimError { Detail = "Groupe existe déjà", Status = 409 });
+                    return Conflict(new ScimError { Detail = "Group already exists", Status = 409 });
 
                 var createdGroup = await repository.CreateGroupAsync(group);
                 return CreatedAtAction(nameof(GetGroup), new { id = createdGroup.Id }, createdGroup);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Erreur CreateGroup");
-                return StatusCode(500, new ScimError { Detail = "Erreur interne", Status = 500 });
+                logger.LogError(ex, "Error in CreateGroup");
+                return StatusCode(500, new ScimError { Detail = "Internal server error", Status = 500 });
             }
         }
 
@@ -88,7 +99,7 @@ namespace EzSCIM.Controllers
         {
             var updatedGroup = await repository.UpdateGroupAsync(id, group);
             if (updatedGroup == null)
-                return NotFound(new ScimError { Detail = $"Groupe {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"Group {id} not found", Status = 404 });
             return Ok(updatedGroup);
         }
 
@@ -97,7 +108,7 @@ namespace EzSCIM.Controllers
         {
             var patchedGroup = await repository.PatchGroupAsync(id, patchRequest);
             if (patchedGroup == null)
-                return NotFound(new ScimError { Detail = $"Groupe {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"Group {id} not found", Status = 404 });
             return Ok(patchedGroup);
         }
 
@@ -110,18 +121,6 @@ namespace EzSCIM.Controllers
             return NoContent();
         }
 
-        private ScimGroup FilterGroupAttributes(ScimGroup group, string excludedAttributes)
-        {
-            var attributesToExclude = excludedAttributes
-                .Split(',')
-                .Select(a => a.Trim().ToLowerInvariant())
-                .ToHashSet();
-
-            if (attributesToExclude.Contains("members"))
-                group.Members = new List<ScimMember>();
-
-            return group;
-        }
     }
 }
 

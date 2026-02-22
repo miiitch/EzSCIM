@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
+using EzSCIM.Helpers;
 using EzSCIM.Models;
 using EzSCIM.Repositories;
 
@@ -43,7 +44,10 @@ namespace EzSCIM.Controllers
                 
                 if (!string.IsNullOrWhiteSpace(excludedAttributes))
                 {
-                    response.Resources = response.Resources.Select(u => FilterUserAttributes(u, excludedAttributes)).ToList();
+                    var excludeSet = AttributeFilterHelper.ParseAttributeList(excludedAttributes);
+                    response.Resources = response.Resources
+                        .Select(u => AttributeFilterHelper.FilterUserAttributes(u, excludeSet))
+                        .ToList();
                 }
                 
                 return Ok(response);
@@ -56,11 +60,18 @@ namespace EzSCIM.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(string id)
+        public async Task<IActionResult> GetUser(string id, [FromQuery] string? excludedAttributes = null)
         {
             var user = await repository.GetUserAsync(id);
             if (user == null)
-                return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"User {id} not found", Status = 404 });
+            
+            if (!string.IsNullOrWhiteSpace(excludedAttributes))
+            {
+                var excludeSet = AttributeFilterHelper.ParseAttributeList(excludedAttributes);
+                user = AttributeFilterHelper.FilterUserAttributes(user, excludeSet);
+            }
+            
             return Ok(user);
         }
 
@@ -71,15 +82,15 @@ namespace EzSCIM.Controllers
             {
                 var existing = await repository.GetUserByUserNameAsync(user.UserName);
                 if (existing != null)
-                    return Conflict(new ScimError { Detail = "Utilisateur existe déjà", Status = 409 });
+                    return Conflict(new ScimError { Detail = "User already exists", Status = 409 });
 
                 var createdUser = await repository.CreateUserAsync(user);
                 return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Erreur CreateUser");
-                return StatusCode(500, new ScimError { Detail = "Erreur interne", Status = 500 });
+                logger.LogError(ex, "Error in CreateUser");
+                return StatusCode(500, new ScimError { Detail = "Internal server error", Status = 500 });
             }
         }
 
@@ -88,7 +99,7 @@ namespace EzSCIM.Controllers
         {
             var updatedUser = await repository.UpdateUserAsync(id, user);
             if (updatedUser == null)
-                return NotFound(new ScimError { Detail = $"Utilisateur {id} non trouvé", Status = 404 });
+                return NotFound(new ScimError { Detail = $"User {id} not found", Status = 404 });
             return Ok(updatedUser);
         }
 
@@ -110,30 +121,6 @@ namespace EzSCIM.Controllers
             return NoContent();
         }
 
-        private ScimUser FilterUserAttributes(ScimUser user, string excludedAttributes)
-        {
-            var attributesToExclude = excludedAttributes
-                .Split(',')
-                .Select(a => a.Trim().ToLowerInvariant())
-                .ToHashSet();
-
-            if (attributesToExclude.Contains("emails"))
-                user.Emails = new List<ScimEmail>();
-
-            if (attributesToExclude.Contains("phonenumbers"))
-                user.PhoneNumbers = new List<ScimPhoneNumber>();
-
-            if (attributesToExclude.Contains("addresses"))
-                user.Addresses = new List<ScimAddress>();
-
-            if (attributesToExclude.Contains("name"))
-                user.Name = new ScimName();
-
-            if (attributesToExclude.Contains("groups"))
-                user.Groups = new List<ScimGroupMembership>();
-
-            return user;
-        }
     }
 }
 
