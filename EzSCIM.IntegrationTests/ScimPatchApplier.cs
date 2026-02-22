@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using EzSCIM.Attributes;
@@ -102,14 +103,16 @@ public static class ScimPatchApplier
     /// </summary>
     private static bool ApplyOperation<TEntity>(TEntity entity, ScimPatchOperation op, Dictionary<string, PropertyMapping> mappings) where TEntity : class
     {
-        if (string.IsNullOrEmpty(op.Path) && op.Op?.ToLowerInvariant() == "replace" && op.Value != null)
+        var operation = op.Op?.ToLowerInvariant() ?? "replace";
+        
+        // RFC 7644: If path is omitted, value must be a complex object with attribute names
+        // This applies to both "add" and "replace" operations without path
+        if (string.IsNullOrEmpty(op.Path) && (operation == "replace" || operation == "add") && op.Value != null)
         {
-            // RFC 7644: If path is omitted, value must be a complex object with attribute names
             return ApplyBulkReplace(entity, op.Value, mappings);
         }
 
         var path = op.Path ?? "";
-        var operation = op.Op?.ToLowerInvariant() ?? "replace";
 
         // Special handling for "members" path (array operations)
         if (path.Equals("members", StringComparison.OrdinalIgnoreCase))
@@ -117,14 +120,23 @@ public static class ScimPatchApplier
             return false; // Handled separately by CompositeScimRepository
         }
 
-        // Find the property mapping
-        if (!mappings.TryGetValue(path, out var mapping))
+        // Find the property mapping - try multiple strategies
+        PropertyMapping? mapping = null;
+        
+        // Strategy 1: Direct lookup (case-insensitive)
+        if (!mappings.TryGetValue(path, out mapping))
         {
-            // Try with normalized path (remove brackets, lowercase)
+            // Strategy 2: Normalized path (filtered expressions -> [0])
             var normalizedPath = NormalizePath(path);
             if (!mappings.TryGetValue(normalizedPath, out mapping))
             {
-                // Property not found - skip silently or could throw
+                // Property not found - log detailed error and return false
+                // This allows tests to continue but indicates the operation failed
+                var availableMappings = string.Join(", ", mappings.Keys.OrderBy(k => k).Take(10));
+                System.Diagnostics.Debug.WriteLine(
+                    $"[ScimPatchApplier] Could not find mapping for path '{path}'. " +
+                    $"Normalized: '{normalizedPath}'. " +
+                    $"Available (first 10): {availableMappings}");
                 return false;
             }
         }

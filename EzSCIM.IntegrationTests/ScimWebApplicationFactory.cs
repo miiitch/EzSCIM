@@ -104,7 +104,8 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             {
                 var dataRepo = sp.GetRequiredService<IUserDataRepository<UserEntity>>();
                 var translator = sp.GetRequiredService<IScimFilterTranslator<UserEntity>>();
-                return new ScimUserRepositoryAdapter<UserEntity>(dataRepo, translator);
+                // Use JsonUserRepositoryAdapter that handles multi-valued JSON attributes
+                return new Data.Repositories.JsonUserRepositoryAdapter(dataRepo, translator);
             });
 
             services.AddScoped<IScimGroupRepository<ScimGroup>>(sp =>
@@ -180,7 +181,8 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         public Task<ScimUser?> UpdateUserAsync(string id, ScimUser user) => _userRepo.UpdateUserAsync(id, user);
         
         /// <summary>
-        /// Implements PATCH for users using ScimPatchApplier with ScimProperty attributes.
+        /// Implements PATCH for users using UserEntityPatchApplier for JSON multi-valued attributes.
+        /// EF Core automatically detects changes on tracked entities.
         /// </summary>
         public async Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
         {
@@ -188,14 +190,26 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (user == null)
                 return null;
 
-            // Use generic ScimPatchApplier based on ScimProperty attributes
-            ScimPatchApplier.ApplyPatch(user, patchRequest.Operations);
+            // Use specialized UserEntityPatchApplier for JSON multi-valued attributes
+            var modified = Data.UserEntityPatchApplier.ApplyPatch(user, patchRequest.Operations);
+            
+            if (!modified)
+            {
+                Console.WriteLine($"[PatchUserAsync] WARNING: No properties were modified for user {id}");
+            }
+            else
+            {
+                Console.WriteLine($"[PatchUserAsync] Successfully modified user {id}");
+            }
 
             user.ModifiedAt = DateTime.UtcNow;
+            
+            // EF Core change tracking automatically detects modifications to properties
+            // (including JSON columns) since the entity was obtained via FindAsync
             await _dbContext.SaveChangesAsync();
 
-            // Return updated user as ScimUser
-            return await GetUserAsync(id);
+            // Return updated user as ScimUser using extension method
+            return user.ToScimUser();
         }
 
         public Task<bool> DeleteUserAsync(string id) => _userRepo.DeleteUserAsync(id);
@@ -219,11 +233,16 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
                 return null;
 
             // Separate members operations from scalar operations
+            // Handle both "members" and "members[filter]" paths
             var membersOps = patchRequest.Operations
-                .Where(op => op.Path?.Equals("members", StringComparison.OrdinalIgnoreCase) == true)
+                .Where(op => op.Path != null && 
+                    (string.Equals(op.Path, "members", StringComparison.OrdinalIgnoreCase) ||
+                     op.Path.StartsWith("members[", StringComparison.OrdinalIgnoreCase)))
                 .ToList();
             var scalarOps = patchRequest.Operations
-                .Where(op => !op.Path?.Equals("members", StringComparison.OrdinalIgnoreCase) != false)
+                .Where(op => op.Path == null || 
+                    (!string.Equals(op.Path, "members", StringComparison.OrdinalIgnoreCase) &&
+                     !op.Path.StartsWith("members[", StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
             // Apply scalar operations using generic ScimPatchApplier
@@ -247,6 +266,21 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             var operation = op.Op?.ToLowerInvariant() ?? "replace";
             var currentMembers = ParseMembersJson(group.MembersJson);
             
+            // Check if path contains a filter (e.g., members[value eq "userId"])
+            string? filterValue = null;
+            if (op.Path != null && op.Path.Contains("[") && op.Path.Contains("]"))
+            {
+                // Extract filter value from path like: members[value eq "userId"]
+                var match = System.Text.RegularExpressions.Regex.Match(
+                    op.Path, 
+                    @"members\[value\s+eq\s+""([^""]+)""\]",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    filterValue = match.Groups[1].Value;
+                }
+            }
+            
             if (operation == "add" && op.Value != null)
             {
                 var newMembers = ParseMembersFromValue(op.Value);
@@ -255,10 +289,16 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
                     if (!currentMembers.Any(m => m.Value == member.Value))
                         currentMembers.Add(member);
                 }
+                group.MembersJson = System.Text.Json.JsonSerializer.Serialize(currentMembers);
             }
             else if (operation == "remove")
             {
-                if (op.Value != null)
+                if (filterValue != null)
+                {
+                    // Remove specific member matching the filter
+                    currentMembers.RemoveAll(m => m.Value == filterValue);
+                }
+                else if (op.Value != null)
                 {
                     var membersToRemove = ParseMembersFromValue(op.Value);
                     currentMembers.RemoveAll(m => membersToRemove.Any(r => r.Value == m.Value));
@@ -267,13 +307,14 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
                 {
                     currentMembers.Clear();
                 }
+                group.MembersJson = System.Text.Json.JsonSerializer.Serialize(currentMembers);
             }
             else if (operation == "replace" && op.Value != null)
             {
-                currentMembers = ParseMembersFromValue(op.Value);
+                // Replace entire members list
+                var newMembers = ParseMembersFromValue(op.Value);
+                group.MembersJson = System.Text.Json.JsonSerializer.Serialize(newMembers);
             }
-
-            group.MembersJson = System.Text.Json.JsonSerializer.Serialize(currentMembers);
         }
 
         private List<MemberInfo> ParseMembersJson(string? json)

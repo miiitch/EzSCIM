@@ -174,13 +174,20 @@ namespace EzSCIM.Repositories
                 
                 if (value == null) continue;
 
+                // Handle array-indexed SCIM properties like "emails[0].value"
+                if (scimAttrName.Contains("[0]"))
+                {
+                    MapArrayIndexedProperty(scimUser, scimAttrName, value);
+                    continue;
+                }
+
                 // Handle nested SCIM attributes like "name.givenName"
                 if (scimAttrName.Contains('.'))
                 {
                     var parts = scimAttrName.Split('.');
                     if (parts.Length == 2)
                     {
-                        // Get the parent property (e.g., "name" ? ScimUser.Name)
+                        // Get the parent property (e.g., "name" → ScimUser.Name)
                         var parentPropName = NormalizePropertyName(parts[0]);
                         var childPropName = NormalizePropertyName(parts[1]);
                         
@@ -227,6 +234,76 @@ namespace EzSCIM.Repositories
         }
 
         /// <summary>
+        /// Maps array-indexed SCIM properties (e.g., "emails[0].value") to ScimUser multi-valued attributes.
+        /// </summary>
+        private void MapArrayIndexedProperty(ScimUser scimUser, string scimAttrName, object value)
+        {
+            // Parse: "emails[0].value" → arrayProp="emails", index=0, subAttr="value"
+            var match = System.Text.RegularExpressions.Regex.Match(
+                scimAttrName, 
+                @"^(\w+)\[(\d+)\]\.(\w+)$");
+            
+            if (!match.Success)
+                return;
+
+            var arrayPropName = match.Groups[1].Value; // "emails"
+            var index = int.Parse(match.Groups[2].Value); // 0
+            var subAttrName = match.Groups[3].Value; // "value"
+
+            // Map to the corresponding List<T> property on ScimUser
+            var normalizedArrayProp = NormalizePropertyName(arrayPropName);
+            var listProp = typeof(ScimUser).GetProperty(normalizedArrayProp);
+            
+            if (listProp == null || !listProp.PropertyType.IsGenericType)
+                return;
+
+            var listValue = listProp.GetValue(scimUser);
+            if (listValue == null)
+            {
+                listValue = Activator.CreateInstance(listProp.PropertyType);
+                listProp.SetValue(scimUser, listValue);
+            }
+
+            var listType = listProp.PropertyType;
+            var itemType = listType.GetGenericArguments()[0];
+            
+            // Get the list as IList
+            var list = listValue as System.Collections.IList;
+            if (list == null)
+                return;
+
+            // Ensure the list has enough items
+            while (list.Count <= index)
+            {
+                var newItem = Activator.CreateInstance(itemType);
+                
+                // For index 0, set Primary = true
+                if (list.Count == 0)
+                {
+                    var primaryProp = itemType.GetProperty("Primary");
+                    if (primaryProp != null && primaryProp.CanWrite)
+                    {
+                        primaryProp.SetValue(newItem, true);
+                    }
+                }
+                
+                list.Add(newItem);
+            }
+
+            // Set the sub-attribute on the list item
+            var item = list[index];
+            if (item != null)
+            {
+                var normalizedSubAttr = NormalizePropertyName(subAttrName);
+                var subProp = itemType.GetProperty(normalizedSubAttr);
+                if (subProp != null && subProp.CanWrite)
+                {
+                    subProp.SetValue(item, value);
+                }
+            }
+        }
+
+        /// <summary>
         /// Normalizes property names from camelCase to PascalCase.
         /// </summary>
         private string NormalizePropertyName(string name)
@@ -238,11 +315,26 @@ namespace EzSCIM.Repositories
                 "name" => "Name",
                 "givenname" => "GivenName",
                 "familyname" => "FamilyName",
+                "middlename" => "MiddleName",
+                "honorificprefix" => "HonorificPrefix",
+                "honorificsuffix" => "HonorificSuffix",
                 "username" => "UserName",
                 "displayname" => "DisplayName",
                 "externalid" => "ExternalId",
                 "active" => "Active",
                 "title" => "Title",
+                "emails" => "Emails",
+                "phonenumbers" => "PhoneNumbers",
+                "addresses" => "Addresses",
+                "value" => "Value",
+                "type" => "Type",
+                "primary" => "Primary",
+                "formatted" => "Formatted",
+                "streetaddress" => "StreetAddress",
+                "locality" => "Locality",
+                "region" => "Region",
+                "postalcode" => "PostalCode",
+                "country" => "Country",
                 _ => char.ToUpper(name[0]) + name.Substring(1)
             };
         }
@@ -271,8 +363,13 @@ namespace EzSCIM.Repositories
 
                 object? value = null;
 
+                // Handle array-indexed SCIM properties like "emails[0].value"
+                if (scimAttrName.Contains("[0]"))
+                {
+                    value = GetArrayIndexedPropertyValue(scimUser, scimAttrName);
+                }
                 // Handle nested SCIM attributes like "name.givenName"
-                if (scimAttrName.Contains('.'))
+                else if (scimAttrName.Contains('.'))
                 {
                     var parts = scimAttrName.Split('.');
                     if (parts.Length == 2)
@@ -308,6 +405,50 @@ namespace EzSCIM.Repositories
             }
 
             return user;
+        }
+
+        /// <summary>
+        /// Gets value from array-indexed SCIM properties (e.g., "emails[0].value").
+        /// </summary>
+        private object? GetArrayIndexedPropertyValue(ScimUser scimUser, string scimAttrName)
+        {
+            // Parse: "emails[0].value" → arrayProp="emails", index=0, subAttr="value"
+            var match = System.Text.RegularExpressions.Regex.Match(
+                scimAttrName, 
+                @"^(\w+)\[(\d+)\]\.(\w+)$");
+            
+            if (!match.Success)
+                return null;
+
+            var arrayPropName = match.Groups[1].Value; // "emails"
+            var index = int.Parse(match.Groups[2].Value); // 0
+            var subAttrName = match.Groups[3].Value; // "value"
+
+            // Get the List<T> property from ScimUser
+            var normalizedArrayProp = NormalizePropertyName(arrayPropName);
+            var listProp = typeof(ScimUser).GetProperty(normalizedArrayProp);
+            
+            if (listProp == null)
+                return null;
+
+            var listValue = listProp.GetValue(scimUser);
+            if (listValue == null)
+                return null;
+
+            var list = listValue as System.Collections.IList;
+            if (list == null || list.Count <= index)
+                return null;
+
+            var item = list[index];
+            if (item == null)
+                return null;
+
+            // Get the sub-attribute value
+            var itemType = item.GetType();
+            var normalizedSubAttr = NormalizePropertyName(subAttrName);
+            var subProp = itemType.GetProperty(normalizedSubAttr);
+            
+            return subProp?.GetValue(item);
         }
 
         /// <summary>

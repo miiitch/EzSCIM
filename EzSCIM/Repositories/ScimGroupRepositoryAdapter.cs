@@ -184,6 +184,32 @@ namespace EzSCIM.Repositories
                 }
             }
 
+            // Handle MembersJson if present (special case for JSON-serialized members)
+            var membersJsonProp = typeof(TGroup).GetProperty("MembersJson");
+            if (membersJsonProp != null)
+            {
+                var membersJson = membersJsonProp.GetValue(group) as string;
+                if (!string.IsNullOrEmpty(membersJson))
+                {
+                    try
+                    {
+                        var memberInfos = System.Text.Json.JsonSerializer.Deserialize<List<MemberInfo>>(membersJson);
+                        if (memberInfos != null && memberInfos.Count > 0)
+                        {
+                            scimGroup.Members = memberInfos.Select(m => new ScimMember
+                            {
+                                Value = m.Value,
+                                Display = m.Display
+                            }).ToList();
+                        }
+                    }
+                    catch
+                    {
+                        // If deserialization fails, leave Members empty
+                    }
+                }
+            }
+
             // Set metadata
             scimGroup.Meta = new ScimMeta
             {
@@ -194,6 +220,15 @@ namespace EzSCIM.Repositories
             };
 
             return scimGroup;
+        }
+
+        /// <summary>
+        /// Helper class for JSON deserialization of members.
+        /// </summary>
+        private class MemberInfo
+        {
+            public string Value { get; set; } = "";
+            public string Display { get; set; } = "";
         }
 
         /// <summary>

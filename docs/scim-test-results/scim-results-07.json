@@ -1,0 +1,971 @@
+{
+  "results": {
+    "$id": "1",
+    "data": {
+      "$id": "2",
+      "CorrelationId": "f11da8e0-85ed-4693-974a-925b7bdf8684",
+      "InvalidCredentials": false,
+      "Message": null,
+      "WarningMessage": null,
+      "ErrorTrace": null,
+      "SFComplianceFailed": true,
+      "PassedTests": [
+        {
+          "$id": "3",
+          "Description": "Create a new User",
+          "Name": "POST /Users",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:51 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m\r\nRateLimit-Remaining: HttpRequestRatePerPort:1499\r\nRateLimit-Reset: HttpRequestRatePerPort:30s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 41d146de-4f00-47f1-9903-5488960f5c9f\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":1,\"startIndex\":1,\"itemsPerPage\":1,\"resources\":[{\"externalId\":\"3edfc07a-51da-4c05-976f-5f3e62e88ba6\",\"name\":{\"formatted\":\"Jewell\",\"familyName\":\"Emily\",\"givenName\":\"Hyman\",\"middleName\":\"Jerad\",\"honorificPrefix\":\"Burnice\",\"honorificSuffix\":\"Coleman\"},\"displayName\":\"RGTTAFGXEIAX\",\"nickName\":\"HPLMVMRBDEPR\",\"profileUrl\":\"TCYMYDEEFUYX\",\"title\":\"QCLIYGGCOSDO\",\"userType\":\"KGZITNPDIAGR\",\"preferredLanguage\":\"shi-Latn-MA\",\"locale\":\"YUFQUHXUYXJK\",\"timezone\":\"America/Detroit\",\"active\":true,\"emails\":[{\"value\":\"sylvan@hilpert.ca\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"61-392-9473\",\"primary\":true}],\"addresses\":[{\"formatted\":\"YHQPTMKREXJR\",\"streetAddress\":\"36774 Junior Fort\",\"locality\":\"BRFNAIYEWFFE\",\"region\":\"GLKQIFJDIPRP\",\"postalCode\":\"dq96 3ia\",\"country\":\"Estonia\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"c605f3a1-a180-4f2c-ad6b-dc753acd8f55\",\"userName\":\"adrianna_jenkins@jewessupton.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.6690891Z\",\"lastModified\":\"2026-02-23T08:57:51.6690891Z\",\"location\":\"/scim/Users/c605f3a1-a180-4f2c-ad6b-dc753acd8f55\"}}]}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"3edfc07a-51da-4c05-976f-5f3e62e88ba6\",\"name\":{\"formatted\":\"Jewell\",\"familyName\":\"Emily\",\"givenName\":\"Hyman\",\"middleName\":\"Jerad\",\"honorificPrefix\":\"Burnice\",\"honorificSuffix\":\"Coleman\"},\"displayName\":\"RGTTAFGXEIAX\",\"nickName\":\"HPLMVMRBDEPR\",\"profileUrl\":\"TCYMYDEEFUYX\",\"title\":\"QCLIYGGCOSDO\",\"userType\":\"KGZITNPDIAGR\",\"preferredLanguage\":\"shi-Latn-MA\",\"locale\":\"YUFQUHXUYXJK\",\"timezone\":\"America/Detroit\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"sylvan@hilpert.ca\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"61-392-9473\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"YHQPTMKREXJR\",\"streetAddress\":\"36774 Junior Fort\",\"locality\":\"BRFNAIYEWFFE\",\"region\":\"GLKQIFJDIPRP\",\"postalCode\":\"dq96 3ia\",\"country\":\"Estonia\"}],\"userName\":\"adrianna_jenkins@jewessupton.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"3edfc07a-51da-4c05-976f-5f3e62e88ba6\",\"name\":{\"formatted\":\"Jewell\",\"familyName\":\"Emily\",\"givenName\":\"Hyman\",\"middleName\":\"Jerad\",\"honorificPrefix\":\"Burnice\",\"honorificSuffix\":\"Coleman\"},\"displayName\":\"RGTTAFGXEIAX\",\"nickName\":\"HPLMVMRBDEPR\",\"profileUrl\":\"TCYMYDEEFUYX\",\"title\":\"QCLIYGGCOSDO\",\"userType\":\"KGZITNPDIAGR\",\"preferredLanguage\":\"shi-Latn-MA\",\"locale\":\"YUFQUHXUYXJK\",\"timezone\":\"America/Detroit\",\"active\":true,\"emails\":[{\"value\":\"sylvan@hilpert.ca\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"61-392-9473\",\"primary\":true}],\"addresses\":[{\"formatted\":\"YHQPTMKREXJR\",\"streetAddress\":\"36774 Junior Fort\",\"locality\":\"BRFNAIYEWFFE\",\"region\":\"GLKQIFJDIPRP\",\"postalCode\":\"dq96 3ia\",\"country\":\"Estonia\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"c605f3a1-a180-4f2c-ad6b-dc753acd8f55\",\"userName\":\"adrianna_jenkins@jewessupton.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.6690891Z\",\"lastModified\":\"2026-02-23T08:57:51.6690891Z\",\"location\":\"/scim/Users/c605f3a1-a180-4f2c-ad6b-dc753acd8f55\"}}"
+          ],
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users?filter=userName+eq+\"adrianna_jenkins%40jewessupton.com\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 874,
+          "Category": 0
+        },
+        {
+          "$id": "4",
+          "Description": "Create a duplicate User",
+          "Name": "POST /Users",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:51 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1498\r\nRateLimit-Reset: HttpRequestRatePerPort:40s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 89b9b1cb-7e43-4f61-9e83-a76f8ccf4482\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "409 Conflict",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"User already exists\",\"status\":409}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"f55c8f7d-4ca4-4256-84c9-1eb21106a4ac\",\"name\":{\"formatted\":\"Karen\",\"familyName\":\"Aileen\",\"givenName\":\"Brendon\",\"middleName\":\"Armand\",\"honorificPrefix\":\"Gretchen\",\"honorificSuffix\":\"Savanah\"},\"displayName\":\"GLNPEOSOYDAY\",\"nickName\":\"JEWELHHFHWHH\",\"profileUrl\":\"OFRVJALBGSOY\",\"title\":\"AAGGBKTDVDLB\",\"userType\":\"RMPYSYKZXRCG\",\"preferredLanguage\":\"sr-Cyrl-RS\",\"locale\":\"XKBVAJGKBLAL\",\"timezone\":\"America/Atikokan\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"princess_rau@pfannerstillturner.ca\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"24-249-8626\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"DPEAXMGJAAFW\",\"streetAddress\":\"26466 Bruce Cape\",\"locality\":\"MWYOACWGFQGQ\",\"region\":\"LYBDJYLFOMVE\",\"postalCode\":\"cb0 9fr\",\"country\":\"Taiwan\"}],\"userName\":\"mckenna_deckow@haleygibson.uk\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 905,
+          "Category": 0
+        },
+        {
+          "$id": "5",
+          "Description": "Filter for an existing user",
+          "Name": "Get /Users filter",
+          "Results": [
+            {
+              "$id": "6",
+              "Message": "The response should contain the required attributes for a list response, i.e. schemas and totalResults",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "7",
+              "Message": "The response should contain the correct schema URI for a list response",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "8",
+              "Message": "Total Results should be equal to the count of all the Users that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "9",
+              "Message": "The response should contain the Resources attribute when totalResults is non-zero",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "10",
+              "Message": "The response should contain all the Users that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "11",
+              "Message": "The response should contain all the required fields for Users",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "12",
+              "Message": "The response should match the created resource",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "13",
+              "Message": "The response should contain be serialized to SCIM2 Core User",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:51 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1496\r\nRateLimit-Reset: HttpRequestRatePerPort:58s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 6742cdfd-eab6-42b4-9724-f8deeaa20d6b\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":1,\"startIndex\":1,\"itemsPerPage\":1,\"resources\":[{\"externalId\":\"f925ab46-d353-429f-88f3-f6292fa4ee8f\",\"name\":{\"formatted\":\"Bridget\",\"familyName\":\"Ashleigh\",\"givenName\":\"Noemi\",\"middleName\":\"Lura\",\"honorificPrefix\":\"Dion\",\"honorificSuffix\":\"Aletha\"},\"displayName\":\"HGADITDKHCYQ\",\"nickName\":\"ARASIKCWLPLO\",\"profileUrl\":\"YREWVFVOBOUZ\",\"title\":\"BHHMWLLFIRJK\",\"userType\":\"DTEUOQORMPTA\",\"preferredLanguage\":\"hi-IN\",\"locale\":\"TPTNPBOFRXMN\",\"timezone\":\"America/Chihuahua\",\"active\":true,\"emails\":[{\"value\":\"justine_jacobson@purdybeer.biz\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"64-881-1780\",\"primary\":true}],\"addresses\":[{\"formatted\":\"TDZLZEKKFFPW\",\"streetAddress\":\"29459 Marcel Passage\",\"locality\":\"GODEOWAJHNNA\",\"region\":\"WIYYGNPIGKKV\",\"postalCode\":\"lz37 2hw\",\"country\":\"Afghanistan\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"9dcee7c5-2585-46a4-996b-1ec97966bedf\",\"userName\":\"garry@kemmerstark.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.9589436Z\",\"lastModified\":\"2026-02-23T08:57:51.9589437Z\",\"location\":\"/scim/Users/9dcee7c5-2585-46a4-996b-1ec97966bedf\"}}]}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users?filter=userName+eq+\"garry%40kemmerstark.com\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 165,
+          "Category": 0
+        },
+        {
+          "$id": "14",
+          "Description": "Filter for a non-existing user",
+          "Name": "Get /Users filter",
+          "Results": [
+            {
+              "$id": "15",
+              "Message": "The response should contain the required attributes for a list response, i.e. schemas and totalResults",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "16",
+              "Message": "The response should contain the correct schema URI for a list response",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "17",
+              "Message": "Total Results should be equal to the count of all the Users that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "18",
+              "Message": "The response should contain be serialized to SCIM2 Core User",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:51 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1497\r\nRateLimit-Reset: HttpRequestRatePerPort:30s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 7d40e781-c474-4906-89ca-027f4494a67c\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":0,\"startIndex\":1,\"itemsPerPage\":0,\"resources\":[]}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users?filter=userName+eq+\"nonexistente997dccbd8b7_immanuel%40crist.ca\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 159,
+          "Category": 0
+        },
+        {
+          "$id": "19",
+          "Description": "Filter for an existing user with a different case",
+          "Name": "Get /Users filter",
+          "Results": [
+            {
+              "$id": "20",
+              "Message": "The response should contain the required attributes for a list response, i.e. schemas and totalResults",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "21",
+              "Message": "The response should contain the correct schema URI for a list response",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "22",
+              "Message": "Total Results should be equal to the count of all the Users that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "23",
+              "Message": "The response should contain the Resources attribute when totalResults is non-zero",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "24",
+              "Message": "The response should contain all the Users that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "25",
+              "Message": "The response should contain all the required fields for Users",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "26",
+              "Message": "The response should match the created resource",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "27",
+              "Message": "The response should contain be serialized to SCIM2 Core User",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:52 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1497\r\nRateLimit-Reset: HttpRequestRatePerPort:40s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: c569ee8f-3bcf-4a64-84e9-b0081bf585fa\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":1,\"startIndex\":1,\"itemsPerPage\":1,\"resources\":[{\"externalId\":\"f925ab46-d353-429f-88f3-f6292fa4ee8f\",\"name\":{\"formatted\":\"Bridget\",\"familyName\":\"Ashleigh\",\"givenName\":\"Noemi\",\"middleName\":\"Lura\",\"honorificPrefix\":\"Dion\",\"honorificSuffix\":\"Aletha\"},\"displayName\":\"HGADITDKHCYQ\",\"nickName\":\"ARASIKCWLPLO\",\"profileUrl\":\"YREWVFVOBOUZ\",\"title\":\"BHHMWLLFIRJK\",\"userType\":\"DTEUOQORMPTA\",\"preferredLanguage\":\"hi-IN\",\"locale\":\"TPTNPBOFRXMN\",\"timezone\":\"America/Chihuahua\",\"active\":true,\"emails\":[{\"value\":\"justine_jacobson@purdybeer.biz\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"64-881-1780\",\"primary\":true}],\"addresses\":[{\"formatted\":\"TDZLZEKKFFPW\",\"streetAddress\":\"29459 Marcel Passage\",\"locality\":\"GODEOWAJHNNA\",\"region\":\"WIYYGNPIGKKV\",\"postalCode\":\"lz37 2hw\",\"country\":\"Afghanistan\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"9dcee7c5-2585-46a4-996b-1ec97966bedf\",\"userName\":\"garry@kemmerstark.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.9589436Z\",\"lastModified\":\"2026-02-23T08:57:51.9589437Z\",\"location\":\"/scim/Users/9dcee7c5-2585-46a4-996b-1ec97966bedf\"}}]}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users?filter=userName+eq+\"GARRY%40KEMMERSTARK.COM\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 161,
+          "Category": 0
+        },
+        {
+          "$id": "28",
+          "Description": "Update User userName",
+          "Name": "PATCH /Users/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:51 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1498\r\nRateLimit-Reset: HttpRequestRatePerPort:30s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 6ad7eba0-e922-47cb-ad79-e0b7fee45ca8\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"5e77470c-9637-4d3e-b7e5-11a923a81594\",\"name\":{\"formatted\":\"Natasha\",\"familyName\":\"Murl\",\"givenName\":\"Giovani\",\"middleName\":\"Vivianne\",\"honorificPrefix\":\"Denis\",\"honorificSuffix\":\"Richmond\"},\"displayName\":\"YDWSKLSZQAAN\",\"nickName\":\"GKDIVETGMVAP\",\"profileUrl\":\"QQFAGWEBRMOW\",\"title\":\"ZBSKQDORKNLG\",\"userType\":\"ZDJSTQWSWAUW\",\"preferredLanguage\":\"ar-DZ\",\"locale\":\"TMOSNQGMCWXD\",\"timezone\":\"Africa/Blantyre\",\"active\":true,\"emails\":[{\"value\":\"karine@lubowitz.biz\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"68-369-4087\",\"primary\":true}],\"addresses\":[{\"formatted\":\"JKIWHTGIJVTU\",\"streetAddress\":\"08962 Rose Locks\",\"locality\":\"IJGKMDMSJXTB\",\"region\":\"XKCVDYNJYTTC\",\"postalCode\":\"vu18 4md\",\"country\":\"Korea\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"d1926a2c-a32f-4949-91a1-00b88eac8527\",\"userName\":\"delpha@mullerwintheiser.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.9664868Z\",\"lastModified\":\"2026-02-23T08:57:52.135179Z\",\"location\":\"/scim/Users/d1926a2c-a32f-4949-91a1-00b88eac8527\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"5e77470c-9637-4d3e-b7e5-11a923a81594\",\"name\":{\"formatted\":\"Natasha\",\"familyName\":\"Murl\",\"givenName\":\"Giovani\",\"middleName\":\"Vivianne\",\"honorificPrefix\":\"Denis\",\"honorificSuffix\":\"Richmond\"},\"displayName\":\"YDWSKLSZQAAN\",\"nickName\":\"GKDIVETGMVAP\",\"profileUrl\":\"QQFAGWEBRMOW\",\"title\":\"ZBSKQDORKNLG\",\"userType\":\"ZDJSTQWSWAUW\",\"preferredLanguage\":\"ar-DZ\",\"locale\":\"TMOSNQGMCWXD\",\"timezone\":\"Africa/Blantyre\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"karine@lubowitz.biz\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"68-369-4087\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"JKIWHTGIJVTU\",\"streetAddress\":\"08962 Rose Locks\",\"locality\":\"IJGKMDMSJXTB\",\"region\":\"XKCVDYNJYTTC\",\"postalCode\":\"vu18 4md\",\"country\":\"Korea\"}],\"userName\":\"arely@stehr.us\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"5e77470c-9637-4d3e-b7e5-11a923a81594\",\"name\":{\"formatted\":\"Natasha\",\"familyName\":\"Murl\",\"givenName\":\"Giovani\",\"middleName\":\"Vivianne\",\"honorificPrefix\":\"Denis\",\"honorificSuffix\":\"Richmond\"},\"displayName\":\"YDWSKLSZQAAN\",\"nickName\":\"GKDIVETGMVAP\",\"profileUrl\":\"QQFAGWEBRMOW\",\"title\":\"ZBSKQDORKNLG\",\"userType\":\"ZDJSTQWSWAUW\",\"preferredLanguage\":\"ar-DZ\",\"locale\":\"TMOSNQGMCWXD\",\"timezone\":\"Africa/Blantyre\",\"active\":true,\"emails\":[{\"value\":\"karine@lubowitz.biz\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"68-369-4087\",\"primary\":true}],\"addresses\":[{\"formatted\":\"JKIWHTGIJVTU\",\"streetAddress\":\"08962 Rose Locks\",\"locality\":\"IJGKMDMSJXTB\",\"region\":\"XKCVDYNJYTTC\",\"postalCode\":\"vu18 4md\",\"country\":\"Korea\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"d1926a2c-a32f-4949-91a1-00b88eac8527\",\"userName\":\"arely@stehr.us\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.9664868Z\",\"lastModified\":\"2026-02-23T08:57:51.9664868Z\",\"location\":\"/scim/Users/d1926a2c-a32f-4949-91a1-00b88eac8527\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/d1926a2c-a32f-4949-91a1-00b88eac8527 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"replace\",\"value\":{\"userName\":\"delpha@mullerwintheiser.biz\"}}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 959,
+          "Category": 0
+        },
+        {
+          "$id": "29",
+          "Description": "Patch User - Disable User",
+          "Name": "PATCH /Users/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:53 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1496\r\nRateLimit-Reset: HttpRequestRatePerPort:6s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 1bcc5772-c243-436a-8ac8-c34ce317d0a3\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"2b9e3fb4-111c-4fa8-8d04-8157eb3d137e\",\"name\":{\"formatted\":\"Thora\",\"familyName\":\"Cassie\",\"givenName\":\"Arnulfo\",\"middleName\":\"Burnice\",\"honorificPrefix\":\"Brant\",\"honorificSuffix\":\"Johnson\"},\"displayName\":\"IPVJFXXTJUKB\",\"nickName\":\"AUPMMKRBFBSA\",\"profileUrl\":\"ZILDLZADEATB\",\"title\":\"ADLMMWPFVCZH\",\"userType\":\"WJPNSQRJZWUS\",\"preferredLanguage\":\"dua\",\"locale\":\"MRWOBTMWKQJX\",\"timezone\":\"Africa/Libreville\",\"active\":false,\"emails\":[{\"value\":\"cayla_monahan@schowalter.info\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"56-226-3256\",\"primary\":true}],\"addresses\":[{\"formatted\":\"QAEQUNTEEEZD\",\"streetAddress\":\"8767 Torphy Burg\",\"locality\":\"LPECVUFLAMIX\",\"region\":\"GXFDRDLOGWMQ\",\"postalCode\":\"yg27 3xy\",\"country\":\"Micronesia\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"454e9661-dfeb-43ff-a543-48ec983e7be0\",\"userName\":\"lauriane@whitebuckridge.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:53.7515276Z\",\"lastModified\":\"2026-02-23T08:57:53.9099177Z\",\"location\":\"/scim/Users/454e9661-dfeb-43ff-a543-48ec983e7be0\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"2b9e3fb4-111c-4fa8-8d04-8157eb3d137e\",\"name\":{\"formatted\":\"Thora\",\"familyName\":\"Cassie\",\"givenName\":\"Arnulfo\",\"middleName\":\"Burnice\",\"honorificPrefix\":\"Brant\",\"honorificSuffix\":\"Johnson\"},\"displayName\":\"IPVJFXXTJUKB\",\"nickName\":\"AUPMMKRBFBSA\",\"profileUrl\":\"ZILDLZADEATB\",\"title\":\"ADLMMWPFVCZH\",\"userType\":\"WJPNSQRJZWUS\",\"preferredLanguage\":\"dua\",\"locale\":\"MRWOBTMWKQJX\",\"timezone\":\"Africa/Libreville\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"cayla_monahan@schowalter.info\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"56-226-3256\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"QAEQUNTEEEZD\",\"streetAddress\":\"8767 Torphy Burg\",\"locality\":\"LPECVUFLAMIX\",\"region\":\"GXFDRDLOGWMQ\",\"postalCode\":\"yg27 3xy\",\"country\":\"Micronesia\"}],\"userName\":\"lauriane@whitebuckridge.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"2b9e3fb4-111c-4fa8-8d04-8157eb3d137e\",\"name\":{\"formatted\":\"Thora\",\"familyName\":\"Cassie\",\"givenName\":\"Arnulfo\",\"middleName\":\"Burnice\",\"honorificPrefix\":\"Brant\",\"honorificSuffix\":\"Johnson\"},\"displayName\":\"IPVJFXXTJUKB\",\"nickName\":\"AUPMMKRBFBSA\",\"profileUrl\":\"ZILDLZADEATB\",\"title\":\"ADLMMWPFVCZH\",\"userType\":\"WJPNSQRJZWUS\",\"preferredLanguage\":\"dua\",\"locale\":\"MRWOBTMWKQJX\",\"timezone\":\"Africa/Libreville\",\"active\":true,\"emails\":[{\"value\":\"cayla_monahan@schowalter.info\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"56-226-3256\",\"primary\":true}],\"addresses\":[{\"formatted\":\"QAEQUNTEEEZD\",\"streetAddress\":\"8767 Torphy Burg\",\"locality\":\"LPECVUFLAMIX\",\"region\":\"GXFDRDLOGWMQ\",\"postalCode\":\"yg27 3xy\",\"country\":\"Micronesia\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"454e9661-dfeb-43ff-a543-48ec983e7be0\",\"userName\":\"lauriane@whitebuckridge.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:53.7515276Z\",\"lastModified\":\"2026-02-23T08:57:53.7515276Z\",\"location\":\"/scim/Users/454e9661-dfeb-43ff-a543-48ec983e7be0\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/454e9661-dfeb-43ff-a543-48ec983e7be0 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"replace\",\"path\":\"active\",\"value\":false}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 637,
+          "Category": 0
+        },
+        {
+          "$id": "30",
+          "Description": "Delete a User",
+          "Name": "DELETE /Users/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:53 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort: max 1000\r\nRateLimit-Remaining: HttpRequestRatePerPort:1496, ClientConnectionsPerPort:998\r\nRateLimit-Reset: HttpRequestRatePerPort:39s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1498\r\nx-ms-ratelimit-used: 2\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 54d51568-ce00-4a5b-a9a8-de6b9194788c\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "404 NotFound",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"User 88af7c4b-cd7e-403d-867d-3a238d928360 not found\",\"status\":404}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/88af7c4b-cd7e-403d-867d-3a238d928360 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 662,
+          "Category": 0
+        },
+        {
+          "$id": "31",
+          "Description": "Get group by id excluding members",
+          "Name": "GET /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1495\r\nRateLimit-Reset: HttpRequestRatePerPort:36s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1497\r\nx-ms-ratelimit-used: 3\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: b2036cc1-62ae-4479-861f-5c1300dbbf1c\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"2b47a8e3-2242-4786-830f-3301dca3139d\",\"customAttributes\":{},\"id\":\"091f52c1-5e3f-4d07-9d55-8bec0e14cc93\",\"displayName\":\"QFNHWJVAJKRO\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908389Z\",\"lastModified\":\"2026-02-23T08:57:54.5908389Z\",\"location\":\"/scim/Groups/091f52c1-5e3f-4d07-9d55-8bec0e14cc93\"}}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/091f52c1-5e3f-4d07-9d55-8bec0e14cc93?excludedAttributes=members 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 169,
+          "Category": 0
+        },
+        {
+          "$id": "32",
+          "Description": "Filter for an existing group by displayName excluding members",
+          "Name": "Get /Groups filter",
+          "Results": [
+            {
+              "$id": "33",
+              "Message": "The response should contain the required attributes for a list response, i.e. schemas and totalResults",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "34",
+              "Message": "The response should contain the correct schema URI for a list response",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "35",
+              "Message": "Total Results should be equal to the count of all the Groups that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "36",
+              "Message": "The response should contain the Resources attribute when totalResults is non-zero",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "37",
+              "Message": "The response should contain all the Groups that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "38",
+              "Message": "The response should contain all the required fields for Groups",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "39",
+              "Message": "The response should match the created resource",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "40",
+              "Message": "The response should exclude the attribute: members",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "41",
+              "Message": "The response should contain be serialized to SCIM2 Core User",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1493\r\nRateLimit-Reset: HttpRequestRatePerPort:48s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: da1b9a7f-3388-4cd1-84df-265b201c2b07\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":1,\"startIndex\":1,\"itemsPerPage\":1,\"resources\":[{\"externalId\":\"2b47a8e3-2242-4786-830f-3301dca3139d\",\"customAttributes\":{},\"id\":\"091f52c1-5e3f-4d07-9d55-8bec0e14cc93\",\"displayName\":\"QFNHWJVAJKRO\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908389Z\",\"lastModified\":\"2026-02-23T08:57:54.5908389Z\",\"location\":\"/scim/Groups/091f52c1-5e3f-4d07-9d55-8bec0e14cc93\"}}]}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups?excludedAttributes=members&filter=displayName+eq+\"QFNHWJVAJKRO\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 202,
+          "Category": 0
+        },
+        {
+          "$id": "42",
+          "Description": "Filter for an existing group",
+          "Name": "Get /Groups filter",
+          "Results": [
+            {
+              "$id": "43",
+              "Message": "The response should contain the required attributes for a list response, i.e. schemas and totalResults",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "44",
+              "Message": "The response should contain the correct schema URI for a list response",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "45",
+              "Message": "Total Results should be equal to the count of all the Groups that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "46",
+              "Message": "The response should contain the Resources attribute when totalResults is non-zero",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "47",
+              "Message": "The response should contain all the Groups that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "48",
+              "Message": "The response should contain all the required fields for Groups",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "49",
+              "Message": "The response should match the created resource",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "50",
+              "Message": "The response should contain be serialized to SCIM2 Core User",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1492\r\nRateLimit-Reset: HttpRequestRatePerPort:37s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1497\r\nx-ms-ratelimit-used: 3\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: dd9aae79-8cdb-4bde-b2da-128d3436c517\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":1,\"startIndex\":1,\"itemsPerPage\":1,\"resources\":[{\"externalId\":\"2b47a8e3-2242-4786-830f-3301dca3139d\",\"customAttributes\":{},\"id\":\"091f52c1-5e3f-4d07-9d55-8bec0e14cc93\",\"displayName\":\"QFNHWJVAJKRO\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908389Z\",\"lastModified\":\"2026-02-23T08:57:54.5908389Z\",\"location\":\"/scim/Groups/091f52c1-5e3f-4d07-9d55-8bec0e14cc93\"}}]}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups?filter=displayName+eq+\"QFNHWJVAJKRO\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 168,
+          "Category": 0
+        },
+        {
+          "$id": "51",
+          "Description": "Filter for a non-existing group",
+          "Name": "Get /Groups filter",
+          "Results": [
+            {
+              "$id": "52",
+              "Message": "The response should contain the required attributes for a list response, i.e. schemas and totalResults",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "53",
+              "Message": "The response should contain the correct schema URI for a list response",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "54",
+              "Message": "Total Results should be equal to the count of all the Groups that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "55",
+              "Message": "The response should contain be serialized to SCIM2 Core User",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1489\r\nRateLimit-Reset: HttpRequestRatePerPort:37s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: c64146ce-7292-464b-87d6-dc939155cdf4\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":0,\"startIndex\":1,\"itemsPerPage\":0,\"resources\":[]}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups?filter=displayName+eq+\"nonexistente997dccbd8b7_GHUBEIEFLIQE\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 168,
+          "Category": 0
+        },
+        {
+          "$id": "56",
+          "Description": "Filter for an existing group with a different case",
+          "Name": "Get /Groups filter",
+          "Results": [
+            {
+              "$id": "57",
+              "Message": "The response should contain the required attributes for a list response, i.e. schemas and totalResults",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "58",
+              "Message": "The response should contain the correct schema URI for a list response",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "59",
+              "Message": "Total Results should be equal to the count of all the Groups that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "60",
+              "Message": "The response should contain the Resources attribute when totalResults is non-zero",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "61",
+              "Message": "The response should contain all the Groups that match the filter",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "62",
+              "Message": "The response should contain all the required fields for Groups",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "63",
+              "Message": "The response should match the created resource",
+              "Outcome": 0,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "64",
+              "Message": "The response should contain be serialized to SCIM2 Core User",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:55 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort: max 1000\r\nRateLimit-Remaining: HttpRequestRatePerPort:1492, ClientConnectionsPerPort:998\r\nRateLimit-Reset: HttpRequestRatePerPort:37s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1498\r\nx-ms-ratelimit-used: 2\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 426560ca-9c1b-4cbb-8a52-3377a69e2e54\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"],\"totalResults\":1,\"startIndex\":1,\"itemsPerPage\":1,\"resources\":[{\"externalId\":\"2b47a8e3-2242-4786-830f-3301dca3139d\",\"customAttributes\":{},\"id\":\"091f52c1-5e3f-4d07-9d55-8bec0e14cc93\",\"displayName\":\"QFNHWJVAJKRO\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908389Z\",\"lastModified\":\"2026-02-23T08:57:54.5908389Z\",\"location\":\"/scim/Groups/091f52c1-5e3f-4d07-9d55-8bec0e14cc93\"}}]}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups?filter=displayName+eq+\"qfnhwjvajkro\" 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 161,
+          "Category": 0
+        },
+        {
+          "$id": "65",
+          "Description": "Create a new Group",
+          "Name": "POST /Groups",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nLocation: https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/24cb9a4c-222d-4e34-9543-a21028afb8b5\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1496\r\nRateLimit-Reset: HttpRequestRatePerPort:36s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1497\r\nx-ms-ratelimit-used: 3\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 4544d44f-3852-4121-9992-16aec054fd89\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "201 Created",
+          "ResponseBody": "{\"externalId\":\"c765dfd0-6c05-4c3c-9249-802acabd0ebd\",\"members\":[],\"customAttributes\":{},\"id\":\"24cb9a4c-222d-4e34-9543-a21028afb8b5\",\"displayName\":\"PDSQQLROFNSC\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908286Z\",\"lastModified\":\"2026-02-23T08:57:54.5908286Z\",\"location\":\"/scim/Groups/24cb9a4c-222d-4e34-9543-a21028afb8b5\"}}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"c765dfd0-6c05-4c3c-9249-802acabd0ebd\",\"displayName\":\"PDSQQLROFNSC\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 379,
+          "Category": 0
+        },
+        {
+          "$id": "66",
+          "Description": "Create a duplicate Group",
+          "Name": "POST /Groups",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1494\r\nRateLimit-Reset: HttpRequestRatePerPort:27s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: eab7a184-8b1a-4a1a-a651-2d12044be365\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "409 Conflict",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"Group already exists\",\"status\":409}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"8bc1f70d-eb4c-461c-85de-b0b0b2217162\",\"displayName\":\"XGCEDXZJTAZT\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 682,
+          "Category": 0
+        },
+        {
+          "$id": "67",
+          "Description": "Patch Group - Replace Attributes",
+          "Name": "PATCH /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort: max 1000\r\nRateLimit-Remaining: HttpRequestRatePerPort:1493, ClientConnectionsPerPort:998\r\nRateLimit-Reset: HttpRequestRatePerPort:38s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1498\r\nx-ms-ratelimit-used: 2\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 647f4b5d-6603-4225-8332-f6e56686e503\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"9a2c03ee-ef37-4de5-85fa-4816379096f6\",\"members\":[],\"customAttributes\":{},\"id\":\"a0676113-6d40-45de-854c-bf8a3ba7b4dc\",\"displayName\":\"KBZIMXSIMNVB\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908338Z\",\"lastModified\":\"2026-02-23T08:57:54.7649977Z\",\"location\":\"/scim/Groups/a0676113-6d40-45de-854c-bf8a3ba7b4dc\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"9217c5f7-3159-4785-ad7a-a3b8b1f2f79f\",\"displayName\":\"KBZIMXSIMNVB\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"9217c5f7-3159-4785-ad7a-a3b8b1f2f79f\",\"members\":[],\"customAttributes\":{},\"id\":\"a0676113-6d40-45de-854c-bf8a3ba7b4dc\",\"displayName\":\"KBZIMXSIMNVB\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908338Z\",\"lastModified\":\"2026-02-23T08:57:54.5908338Z\",\"location\":\"/scim/Groups/a0676113-6d40-45de-854c-bf8a3ba7b4dc\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/a0676113-6d40-45de-854c-bf8a3ba7b4dc 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"replace\",\"value\":{\"externalId\":\"9a2c03ee-ef37-4de5-85fa-4816379096f6\"}}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 746,
+          "Category": 0
+        },
+        {
+          "$id": "68",
+          "Description": "Update Group displayName",
+          "Name": "PATCH /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1491\r\nRateLimit-Reset: HttpRequestRatePerPort:55s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 8a1d99bf-eaf0-4cfb-8996-7da7bef65b05\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"4aa44819-3d93-48b4-a95b-13805f43426b\",\"members\":[],\"customAttributes\":{},\"id\":\"8abadac2-2d6b-4df2-8cae-ef1654d75435\",\"displayName\":\"ADSHOEMEQYJL\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908283Z\",\"lastModified\":\"2026-02-23T08:57:54.7649792Z\",\"location\":\"/scim/Groups/8abadac2-2d6b-4df2-8cae-ef1654d75435\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"4aa44819-3d93-48b4-a95b-13805f43426b\",\"displayName\":\"MJWMNGFSWFDN\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"4aa44819-3d93-48b4-a95b-13805f43426b\",\"members\":[],\"customAttributes\":{},\"id\":\"8abadac2-2d6b-4df2-8cae-ef1654d75435\",\"displayName\":\"MJWMNGFSWFDN\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908283Z\",\"lastModified\":\"2026-02-23T08:57:54.5908283Z\",\"location\":\"/scim/Groups/8abadac2-2d6b-4df2-8cae-ef1654d75435\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/8abadac2-2d6b-4df2-8cae-ef1654d75435 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"replace\",\"value\":{\"displayName\":\"ADSHOEMEQYJL\"}}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 627,
+          "Category": 0
+        },
+        {
+          "$id": "69",
+          "Description": "Patch Group - Add Member",
+          "Name": "PATCH /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1493\r\nRateLimit-Reset: HttpRequestRatePerPort:36s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1497\r\nx-ms-ratelimit-used: 3\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: f1c4fc09-5df8-417c-92b4-2907a24106a6\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"7b882e7e-b693-41d2-b16a-a76a4af4ed56\",\"members\":[{\"value\":\"03985ec1-b8d7-4b07-a2ac-407589004051\",\"type\":\"User\"}],\"customAttributes\":{},\"id\":\"2454038d-9137-445d-916c-a1142a5fa900\",\"displayName\":\"JTPNYCYFRRJI\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908301Z\",\"lastModified\":\"2026-02-23T08:57:55.0877509Z\",\"location\":\"/scim/Groups/2454038d-9137-445d-916c-a1142a5fa900\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"7b882e7e-b693-41d2-b16a-a76a4af4ed56\",\"displayName\":\"JTPNYCYFRRJI\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n",
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"c80521ca-0661-418e-9a01-50202af3ef39\",\"name\":{\"formatted\":\"Marquise\",\"familyName\":\"Stephany\",\"givenName\":\"Kayden\",\"middleName\":\"Scottie\",\"honorificPrefix\":\"Aileen\",\"honorificSuffix\":\"Jerad\"},\"displayName\":\"MCUIQOOSUJBP\",\"nickName\":\"RUWPFIDADRTB\",\"profileUrl\":\"FOWZKFOFBMIG\",\"title\":\"NNLPRIRUBUMV\",\"userType\":\"WYGXRCAXHQVM\",\"preferredLanguage\":\"en-GD\",\"locale\":\"STDWUUTOWHYX\",\"timezone\":\"America/Cuiaba\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"aglae_huels@rolfson.us\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"70-179-2484\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"EQGPZRUOWLGL\",\"streetAddress\":\"12809 Reina Inlet\",\"locality\":\"ZTNDZEFKFHPZ\",\"region\":\"UJYNFPAIOVUO\",\"postalCode\":\"wm26 7ix\",\"country\":\"Rwanda\"}],\"userName\":\"member_shaylee@bernierreynolds.ca\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created",
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"7b882e7e-b693-41d2-b16a-a76a4af4ed56\",\"members\":[],\"customAttributes\":{},\"id\":\"2454038d-9137-445d-916c-a1142a5fa900\",\"displayName\":\"JTPNYCYFRRJI\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.5908301Z\",\"lastModified\":\"2026-02-23T08:57:54.5908302Z\",\"location\":\"/scim/Groups/2454038d-9137-445d-916c-a1142a5fa900\"}}",
+            "{\"externalId\":\"c80521ca-0661-418e-9a01-50202af3ef39\",\"name\":{\"formatted\":\"Marquise\",\"familyName\":\"Stephany\",\"givenName\":\"Kayden\",\"middleName\":\"Scottie\",\"honorificPrefix\":\"Aileen\",\"honorificSuffix\":\"Jerad\"},\"displayName\":\"MCUIQOOSUJBP\",\"nickName\":\"RUWPFIDADRTB\",\"profileUrl\":\"FOWZKFOFBMIG\",\"title\":\"NNLPRIRUBUMV\",\"userType\":\"WYGXRCAXHQVM\",\"preferredLanguage\":\"en-GD\",\"locale\":\"STDWUUTOWHYX\",\"timezone\":\"America/Cuiaba\",\"active\":true,\"emails\":[{\"value\":\"aglae_huels@rolfson.us\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"70-179-2484\",\"primary\":true}],\"addresses\":[{\"formatted\":\"EQGPZRUOWLGL\",\"streetAddress\":\"12809 Reina Inlet\",\"locality\":\"ZTNDZEFKFHPZ\",\"region\":\"UJYNFPAIOVUO\",\"postalCode\":\"wm26 7ix\",\"country\":\"Rwanda\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"03985ec1-b8d7-4b07-a2ac-407589004051\",\"userName\":\"member_shaylee@bernierreynolds.ca\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:54.9223111Z\",\"lastModified\":\"2026-02-23T08:57:54.9223111Z\",\"location\":\"/scim/Users/03985ec1-b8d7-4b07-a2ac-407589004051\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/2454038d-9137-445d-916c-a1142a5fa900 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"replace\",\"path\":\"members\",\"value\":[{\"value\":\"03985ec1-b8d7-4b07-a2ac-407589004051\"}]}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 1035,
+          "Category": 0
+        },
+        {
+          "$id": "70",
+          "Description": "Patch Group - Remove Member",
+          "Name": "PATCH /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:55 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort: max 1000\r\nRateLimit-Remaining: HttpRequestRatePerPort:1491, ClientConnectionsPerPort:998\r\nRateLimit-Reset: HttpRequestRatePerPort:37s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1498\r\nx-ms-ratelimit-used: 2\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 266c9432-05f4-4d15-9bda-2bd58eecb08d\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"84db256a-d93b-4a21-8063-397e40b2c00f\",\"members\":[{\"value\":\"75c7805d-df6d-4beb-b55f-4b0b0548461e\",\"type\":\"User\"}],\"customAttributes\":{},\"id\":\"20c674d8-3d77-44b7-a32d-60d7e17483b3\",\"displayName\":\"XZVMYPWAYPXZ\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.750113Z\",\"lastModified\":\"2026-02-23T08:57:55.5749549Z\",\"location\":\"/scim/Groups/20c674d8-3d77-44b7-a32d-60d7e17483b3\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"84db256a-d93b-4a21-8063-397e40b2c00f\",\"displayName\":\"XZVMYPWAYPXZ\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n",
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"eef2e94e-638c-4ee0-a91d-d1cb31622358\",\"name\":{\"formatted\":\"Eldridge\",\"familyName\":\"Taya\",\"givenName\":\"Jonatan\",\"middleName\":\"Selena\",\"honorificPrefix\":\"Ned\",\"honorificSuffix\":\"Katlynn\"},\"displayName\":\"WRAMFXOWOPFA\",\"nickName\":\"AUMYXQXKGKJS\",\"profileUrl\":\"MIEDKKYYRYNQ\",\"title\":\"FWCFNMRDGIZY\",\"userType\":\"FYHZOATOKTAU\",\"preferredLanguage\":\"mua\",\"locale\":\"SUIFKAMGZWMC\",\"timezone\":\"America/Chicago\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"camylle@bartellcrona.co.uk\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"61-330-2671\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"MBWWLTMMXNOX\",\"streetAddress\":\"9393 Hansen Highway\",\"locality\":\"DFAKFPWCGHOL\",\"region\":\"FWYQRNGAYHJS\",\"postalCode\":\"wv7 2bu\",\"country\":\"Guernsey\"}],\"userName\":\"member_jewell@gusikowski.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n",
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"55b3365f-0c08-4de8-96ce-fb1bc5a0e10b\",\"name\":{\"formatted\":\"Chloe\",\"familyName\":\"Savannah\",\"givenName\":\"Marielle\",\"middleName\":\"Jadon\",\"honorificPrefix\":\"Baron\",\"honorificSuffix\":\"Genoveva\"},\"displayName\":\"VIYPJXSJWHRF\",\"nickName\":\"VJXGEMBIBDFZ\",\"profileUrl\":\"NWOXLVTHIFVB\",\"title\":\"XCVIUFUEQACD\",\"userType\":\"RUKKUDHKMLAA\",\"preferredLanguage\":\"my-MM\",\"locale\":\"CDNKLXFVCXCO\",\"timezone\":\"America/Belize\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"trenton.zieme@boyle.co.uk\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"20-053-8851\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"DBWRFPSLUCQO\",\"streetAddress\":\"80122 Xavier View\",\"locality\":\"PTVMYGWHSGHQ\",\"region\":\"NPPLWVASLNPD\",\"postalCode\":\"cy3 1sk\",\"country\":\"Swaziland\"}],\"userName\":\"member_jovan@mcglynn.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n",
+            "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/20c674d8-3d77-44b7-a32d-60d7e17483b3 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"replace\",\"path\":\"members\",\"value\":[{\"value\":\"8eebce7c-3536-457a-a97c-2ffeba9d1ab5\"},{\"value\":\"75c7805d-df6d-4beb-b55f-4b0b0548461e\"}]}]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created",
+            "201 Created",
+            "201 Created",
+            "200 OK"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"84db256a-d93b-4a21-8063-397e40b2c00f\",\"members\":[],\"customAttributes\":{},\"id\":\"20c674d8-3d77-44b7-a32d-60d7e17483b3\",\"displayName\":\"XZVMYPWAYPXZ\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.750113Z\",\"lastModified\":\"2026-02-23T08:57:54.7501131Z\",\"location\":\"/scim/Groups/20c674d8-3d77-44b7-a32d-60d7e17483b3\"}}",
+            "{\"externalId\":\"eef2e94e-638c-4ee0-a91d-d1cb31622358\",\"name\":{\"formatted\":\"Eldridge\",\"familyName\":\"Taya\",\"givenName\":\"Jonatan\",\"middleName\":\"Selena\",\"honorificPrefix\":\"Ned\",\"honorificSuffix\":\"Katlynn\"},\"displayName\":\"WRAMFXOWOPFA\",\"nickName\":\"AUMYXQXKGKJS\",\"profileUrl\":\"MIEDKKYYRYNQ\",\"title\":\"FWCFNMRDGIZY\",\"userType\":\"FYHZOATOKTAU\",\"preferredLanguage\":\"mua\",\"locale\":\"SUIFKAMGZWMC\",\"timezone\":\"America/Chicago\",\"active\":true,\"emails\":[{\"value\":\"camylle@bartellcrona.co.uk\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"61-330-2671\",\"primary\":true}],\"addresses\":[{\"formatted\":\"MBWWLTMMXNOX\",\"streetAddress\":\"9393 Hansen Highway\",\"locality\":\"DFAKFPWCGHOL\",\"region\":\"FWYQRNGAYHJS\",\"postalCode\":\"wv7 2bu\",\"country\":\"Guernsey\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"8eebce7c-3536-457a-a97c-2ffeba9d1ab5\",\"userName\":\"member_jewell@gusikowski.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:54.92307Z\",\"lastModified\":\"2026-02-23T08:57:54.9230701Z\",\"location\":\"/scim/Users/8eebce7c-3536-457a-a97c-2ffeba9d1ab5\"}}",
+            "{\"externalId\":\"55b3365f-0c08-4de8-96ce-fb1bc5a0e10b\",\"name\":{\"formatted\":\"Chloe\",\"familyName\":\"Savannah\",\"givenName\":\"Marielle\",\"middleName\":\"Jadon\",\"honorificPrefix\":\"Baron\",\"honorificSuffix\":\"Genoveva\"},\"displayName\":\"VIYPJXSJWHRF\",\"nickName\":\"VJXGEMBIBDFZ\",\"profileUrl\":\"NWOXLVTHIFVB\",\"title\":\"XCVIUFUEQACD\",\"userType\":\"RUKKUDHKMLAA\",\"preferredLanguage\":\"my-MM\",\"locale\":\"CDNKLXFVCXCO\",\"timezone\":\"America/Belize\",\"active\":true,\"emails\":[{\"value\":\"trenton.zieme@boyle.co.uk\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"20-053-8851\",\"primary\":true}],\"addresses\":[{\"formatted\":\"DBWRFPSLUCQO\",\"streetAddress\":\"80122 Xavier View\",\"locality\":\"PTVMYGWHSGHQ\",\"region\":\"NPPLWVASLNPD\",\"postalCode\":\"cy3 1sk\",\"country\":\"Swaziland\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"75c7805d-df6d-4beb-b55f-4b0b0548461e\",\"userName\":\"member_jovan@mcglynn.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:55.0869765Z\",\"lastModified\":\"2026-02-23T08:57:55.0869767Z\",\"location\":\"/scim/Users/75c7805d-df6d-4beb-b55f-4b0b0548461e\"}}",
+            "{\"externalId\":\"84db256a-d93b-4a21-8063-397e40b2c00f\",\"members\":[{\"value\":\"8eebce7c-3536-457a-a97c-2ffeba9d1ab5\",\"type\":\"User\"},{\"value\":\"75c7805d-df6d-4beb-b55f-4b0b0548461e\",\"type\":\"User\"}],\"customAttributes\":{},\"id\":\"20c674d8-3d77-44b7-a32d-60d7e17483b3\",\"displayName\":\"XZVMYPWAYPXZ\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.750113Z\",\"lastModified\":\"2026-02-23T08:57:55.2475417Z\",\"location\":\"/scim/Groups/20c674d8-3d77-44b7-a32d-60d7e17483b3\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/20c674d8-3d77-44b7-a32d-60d7e17483b3 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"remove\",\"path\":\"members[value eq \\\"8eebce7c-3536-457a-a97c-2ffeba9d1ab5\\\"]\"}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 1840,
+          "Category": 0
+        },
+        {
+          "$id": "71",
+          "Description": "Delete a Group",
+          "Name": "DELETE /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:55 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1487\r\nRateLimit-Reset: HttpRequestRatePerPort:26s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 5dd75490-e7b0-4245-a165-5741db4ada1b\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "404 NotFound",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"Group 0612a778-ec66-483a-9cf5-05074232112c not found\",\"status\":404}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "GET https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/0612a778-ec66-483a-9cf5-05074232112c 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 672,
+          "Category": 0
+        }
+      ],
+      "FailedTests": [
+        {
+          "$id": "72",
+          "Description": "Patch User - Replace Attributes",
+          "Name": "PATCH /Users/Id",
+          "Results": [
+            {
+              "$id": "73",
+              "Message": "The value of timezone should be  instead of Africa/Lubumbashi",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "74",
+              "Message": "The value of emails[primary eq true].value is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "75",
+              "Message": "The value of phoneNumbers[primary eq true].value is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "76",
+              "Message": "The value of addresses[primary eq true].formatted is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "77",
+              "Message": "The value of addresses[primary eq true].streetAddress is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "78",
+              "Message": "The value of addresses[primary eq true].locality is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "79",
+              "Message": "The value of addresses[primary eq true].region is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "80",
+              "Message": "The value of addresses[primary eq true].postalCode is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            },
+            {
+              "$id": "81",
+              "Message": "The value of addresses[primary eq true].country is Missing from the fetched Resource",
+              "Outcome": 1,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:51 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1498\r\nRateLimit-Reset: HttpRequestRatePerPort:51s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 80e5f6a5-1367-493b-bc72-36617c82608b\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"c7145de2-8d09-4d3f-ad32-73f3ad2f7dc3\",\"name\":{\"formatted\":\"Theresa\",\"familyName\":\"Mateo\",\"givenName\":\"Leanne\",\"middleName\":\"Keyshawn\",\"honorificPrefix\":\"Petra\",\"honorificSuffix\":\"Donald\"},\"displayName\":\"WPMGMAPZZZOG\",\"nickName\":\"XRVKUQQEWTWM\",\"profileUrl\":\"MVFHUEKNWNOZ\",\"title\":\"KDDASUUSXZHZ\",\"userType\":\"KHPEVIFITFOF\",\"preferredLanguage\":\"en-SC\",\"locale\":\"PHSYYLKOBPWW\",\"timezone\":\"Africa/Lubumbashi\",\"active\":true,\"emails\":[{\"value\":\"jackeline.graham@thompson.co.uk\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"15-532-3301\",\"primary\":true}],\"addresses\":[{\"formatted\":\"HKHVBPXOTLPU\",\"streetAddress\":\"5603 Gusikowski Overpass\",\"locality\":\"QJQLYXFKNQES\",\"region\":\"BHJLXPTIQJRP\",\"postalCode\":\"ad39 0tr\",\"country\":\"Bahrain\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"87993052-0210-42bf-b003-85d221ddb143\",\"userName\":\"gunner@rempel.info\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.9641351Z\",\"lastModified\":\"2026-02-23T08:57:52.1363639Z\",\"location\":\"/scim/Users/87993052-0210-42bf-b003-85d221ddb143\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"847fb9f0-e272-451e-9bb5-9c4409eec1e9\",\"name\":{\"formatted\":\"Prince\",\"familyName\":\"Madelynn\",\"givenName\":\"Felicity\",\"middleName\":\"Brock\",\"honorificPrefix\":\"Dianna\",\"honorificSuffix\":\"Elyse\"},\"displayName\":\"RYILLMBHZVMV\",\"nickName\":\"GIMFVFXLWNSK\",\"profileUrl\":\"AEUEHXXFPGHN\",\"title\":\"HDSUAYOJAJKA\",\"userType\":\"YDJZMFOYHKVB\",\"preferredLanguage\":\"en-GB\",\"locale\":\"UNYRWFJXPONP\",\"timezone\":\"Africa/Maputo\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"justyn@jones.com\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"31-226-3240\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"ZINGVLVFMQIB\",\"streetAddress\":\"13462 Ramiro Union\",\"locality\":\"YVKNYRNIKUTF\",\"region\":\"GPEHFTPMLEBA\",\"postalCode\":\"qw03 8ik\",\"country\":\"Colombia\"}],\"userName\":\"gunner@rempel.info\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"847fb9f0-e272-451e-9bb5-9c4409eec1e9\",\"name\":{\"formatted\":\"Prince\",\"familyName\":\"Madelynn\",\"givenName\":\"Felicity\",\"middleName\":\"Brock\",\"honorificPrefix\":\"Dianna\",\"honorificSuffix\":\"Elyse\"},\"displayName\":\"RYILLMBHZVMV\",\"nickName\":\"GIMFVFXLWNSK\",\"profileUrl\":\"AEUEHXXFPGHN\",\"title\":\"HDSUAYOJAJKA\",\"userType\":\"YDJZMFOYHKVB\",\"preferredLanguage\":\"en-GB\",\"locale\":\"UNYRWFJXPONP\",\"timezone\":\"Africa/Maputo\",\"active\":true,\"emails\":[{\"value\":\"justyn@jones.com\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"31-226-3240\",\"primary\":true}],\"addresses\":[{\"formatted\":\"ZINGVLVFMQIB\",\"streetAddress\":\"13462 Ramiro Union\",\"locality\":\"YVKNYRNIKUTF\",\"region\":\"GPEHFTPMLEBA\",\"postalCode\":\"qw03 8ik\",\"country\":\"Colombia\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"87993052-0210-42bf-b003-85d221ddb143\",\"userName\":\"gunner@rempel.info\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:51.9641351Z\",\"lastModified\":\"2026-02-23T08:57:51.9641352Z\",\"location\":\"/scim/Users/87993052-0210-42bf-b003-85d221ddb143\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/87993052-0210-42bf-b003-85d221ddb143 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"replace\",\"path\":\"emails[primary eq true].value\",\"value\":\"jackeline.graham@thompson.co.uk\"},{\"op\":\"replace\",\"path\":\"phoneNumbers[primary eq true].value\",\"value\":\"15-532-3301\"},{\"op\":\"replace\",\"path\":\"addresses[primary eq true].formatted\",\"value\":\"HKHVBPXOTLPU\"},{\"op\":\"replace\",\"path\":\"addresses[primary eq true].streetAddress\",\"value\":\"5603 Gusikowski Overpass\"},{\"op\":\"replace\",\"path\":\"addresses[primary eq true].locality\",\"value\":\"QJQLYXFKNQES\"},{\"op\":\"replace\",\"path\":\"addresses[primary eq true].region\",\"value\":\"BHJLXPTIQJRP\"},{\"op\":\"replace\",\"path\":\"addresses[primary eq true].postalCode\",\"value\":\"ad39 0tr\"},{\"op\":\"replace\",\"path\":\"addresses[primary eq true].country\",\"value\":\"Bahrain\"},{\"op\":\"replace\",\"value\":{\"externalId\":\"c7145de2-8d09-4d3f-ad32-73f3ad2f7dc3\",\"name.formatted\":\"Theresa\",\"name.familyName\":\"Mateo\",\"name.givenName\":\"Leanne\",\"name.middleName\":\"Keyshawn\",\"name.honorificPrefix\":\"Petra\",\"name.honorificSuffix\":\"Donald\",\"displayName\":\"WPMGMAPZZZOG\",\"nickName\":\"XRVKUQQEWTWM\",\"profileUrl\":\"MVFHUEKNWNOZ\",\"title\":\"KDDASUUSXZHZ\",\"userType\":\"KHPEVIFITFOF\",\"preferredLanguage\":\"en-SC\",\"locale\":\"PHSYYLKOBPWW\",\"timezone\":\"Africa/Lubumbashi\",\"active\":true}}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": false,
+          "TestexecutionTime": 962,
+          "Category": 0
+        }
+      ],
+      "Warnings": [],
+      "PreviewTests": [
+        {
+          "$id": "82",
+          "Description": "Patch User - Multiple Operations on different attributes",
+          "Name": "PATCH /Users/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:52 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m\r\nRateLimit-Remaining: HttpRequestRatePerPort:1499\r\nRateLimit-Reset: HttpRequestRatePerPort:50s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: ff6f0ea0-48d7-4124-92b8-06891532bd04\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"6f0b8274-70ba-4b93-aaf9-0dfdcd579490\",\"name\":{\"formatted\":\"Durward\",\"familyName\":\"Jeramy\",\"givenName\":\"Daryl\",\"middleName\":\"Madelyn\",\"honorificPrefix\":\"Johan\",\"honorificSuffix\":\"Kay\"},\"displayName\":\"PAXIDTCXZVEK\",\"profileUrl\":\"HDJNCWSJFWMP\",\"title\":\"STBIMKUJBVUJ\",\"userType\":\"IPGFHRQVLGYD\",\"preferredLanguage\":\"ru-UA\",\"locale\":\"UFJPUZHCUQJH\",\"timezone\":\"Africa/Lome\",\"active\":true,\"emails\":[{\"value\":\"ford.deckow@hermiston.biz\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"71-857-6394\",\"primary\":true}],\"addresses\":[{\"formatted\":\"DTAUTRCCFKAG\",\"streetAddress\":\"075 Lang Drive\",\"locality\":\"MRHFXFCUQUKE\",\"region\":\"NHEWJILLXTDZ\",\"postalCode\":\"xm11 2vd\",\"country\":\"Bermuda\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"f32a77a4-a678-440a-8504-6e3cd9dd65d6\",\"userName\":\"pierre@konopelskichamplin.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:52.0531335Z\",\"lastModified\":\"2026-02-23T08:57:52.6390226Z\",\"location\":\"/scim/Users/f32a77a4-a678-440a-8504-6e3cd9dd65d6\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"e264d46b-a9e9-4f3e-bf74-0f966fa608e4\",\"name\":{\"formatted\":\"Durward\",\"familyName\":\"Jeramy\",\"givenName\":\"Daryl\",\"middleName\":\"Madelyn\",\"honorificPrefix\":\"Johan\",\"honorificSuffix\":\"Kay\"},\"displayName\":\"VGAEOUNBHDYC\",\"nickName\":\"SITJMXOSJQZV\",\"profileUrl\":\"HDJNCWSJFWMP\",\"title\":\"STBIMKUJBVUJ\",\"userType\":\"IPGFHRQVLGYD\",\"preferredLanguage\":\"ru-UA\",\"locale\":\"UFJPUZHCUQJH\",\"timezone\":\"Africa/Lome\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"ford.deckow@hermiston.biz\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"71-857-6394\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"DTAUTRCCFKAG\",\"streetAddress\":\"075 Lang Drive\",\"locality\":\"MRHFXFCUQUKE\",\"region\":\"NHEWJILLXTDZ\",\"postalCode\":\"xm11 2vd\",\"country\":\"Bermuda\"}],\"userName\":\"pierre@konopelskichamplin.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"e264d46b-a9e9-4f3e-bf74-0f966fa608e4\",\"name\":{\"formatted\":\"Durward\",\"familyName\":\"Jeramy\",\"givenName\":\"Daryl\",\"middleName\":\"Madelyn\",\"honorificPrefix\":\"Johan\",\"honorificSuffix\":\"Kay\"},\"displayName\":\"VGAEOUNBHDYC\",\"nickName\":\"SITJMXOSJQZV\",\"profileUrl\":\"HDJNCWSJFWMP\",\"title\":\"STBIMKUJBVUJ\",\"userType\":\"IPGFHRQVLGYD\",\"preferredLanguage\":\"ru-UA\",\"locale\":\"UFJPUZHCUQJH\",\"timezone\":\"Africa/Lome\",\"active\":true,\"emails\":[{\"value\":\"ford.deckow@hermiston.biz\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"71-857-6394\",\"primary\":true}],\"addresses\":[{\"formatted\":\"DTAUTRCCFKAG\",\"streetAddress\":\"075 Lang Drive\",\"locality\":\"MRHFXFCUQUKE\",\"region\":\"NHEWJILLXTDZ\",\"postalCode\":\"xm11 2vd\",\"country\":\"Bermuda\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"f32a77a4-a678-440a-8504-6e3cd9dd65d6\",\"userName\":\"pierre@konopelskichamplin.com\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:52.0531335Z\",\"lastModified\":\"2026-02-23T08:57:52.0531336Z\",\"location\":\"/scim/Users/f32a77a4-a678-440a-8504-6e3cd9dd65d6\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/f32a77a4-a678-440a-8504-6e3cd9dd65d6 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"remove\",\"path\":\"nickName\"},{\"op\":\"add\",\"value\":{\"externalId\":\"6f0b8274-70ba-4b93-aaf9-0dfdcd579490\"}},{\"op\":\"replace\",\"value\":{\"displayName\":\"PAXIDTCXZVEK\"}}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 1574,
+          "Category": 1
+        },
+        {
+          "$id": "83",
+          "Description": "Patch User - Multiple Operations on same attribute",
+          "Name": "PATCH /Users/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:52 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1496\r\nRateLimit-Reset: HttpRequestRatePerPort:50s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 67831183-26f8-4cfc-a67c-b29bf178fdaf\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"3a234ac7-2fa7-4fad-a3dc-7eb6e9d79584\",\"name\":{\"formatted\":\"Jarrell\",\"familyName\":\"Makenzie\",\"givenName\":\"Lauren\",\"middleName\":\"Adaline\",\"honorificPrefix\":\"Genesis\",\"honorificSuffix\":\"Lonnie\"},\"displayName\":\"ZDLGBUKBAXHK\",\"nickName\":\"FWWQGKAZBASW\",\"profileUrl\":\"YHXFFHOGKUHD\",\"title\":\"YVMYAKLBQNOX\",\"userType\":\"VDIPWJACUCAU\",\"preferredLanguage\":\"en-AU\",\"locale\":\"KRWQZXOHCWIP\",\"timezone\":\"Africa/Maputo\",\"active\":true,\"emails\":[{\"value\":\"julius.rolfson@pollich.uk\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"61-912-6537\",\"primary\":true}],\"addresses\":[{\"formatted\":\"BADAULILIIPL\",\"streetAddress\":\"2737 Ernser Mills\",\"locality\":\"WEWQPDUNKCHW\",\"region\":\"CZITDHNBDRFP\",\"postalCode\":\"nt88 2jv\",\"country\":\"Kuwait\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"55c56144-0458-49f3-b932-a3290078f60d\",\"userName\":\"earnestine.hamill@gloverkshlerin.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:53.1126976Z\",\"lastModified\":\"2026-02-23T08:57:53.272012Z\",\"location\":\"/scim/Users/55c56144-0458-49f3-b932-a3290078f60d\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"c6ad1fab-5dab-42a6-b4c6-17383bc180f5\",\"name\":{\"formatted\":\"Jarrell\",\"familyName\":\"Makenzie\",\"givenName\":\"Lauren\",\"middleName\":\"Adaline\",\"honorificPrefix\":\"Genesis\",\"honorificSuffix\":\"Lonnie\"},\"displayName\":\"ZDLGBUKBAXHK\",\"nickName\":\"FWWQGKAZBASW\",\"profileUrl\":\"YHXFFHOGKUHD\",\"title\":\"YVMYAKLBQNOX\",\"userType\":\"VDIPWJACUCAU\",\"preferredLanguage\":\"en-AU\",\"locale\":\"KRWQZXOHCWIP\",\"timezone\":\"Africa/Maputo\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"julius.rolfson@pollich.uk\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"61-912-6537\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"BADAULILIIPL\",\"streetAddress\":\"2737 Ernser Mills\",\"locality\":\"WEWQPDUNKCHW\",\"region\":\"CZITDHNBDRFP\",\"postalCode\":\"nt88 2jv\",\"country\":\"Kuwait\"}],\"userName\":\"earnestine.hamill@gloverkshlerin.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"c6ad1fab-5dab-42a6-b4c6-17383bc180f5\",\"name\":{\"formatted\":\"Jarrell\",\"familyName\":\"Makenzie\",\"givenName\":\"Lauren\",\"middleName\":\"Adaline\",\"honorificPrefix\":\"Genesis\",\"honorificSuffix\":\"Lonnie\"},\"displayName\":\"ZDLGBUKBAXHK\",\"nickName\":\"FWWQGKAZBASW\",\"profileUrl\":\"YHXFFHOGKUHD\",\"title\":\"YVMYAKLBQNOX\",\"userType\":\"VDIPWJACUCAU\",\"preferredLanguage\":\"en-AU\",\"locale\":\"KRWQZXOHCWIP\",\"timezone\":\"Africa/Maputo\",\"active\":true,\"emails\":[{\"value\":\"julius.rolfson@pollich.uk\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"61-912-6537\",\"primary\":true}],\"addresses\":[{\"formatted\":\"BADAULILIIPL\",\"streetAddress\":\"2737 Ernser Mills\",\"locality\":\"WEWQPDUNKCHW\",\"region\":\"CZITDHNBDRFP\",\"postalCode\":\"nt88 2jv\",\"country\":\"Kuwait\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"55c56144-0458-49f3-b932-a3290078f60d\",\"userName\":\"earnestine.hamill@gloverkshlerin.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:53.1126976Z\",\"lastModified\":\"2026-02-23T08:57:53.1126977Z\",\"location\":\"/scim/Users/55c56144-0458-49f3-b932-a3290078f60d\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/55c56144-0458-49f3-b932-a3290078f60d 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"remove\",\"path\":\"externalId\"},{\"op\":\"add\",\"value\":{\"externalId\":\"015abcb0-9fa2-4323-8f2a-96dfc0074d99\"}},{\"op\":\"replace\",\"value\":{\"externalId\":\"3a234ac7-2fa7-4fad-a3dc-7eb6e9d79584\"}}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 638,
+          "Category": 1
+        },
+        {
+          "$id": "84",
+          "Description": "Delete a non-existent User",
+          "Name": "DELETE /Users/Id",
+          "Results": [
+            {
+              "$id": "85",
+              "Message": "DELETE request on a non-existent resource returns 404 NotFound as expected",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:53 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort: max 1000\r\nRateLimit-Remaining: HttpRequestRatePerPort:1497, ClientConnectionsPerPort:998\r\nRateLimit-Reset: HttpRequestRatePerPort:39s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1498\r\nx-ms-ratelimit-used: 2\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 58c9af12-b60c-437b-bd1d-ffa8c36dc3f1\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "404 NotFound",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"User 39af5a2b-9832-4ab1-8e07-6e2f202e0161 not found\",\"status\":404}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "DELETE https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/39af5a2b-9832-4ab1-8e07-6e2f202e0161 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 161,
+          "Category": 1
+        },
+        {
+          "$id": "86",
+          "Description": "Delete the same User twice",
+          "Name": "DELETE /Users/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:53 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1497\r\nRateLimit-Reset: HttpRequestRatePerPort:37s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1497\r\nx-ms-ratelimit-used: 3\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 42ca44cb-f801-411a-ba50-d4118596e578\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "404 NotFound",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"User 8e79cafd-800f-46ee-98b6-52116c965cc7 not found\",\"status\":404}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"fc963f21-339f-4118-a6e5-2324779dc784\",\"name\":{\"formatted\":\"Lauren\",\"familyName\":\"Geovanny\",\"givenName\":\"Rafaela\",\"middleName\":\"Lorenza\",\"honorificPrefix\":\"Raphael\",\"honorificSuffix\":\"Tristian\"},\"displayName\":\"EDZPLZUHKPFW\",\"nickName\":\"AMMRUNMGUBAQ\",\"profileUrl\":\"BQSDCZCVLBFR\",\"title\":\"LAMPQNHCKTKT\",\"userType\":\"VUGSVAOKGYDH\",\"preferredLanguage\":\"ha-NE\",\"locale\":\"RAEMMMZONFPO\",\"timezone\":\"America/Campo_Grande\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"sibyl_wehner@treutel.biz\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"71-794-9593\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"CXUMNTKDMSBJ\",\"streetAddress\":\"542 Jesse Tunnel\",\"locality\":\"VCKMGPOWAVLU\",\"region\":\"ZQOCLFXZHZAL\",\"postalCode\":\"fq42 6an\",\"country\":\"New Zealand\"}],\"userName\":\"donato_blick@damore.co.uk\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n",
+            "DELETE https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/8e79cafd-800f-46ee-98b6-52116c965cc7 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created",
+            "204 NoContent"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"fc963f21-339f-4118-a6e5-2324779dc784\",\"name\":{\"formatted\":\"Lauren\",\"familyName\":\"Geovanny\",\"givenName\":\"Rafaela\",\"middleName\":\"Lorenza\",\"honorificPrefix\":\"Raphael\",\"honorificSuffix\":\"Tristian\"},\"displayName\":\"EDZPLZUHKPFW\",\"nickName\":\"AMMRUNMGUBAQ\",\"profileUrl\":\"BQSDCZCVLBFR\",\"title\":\"LAMPQNHCKTKT\",\"userType\":\"VUGSVAOKGYDH\",\"preferredLanguage\":\"ha-NE\",\"locale\":\"RAEMMMZONFPO\",\"timezone\":\"America/Campo_Grande\",\"active\":true,\"emails\":[{\"value\":\"sibyl_wehner@treutel.biz\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"71-794-9593\",\"primary\":true}],\"addresses\":[{\"formatted\":\"CXUMNTKDMSBJ\",\"streetAddress\":\"542 Jesse Tunnel\",\"locality\":\"VCKMGPOWAVLU\",\"region\":\"ZQOCLFXZHZAL\",\"postalCode\":\"fq42 6an\",\"country\":\"New Zealand\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"8e79cafd-800f-46ee-98b6-52116c965cc7\",\"userName\":\"donato_blick@damore.co.uk\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:53.9127855Z\",\"lastModified\":\"2026-02-23T08:57:53.9127855Z\",\"location\":\"/scim/Users/8e79cafd-800f-46ee-98b6-52116c965cc7\"}}",
+            ""
+          ],
+          "RequestBody": "DELETE https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users/8e79cafd-800f-46ee-98b6-52116c965cc7 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 498,
+          "Category": 1
+        },
+        {
+          "$id": "87",
+          "Description": "Patch Group - Multiple Operations on same attribute",
+          "Name": "PATCH /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:54 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1494\r\nRateLimit-Reset: HttpRequestRatePerPort:47s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 1469f641-69ae-4eb3-8caf-5ca75cd8ecd3\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "200 OK",
+          "ResponseBody": "{\"externalId\":\"bfd2f525-8c36-4229-b127-c01541c99c3b\",\"members\":[],\"customAttributes\":{},\"id\":\"465b5e8e-0db1-4827-9e04-12c864ba7476\",\"displayName\":\"WYITAJSUXKQI\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.762373Z\",\"lastModified\":\"2026-02-23T08:57:55.1416074Z\",\"location\":\"/scim/Groups/465b5e8e-0db1-4827-9e04-12c864ba7476\"}}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"bfd2f525-8c36-4229-b127-c01541c99c3b\",\"displayName\":\"WYITAJSUXKQI\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n",
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Users 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"f770a1b0-e6b4-40e1-aa40-0b6d627298b3\",\"name\":{\"formatted\":\"Timmy\",\"familyName\":\"Brian\",\"givenName\":\"Jerad\",\"middleName\":\"Sterling\",\"honorificPrefix\":\"Cassie\",\"honorificSuffix\":\"Filomena\"},\"displayName\":\"CMKENVMULCZN\",\"nickName\":\"EDQWLHMSDFZH\",\"profileUrl\":\"WZIOZNQAKPFY\",\"title\":\"HSCXIWRBONAK\",\"userType\":\"PQNCUTQUQORD\",\"preferredLanguage\":\"jmc-TZ\",\"locale\":\"RTAMQHZALTGJ\",\"timezone\":\"America/Glace_Bay\",\"active\":true,\"emails\":[{\"primary\":\"true\",\"value\":\"jordy_lueilwitz@fadel.com\"}],\"phoneNumbers\":[{\"primary\":\"true\",\"value\":\"4-485-2514\"}],\"addresses\":[{\"primary\":\"true\",\"formatted\":\"TBBMOIEMMWFE\",\"streetAddress\":\"55569 Reilly Port\",\"locality\":\"BAQWSSMLMKRU\",\"region\":\"NATMIWHAMTSL\",\"postalCode\":\"uk35 9bn\",\"country\":\"Paraguay\"}],\"userName\":\"member_shaina@hirthehauck.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]}\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created",
+            "201 Created"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"bfd2f525-8c36-4229-b127-c01541c99c3b\",\"members\":[],\"customAttributes\":{},\"id\":\"465b5e8e-0db1-4827-9e04-12c864ba7476\",\"displayName\":\"WYITAJSUXKQI\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:54.762373Z\",\"lastModified\":\"2026-02-23T08:57:54.762373Z\",\"location\":\"/scim/Groups/465b5e8e-0db1-4827-9e04-12c864ba7476\"}}",
+            "{\"externalId\":\"f770a1b0-e6b4-40e1-aa40-0b6d627298b3\",\"name\":{\"formatted\":\"Timmy\",\"familyName\":\"Brian\",\"givenName\":\"Jerad\",\"middleName\":\"Sterling\",\"honorificPrefix\":\"Cassie\",\"honorificSuffix\":\"Filomena\"},\"displayName\":\"CMKENVMULCZN\",\"nickName\":\"EDQWLHMSDFZH\",\"profileUrl\":\"WZIOZNQAKPFY\",\"title\":\"HSCXIWRBONAK\",\"userType\":\"PQNCUTQUQORD\",\"preferredLanguage\":\"jmc-TZ\",\"locale\":\"RTAMQHZALTGJ\",\"timezone\":\"America/Glace_Bay\",\"active\":true,\"emails\":[{\"value\":\"jordy_lueilwitz@fadel.com\",\"primary\":true}],\"phoneNumbers\":[{\"value\":\"4-485-2514\",\"primary\":true}],\"addresses\":[{\"formatted\":\"TBBMOIEMMWFE\",\"streetAddress\":\"55569 Reilly Port\",\"locality\":\"BAQWSSMLMKRU\",\"region\":\"NATMIWHAMTSL\",\"postalCode\":\"uk35 9bn\",\"country\":\"Paraguay\",\"primary\":true}],\"groups\":[],\"customAttributes\":{},\"id\":\"6168113d-ae07-40b8-97a3-3d3d6e66f666\",\"userName\":\"member_shaina@hirthehauck.biz\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"meta\":{\"resourceType\":\"User\",\"created\":\"2026-02-23T08:57:54.9270613Z\",\"lastModified\":\"2026-02-23T08:57:54.9270613Z\",\"location\":\"/scim/Users/6168113d-ae07-40b8-97a3-3d3d6e66f666\"}}"
+          ],
+          "RequestBody": "PATCH https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/465b5e8e-0db1-4827-9e04-12c864ba7476 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"add\",\"path\":\"members\",\"value\":[{\"value\":\"6168113d-ae07-40b8-97a3-3d3d6e66f666\"}]},{\"op\":\"remove\",\"path\":\"members[value eq \\\"6168113d-ae07-40b8-97a3-3d3d6e66f666\\\"]\"}]}\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 1268,
+          "Category": 1
+        },
+        {
+          "$id": "88",
+          "Description": "Delete a non-existent Group",
+          "Name": "DELETE /Groups/Id",
+          "Results": [
+            {
+              "$id": "89",
+              "Message": "DELETE request on a non-existent resource returns 404 NotFound as expected",
+              "Outcome": 0,
+              "MoreInformation": ""
+            }
+          ],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:55 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1489\r\nRateLimit-Reset: HttpRequestRatePerPort:26s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: \r\nx-ms-ratelimit-remaining: \r\nx-ms-ratelimit-used: 1\r\nx-ms-ratelimit-reset: \r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 572727d1-9dea-4bd5-b683-6e54fabbd83e\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "404 NotFound",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"Group 42584013-5902-429a-9981-8888b00939a5 not found\",\"status\":404}",
+          "InitialRequestBodies": null,
+          "InitialResponseStatuses": null,
+          "InitialResponses": null,
+          "RequestBody": "DELETE https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/42584013-5902-429a-9981-8888b00939a5 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 157,
+          "Category": 1
+        },
+        {
+          "$id": "90",
+          "Description": "Delete the same Group twice",
+          "Name": "DELETE /Groups/Id",
+          "Results": [],
+          "ResponseHeaders": "Date: Mon, 23 Feb 2026 08:57:55 GMT\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\nX-Content-Type-Options: nosniff\r\nRateLimit-Limit: HttpRequestRatePerPort:1500/m, ClientConnectionsPerPort\r\nRateLimit-Remaining: HttpRequestRatePerPort:1491\r\nRateLimit-Reset: HttpRequestRatePerPort:3s\r\nX-Report-Abuse: https://msrc.microsoft.com/report/abuse\r\nx-ms-ratelimit-limit: 1500\r\nx-ms-ratelimit-remaining: 1496\r\nx-ms-ratelimit-used: 4\r\nx-ms-ratelimit-reset: 0\r\nX-Robots-Tag: noindex, nofollow\r\nReferrer-Policy: same-origin\r\nVsSaaS-Request-Id: 505b678c-8f4a-49ae-b1e5-5fb9ad08dc25\r\nStrict-Transport-Security: max-age=31536000; includeSubDomains\r\nX-Served-By: tunnels-prod-rel-uks1-v3-cluster\r\nContent-Type: application/scim+json; charset=utf-8\r\n",
+          "ResponseStatus": "404 NotFound",
+          "ResponseBody": "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"],\"detail\":\"Group 3d296905-7ab4-4f5f-8120-4e2a12eaac7e not found\",\"status\":404}",
+          "InitialRequestBodies": [
+            "POST https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\nContent-Type: application/scim+json; charset=utf-8\r\n{\"externalId\":\"a8801779-acab-4e4e-9429-d38a972521e8\",\"displayName\":\"FEMXBKWHKFAQ\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}\r\n",
+            "DELETE https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/3d296905-7ab4-4f5f-8120-4e2a12eaac7e 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n"
+          ],
+          "InitialResponseStatuses": [
+            "201 Created",
+            "204 NoContent"
+          ],
+          "InitialResponses": [
+            "{\"externalId\":\"a8801779-acab-4e4e-9429-d38a972521e8\",\"members\":[],\"customAttributes\":{},\"id\":\"3d296905-7ab4-4f5f-8120-4e2a12eaac7e\",\"displayName\":\"FEMXBKWHKFAQ\",\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\"meta\":{\"resourceType\":\"Group\",\"created\":\"2026-02-23T08:57:55.9722868Z\",\"lastModified\":\"2026-02-23T08:57:55.9722868Z\",\"location\":\"/scim/Groups/3d296905-7ab4-4f5f-8120-4e2a12eaac7e\"}}",
+            ""
+          ],
+          "RequestBody": "DELETE https://57hjc71j-7269.uks1.devtunnels.ms/scim/Groups/3d296905-7ab4-4f5f-8120-4e2a12eaac7e 1.1\r\nHost: 57hjc71j-7269.uks1.devtunnels.ms\r\n",
+          "SFComplianceOptional": false,
+          "HasTestPassed": true,
+          "TestexecutionTime": 492,
+          "Category": 1
+        }
+      ]
+    },
+    "message": null,
+    "errorTrace": null,
+    "success": true,
+    "correlationId": "f11da8e0-85ed-4693-974a-925b7bdf8684",
+    "timestamp": "2026-02-23T08:57:56.884Z"
+  }
+}

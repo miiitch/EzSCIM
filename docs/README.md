@@ -1,4 +1,4 @@
-﻿# Documentation Index
+﻿﻿# Documentation Index
 
 This documentation is organized by topic and purpose for easy navigation.
 
@@ -79,6 +79,8 @@ docs/
 │   ├── session-summary.md      # Session completion summary
 │   ├── today-summary.md        # Today's work summary
 │   ├── tests-summary.md        # Test suite summary
+│   ├── scim-run06-patch-error-analysis.md  # SCIM Validator Run 06 analysis
+│   ├── scim-run06-tests-implementation.md  # Run 06 test implementation
 │   ├── jwt-extension-delivery.md
 │   ├── delivery-manifest.md    # Project delivery manifest
 │   └── phase-4-completion.md   # Phase 4 completion status

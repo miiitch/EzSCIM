@@ -1,4 +1,5 @@
 using EzSCIM.IntegrationTests.Data.Entities;
+using System.Text.Json;
 
 namespace EzSCIM.IntegrationTests.Data;
 
@@ -7,6 +8,11 @@ namespace EzSCIM.IntegrationTests.Data;
 /// </summary>
 public static class SeedData
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     /// <summary>
     /// Gets 5 predefined test users.
     /// </summary>
@@ -19,9 +25,32 @@ public static class SeedData
                 Id = "user-001",
                 UserName = "john.doe@example.com",
                 DisplayName = "John Doe",
+                NameFormatted = "Mr. John Doe",
                 FirstName = "John",
                 LastName = "Doe",
-                Email = "john.doe@example.com",
+                NameHonorificPrefix = "Mr.",
+                EmailsJson = JsonSerializer.Serialize(new[]
+                {
+                    new EmailData { Value = "john.doe@example.com", Type = "work", Primary = true }
+                }, JsonOptions),
+                PhoneNumbersJson = JsonSerializer.Serialize(new[]
+                {
+                    new PhoneNumberData { Value = "555-0101", Type = "work", Primary = true }
+                }, JsonOptions),
+                AddressesJson = JsonSerializer.Serialize(new[]
+                {
+                    new AddressData
+                    {
+                        Formatted = "123 Main St, Springfield, IL 62701, USA",
+                        StreetAddress = "123 Main St",
+                        Locality = "Springfield",
+                        Region = "IL",
+                        PostalCode = "62701",
+                        Country = "USA",
+                        Type = "work",
+                        Primary = true
+                    }
+                }, JsonOptions),
                 Active = true,
                 Title = "Software Developer",
                 ExternalId = "ext-john-001",
@@ -35,7 +64,28 @@ public static class SeedData
                 DisplayName = "Jane Smith",
                 FirstName = "Jane",
                 LastName = "Smith",
-                Email = "jane.smith@example.com",
+                EmailsJson = JsonSerializer.Serialize(new[]
+                {
+                    new EmailData { Value = "jane.smith@example.com", Type = "work", Primary = true }
+                }, JsonOptions),
+                PhoneNumbersJson = JsonSerializer.Serialize(new[]
+                {
+                    new PhoneNumberData { Value = "555-0102", Type = "work", Primary = true }
+                }, JsonOptions),
+                AddressesJson = JsonSerializer.Serialize(new[]
+                {
+                    new AddressData
+                    {
+                        Formatted = "456 Oak Ave, Portland, OR 97201, USA",
+                        StreetAddress = "456 Oak Ave",
+                        Locality = "Portland",
+                        Region = "OR",
+                        PostalCode = "97201",
+                        Country = "USA",
+                        Type = "work",
+                        Primary = true
+                    }
+                }, JsonOptions),
                 Active = true,
                 Title = "System Administrator",
                 ExternalId = "ext-jane-002",
@@ -49,7 +99,28 @@ public static class SeedData
                 DisplayName = "Bob Wilson",
                 FirstName = "Bob",
                 LastName = "Wilson",
-                Email = "bob.wilson@example.com",
+                EmailsJson = JsonSerializer.Serialize(new[]
+                {
+                    new EmailData { Value = "bob.wilson@example.com", Type = "work", Primary = true }
+                }, JsonOptions),
+                PhoneNumbersJson = JsonSerializer.Serialize(new[]
+                {
+                    new PhoneNumberData { Value = "555-0103", Type = "work", Primary = true }
+                }, JsonOptions),
+                AddressesJson = JsonSerializer.Serialize(new[]
+                {
+                    new AddressData
+                    {
+                        Formatted = "789 Elm St, Austin, TX 78701, USA",
+                        StreetAddress = "789 Elm St",
+                        Locality = "Austin",
+                        Region = "TX",
+                        PostalCode = "78701",
+                        Country = "USA",
+                        Type = "work",
+                        Primary = true
+                    }
+                }, JsonOptions),
                 Active = false,
                 Title = "Former Employee",
                 ExternalId = "ext-bob-003",
@@ -63,7 +134,28 @@ public static class SeedData
                 DisplayName = "Alice Johnson",
                 FirstName = "Alice",
                 LastName = "Johnson",
-                Email = "alice.johnson@example.com",
+                EmailsJson = JsonSerializer.Serialize(new[]
+                {
+                    new EmailData { Value = "alice.johnson@example.com", Type = "work", Primary = true }
+                }, JsonOptions),
+                PhoneNumbersJson = JsonSerializer.Serialize(new[]
+                {
+                    new PhoneNumberData { Value = "555-0104", Type = "work", Primary = true }
+                }, JsonOptions),
+                AddressesJson = JsonSerializer.Serialize(new[]
+                {
+                    new AddressData
+                    {
+                        Formatted = "321 Pine Rd, Seattle, WA 98101, USA",
+                        StreetAddress = "321 Pine Rd",
+                        Locality = "Seattle",
+                        Region = "WA",
+                        PostalCode = "98101",
+                        Country = "USA",
+                        Type = "work",
+                        Primary = true
+                    }
+                }, JsonOptions),
                 Active = true,
                 Title = "Project Manager",
                 ExternalId = "ext-alice-004",
@@ -77,7 +169,28 @@ public static class SeedData
                 DisplayName = "Charlie Brown",
                 FirstName = "Charlie",
                 LastName = "Brown",
-                Email = "charlie.brown@example.com",
+                EmailsJson = JsonSerializer.Serialize(new[]
+                {
+                    new EmailData { Value = "charlie.brown@example.com", Type = "work", Primary = true }
+                }, JsonOptions),
+                PhoneNumbersJson = JsonSerializer.Serialize(new[]
+                {
+                    new PhoneNumberData { Value = "555-0105", Type = "work", Primary = true }
+                }, JsonOptions),
+                AddressesJson = JsonSerializer.Serialize(new[]
+                {
+                    new AddressData
+                    {
+                        Formatted = "654 Maple Dr, Boston, MA 02101, USA",
+                        StreetAddress = "654 Maple Dr",
+                        Locality = "Boston",
+                        Region = "MA",
+                        PostalCode = "02101",
+                        Country = "USA",
+                        Type = "work",
+                        Primary = true
+                    }
+                }, JsonOptions),
                 Active = true,
                 Title = "Senior Developer",
                 ExternalId = "ext-charlie-005",

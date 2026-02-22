@@ -1,13 +1,15 @@
 using EzSCIM.Attributes;
 using EzSCIM.Constants;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 
 namespace EzSCIM.IntegrationTests.Data.Entities;
 
 /// <summary>
 /// Entity Framework user entity with SCIM property mappings for integration tests.
 /// Supports all standard SCIM User attributes plus custom extensions.
-/// No composite properties - all fields are flat (name.givenName -> FirstName).
+/// Multi-valued attributes (emails, phoneNumbers, addresses) are stored as JSON.
 /// </summary>
 public class UserEntity
 {
@@ -39,6 +41,12 @@ public class UserEntity
     public bool Active { get; set; } = true;
 
     /// <summary>
+    /// Formatted name (maps to SCIM name.formatted)
+    /// </summary>
+    [ScimProperty("name.formatted", "string")]
+    public string? NameFormatted { get; set; }
+
+    /// <summary>
     /// First name (maps to SCIM name.givenName)
     /// </summary>
     [ScimProperty(ScimAttributeNames.User.NameGivenName, "string")]
@@ -51,10 +59,45 @@ public class UserEntity
     public string? LastName { get; set; }
 
     /// <summary>
-    /// Email address (maps to SCIM emails[0].value)
+    /// Middle name (maps to SCIM name.middleName)
     /// </summary>
-    [ScimProperty("emails[0].value", "string")]
-    public string? Email { get; set; }
+    [ScimProperty("name.middleName", "string")]
+    public string? NameMiddleName { get; set; }
+
+    /// <summary>
+    /// Honorific prefix (maps to SCIM name.honorificPrefix)
+    /// </summary>
+    [ScimProperty("name.honorificPrefix", "string")]
+    public string? NameHonorificPrefix { get; set; }
+
+    /// <summary>
+    /// Honorific suffix (maps to SCIM name.honorificSuffix)
+    /// </summary>
+    [ScimProperty("name.honorificSuffix", "string")]
+    public string? NameHonorificSuffix { get; set; }
+
+    // ========== Multi-Valued Attributes (JSON) ==========
+
+    /// <summary>
+    /// Emails stored as JSON array.
+    /// Format: [{"value":"email@example.com","type":"work","primary":true}]
+    /// </summary>
+    [Column(TypeName = "jsonb")]
+    public string? EmailsJson { get; set; }
+
+    /// <summary>
+    /// Phone numbers stored as JSON array.
+    /// Format: [{"value":"123-456-7890","type":"work","primary":true}]
+    /// </summary>
+    [Column(TypeName = "jsonb")]
+    public string? PhoneNumbersJson { get; set; }
+
+    /// <summary>
+    /// Addresses stored as JSON array.
+    /// Format: [{"formatted":"123 Main St","streetAddress":"123 Main St","locality":"City","region":"State","postalCode":"12345","country":"USA","type":"work","primary":true}]
+    /// </summary>
+    [Column(TypeName = "jsonb")]
+    public string? AddressesJson { get; set; }
 
     /// <summary>
     /// Job title (maps to SCIM title)
@@ -106,13 +149,7 @@ public class UserEntity
     [ScimProperty("timezone", "string")]
     public string? Timezone { get; set; }
 
-    /// <summary>
-    /// Phone number (maps to SCIM phoneNumbers[0].value)
-    /// </summary>
-    [ScimProperty("phoneNumbers[0].value", "string")]
-    public string? PhoneNumber { get; set; }
-
-    // ========== Enterprise Extension Fields ==========
+    // ========== Custom Extension Fields ==========
 
     /// <summary>
     /// Department (maps to SCIM enterprise extension)

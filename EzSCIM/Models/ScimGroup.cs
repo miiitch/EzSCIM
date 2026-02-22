@@ -16,10 +16,11 @@ namespace EzSCIM.Models
         public string? ExternalId { get; set; }
         
         /// <summary>
-        /// List of members in this group (OPTIONAL, multi-valued)
+        /// List of members in this group (OPTIONAL, multi-valued).
+        /// Nullable so that excludedAttributes=members can omit it from JSON output.
         /// </summary>
         [ScimProperty("members", "complex", MultiValued = true, Description = "List of members in this group")]
-        public List<ScimMember> Members { get; set; } = new();
+        public List<ScimMember>? Members { get; set; } = new();
         
         /// <summary>
         /// Custom/extension attributes (OPTIONAL)
