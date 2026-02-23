@@ -1,4 +1,4 @@
-﻿﻿# Documentation Index
+﻿﻿﻿# Documentation Index
 
 This documentation is organized by topic and purpose for easy navigation.
 
@@ -18,6 +18,7 @@ Start here:
 - **📋 Schema System** → See [docs/schema/](./schema/README.md)
 - **🧪 Testing** → See [docs/tests/](./tests/README.md)
 - **📊 Status Reports** → See [docs/status/](./status/README.md)
+- **🐛 Issues & Bug Reports** → See [docs/issues/](./issues/scim-validator-bug-patch-replace-attributes.md)
 
 ---
 
@@ -86,6 +87,8 @@ docs/
 │   └── phase-4-completion.md   # Phase 4 completion status
 └── archive/                     # Archive (Completed/Historical Documents)
     └── [Historical documentation files]
+├── issues/                      # Bug Reports & Issues
+│   └── scim-validator-bug-patch-replace-attributes.md  # Validator bug report
 ```
 
 ---
@@ -108,7 +111,7 @@ docs/<theme>/<topic>.md
 ```
 
 Where:
-- `<theme>`: auth, filters, guides, migration, schema, tests, status, archive
+- `<theme>`: auth, filters, guides, migration, schema, tests, status, issues, archive
 - `<topic>`: Descriptive name in lowercase with hyphens
 
 **Examples:**
@@ -154,6 +157,13 @@ Where:
 
 ### Migration Progress
 - See [docs/status/migration-summary.md](./status/migration-summary.md)
+
+---
+
+## 🐛 Issues & Bug Reports
+
+### SCIM Validator Bug
+- [Patch User - Replace Attributes: Incorrect Expected State](./issues/scim-validator-bug-patch-replace-attributes.md) — The validator at scimvalidator.microsoft.com incorrectly computes expected state when mixing filtered-path and no-path replace operations (runs 05, 06, 07)
 
 ---
 
@@ -204,7 +214,7 @@ See [docs/status/migration-summary.md](./status/migration-summary.md) for comple
 
 ---
 
-**Last Updated**: February 21, 2026  
-**Convention Version**: 1.0  
+**Last Updated**: February 23, 2026  
+**Convention Version**: 1.1  
 **Language**: English only
 
