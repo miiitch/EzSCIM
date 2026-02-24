@@ -1,4 +1,4 @@
-﻿# 📚 Index - Mapping Repository → SCIM
+﻿﻿# 📚 Index - Mapping Repository → SCIM
 
 Guide de navigation rapide pour l'implémentation du mapping repository vers SCIM.
 
@@ -66,7 +66,7 @@ Guide de navigation rapide pour l'implémentation du mapping repository vers SCI
 
 **Exemples:**
 - `ScimAPI/Examples/CustomUser.cs` - Modèle annoté
-- `ScimAPI/Examples/CustomUserRepository.cs` - Implémentation exemple
+- `EzSCIM.EntraID.Demo/Examples/CustomUserGroupRepository.cs` - Combined user+group example implementation
 
 ### Tests
 

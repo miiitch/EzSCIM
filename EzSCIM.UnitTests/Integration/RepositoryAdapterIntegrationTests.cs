@@ -1,4 +1,4 @@
-using EzSCIM.EntraID.Demo.Examples;
+﻿using EzSCIM.EntraID.Demo.Examples;
 
 using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
@@ -15,14 +15,14 @@ namespace EzSCIM.UnitTests.Integration
     /// </summary>
     public class RepositoryAdapterIntegrationTests
     {
-        private readonly CustomUserRepository _dataRepository;
+        private readonly CustomUserGroupRepository _dataRepository;
         private readonly GenericScimFilterTranslator<CustomUser> _translator;
         private readonly ScimUserRepositoryAdapter<CustomUser> _adapter;
 
         public RepositoryAdapterIntegrationTests()
         {
             // Setup the complete integration chain
-            _dataRepository = new CustomUserRepository();
+            _dataRepository = new CustomUserGroupRepository();
             _translator = new GenericScimFilterTranslator<CustomUser>();
             _adapter = new ScimUserRepositoryAdapter<CustomUser>(_dataRepository, _translator);
 
@@ -78,7 +78,7 @@ namespace EzSCIM.UnitTests.Integration
 
             foreach (var user in users)
             {
-                _dataRepository.CreateAsync(user).Wait();
+                _dataRepository.CreateUserAsync(user).Wait();
             }
         }
 
@@ -191,7 +191,7 @@ namespace EzSCIM.UnitTests.Integration
         public async Task GetUserAsync_ValidId_ReturnsUser()
         {
             // Arrange
-            var created = await _dataRepository.CreateAsync(new CustomUser
+            var created = await _dataRepository.CreateUserAsync(new CustomUser
             {
                 Username = "test@example.com",
                 Email = "test@example.com",
@@ -250,7 +250,7 @@ namespace EzSCIM.UnitTests.Integration
         public async Task UpdateUserAsync_ValidUser_UpdatesSuccessfully()
         {
             // Arrange
-            var created = await _dataRepository.CreateAsync(new CustomUser
+            var created = await _dataRepository.CreateUserAsync(new CustomUser
             {
                 Username = "update@example.com",
                 Email = "update@example.com",
@@ -277,7 +277,7 @@ namespace EzSCIM.UnitTests.Integration
         public async Task DeleteUserAsync_ValidId_DeletesSuccessfully()
         {
             // Arrange
-            var created = await _dataRepository.CreateAsync(new CustomUser
+            var created = await _dataRepository.CreateUserAsync(new CustomUser
             {
                 Username = "delete@example.com",
                 Email = "delete@example.com",

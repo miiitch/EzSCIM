@@ -1,4 +1,4 @@
-﻿# 🎯 Mapping Repository → SCIM - Guide rapide
+﻿﻿# 🎯 Mapping Repository → SCIM - Guide rapide
 
 ## Qu'est-ce que c'est ?
 
@@ -40,7 +40,7 @@ public class MyUserRepo : IUserDataRepository<MyUser>
 ```csharp
 services.AddScoped<IUserDataRepository<MyUser>, MyUserRepo>();
 services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
-services.AddScoped<IScimUserRepository<ScimUser>>(sp => 
+services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp => 
     new ScimUserRepositoryAdapter<MyUser>(
         sp.GetRequiredService<IUserDataRepository<MyUser>>(),
         sp.GetRequiredService<IScimFilterTranslator<MyUser>>()));
@@ -76,7 +76,7 @@ SELECT * FROM Users WHERE IsActive = 1 AND Email LIKE 'john%'
 | Traducteur générique | `GenericScimFilterTranslator.cs` | AST → IQueryable (via attributs) |
 | Traducteur ScimUser | `ScimUserFilterTranslator.cs` | AST → IQueryable (ScimUser direct) |
 | Adaptateur | `ScimUserRepositoryAdapter.cs` | Pont Repository ↔ SCIM |
-| Exemple | `CustomUser.cs`, `CustomUserRepository.cs` | Implémentation de référence |
+| Exemple | `CustomUser.cs`, `CustomUserGroupRepository.cs` | Implémentation de référence |
 
 ---
 

@@ -1,4 +1,4 @@
-﻿using EzSCIM.Filtering;
+﻿﻿using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
 using EzSCIM.Models;
 using Microsoft.Extensions.Logging;
@@ -7,10 +7,10 @@ namespace EzSCIM.Repositories
 {
     /// <summary>
     /// Example implementation of a Users-only SCIM repository.
-    /// This shows how to implement only IScimUserRepository when your provider
-    /// only supports User resources (no Groups or Schemas).
+    /// This shows how to implement only IScimUserOnlyRepository when your provider
+    /// only supports User resources (no Groups).
     /// </summary>
-    public class UsersOnlyRepository : IScimUserRepository<ScimUser>
+    public class UsersOnlyRepository : IScimUserOnlyRepository<ScimUser>
     {
         private readonly ILogger<UsersOnlyRepository> _logger;
         private readonly Dictionary<string, ScimUser> _users = new();

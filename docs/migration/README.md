@@ -1,4 +1,4 @@
-﻿# Repository Integration & Migration
+﻿﻿# Repository Integration & Migration
 
 Documentation for integrating SCIM with your data repositories and migrating existing systems.
 
@@ -21,7 +21,7 @@ Documentation for integrating SCIM with your data repositories and migrating exi
 ### Quick Path (15 minutes)
 1. Read [Quick Start Repository Integration](./quick-start-repository.md)
 2. Annotate your model with `[ScimProperty]`
-3. Implement `IUserDataRepository<T>` or `IGroupDataRepository<T>`
+3. Implement `IUserDataRepository<T>` or `IUserGroupDataRepository<T, TGroup>`
 4. Configure dependency injection
 
 ### Standard Path (1 hour)
@@ -47,9 +47,9 @@ Documentation for integrating SCIM with your data repositories and migrating exi
 - `ScimUserRepositoryAdapter<T>` - SCIM adapter
 
 ### Group Integration (v1.1)
-- `IGroupDataRepository<TGroup>` - Group repository interface
+- `IUserGroupDataRepository<TUser, TGroup>` - Combined user+group repository interface (inherits from IUserDataRepository)
 - `ScimGroupFilterTranslator` - Filter to LINQ translator
-- `ScimGroupRepositoryAdapter<T>` - SCIM adapter
+- `ScimUserGroupRepositoryAdapter<TUser, TGroup>` - SCIM adapter for users and groups
 
 ### Constants (v1.1)
 - `ScimAttributeNames.User.*` - 30+ user attribute constants
@@ -161,7 +161,7 @@ dotnet test --filter "IntegrationTests"
 
 - [ ] Model classes annotated with `[ScimProperty]`
 - [ ] `IUserDataRepository<T>` implemented
-- [ ] `IGroupDataRepository<T>` implemented (if needed)
+- [ ] `IUserGroupDataRepository<TUser, TGroup>` implemented (if groups needed)
 - [ ] Dependency injection configured
 - [ ] Filter translations working
 - [ ] Pagination implemented

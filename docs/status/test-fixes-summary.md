@@ -1,4 +1,4 @@
-﻿# Test Fixes Summary
+﻿﻿# Test Fixes Summary
 
 **Date**: 2026-02-22  
 **Status**: ✅ Fixes Implemented
@@ -110,7 +110,7 @@ if (membersJsonProp != null)
 ```
 
 **Files Modified**:
-- `EzSCIM/Repositories/ScimGroupRepositoryAdapter.cs` - Added members deserialization logic
+- `EzSCIM/Repositories/ScimUserGroupRepositoryAdapter.cs` - Added members deserialization logic
 
 ## Test Results
 
@@ -143,7 +143,7 @@ These fixes improve SCIM RFC 7644 compliance for:
 - `EzSCIM/Repositories/ScimUserRepositoryAdapter.cs`
 - `EzSCIM.IntegrationTests/ScimPatchApplier.cs`
 - `EzSCIM.IntegrationTests/ScimWebApplicationFactory.cs`
-- `EzSCIM/Repositories/ScimGroupRepositoryAdapter.cs`
+- `EzSCIM/Repositories/ScimUserGroupRepositoryAdapter.cs`
 
 ## Testing
 

@@ -91,16 +91,20 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             services.AddDbContext<ScimDbContext>(options =>
                 options.UseNpgsql(_connectionString));
 
-            // Register EF Core data repositories
-            services.AddScoped<IUserDataRepository<UserEntity>, EfUserDataRepository>();
-            services.AddScoped<IGroupDataRepository<GroupEntity>, EfGroupDataRepository>();
+            // Register EF Core data repository (combined user+group)
+            services.AddScoped<IUserGroupDataRepository<UserEntity, GroupEntity>, EfUserGroupDataRepository>();
+
+            // Also register IUserDataRepository pointing to the same instance
+            // (for JsonUserRepositoryAdapter which only needs user data)
+            services.AddScoped<IUserDataRepository<UserEntity>>(sp =>
+                sp.GetRequiredService<IUserGroupDataRepository<UserEntity, GroupEntity>>());
 
             // Register filter translators
             services.AddScoped<IScimFilterTranslator<UserEntity>, GenericScimFilterTranslator<UserEntity>>();
             services.AddScoped<IScimFilterTranslator<GroupEntity>, GenericScimFilterTranslator<GroupEntity>>();
 
             // Register SCIM repository adapters
-            services.AddScoped<IScimUserRepository<ScimUser>>(sp =>
+            services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
             {
                 var dataRepo = sp.GetRequiredService<IUserDataRepository<UserEntity>>();
                 var translator = sp.GetRequiredService<IScimFilterTranslator<UserEntity>>();
@@ -108,18 +112,19 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
                 return new Data.Repositories.JsonUserRepositoryAdapter(dataRepo, translator);
             });
 
-            services.AddScoped<IScimGroupRepository<ScimGroup>>(sp =>
+            services.AddScoped<IScimUserGroupRepository<ScimUser, ScimGroup>>(sp =>
             {
-                var dataRepo = sp.GetRequiredService<IGroupDataRepository<GroupEntity>>();
-                var translator = sp.GetRequiredService<IScimFilterTranslator<GroupEntity>>();
-                return new ScimGroupRepositoryAdapter<GroupEntity>(dataRepo, translator);
+                var dataRepo = sp.GetRequiredService<IUserGroupDataRepository<UserEntity, GroupEntity>>();
+                var userTranslator = sp.GetRequiredService<IScimFilterTranslator<UserEntity>>();
+                var groupTranslator = sp.GetRequiredService<IScimFilterTranslator<GroupEntity>>();
+                return new ScimUserGroupRepositoryAdapter<UserEntity, GroupEntity>(dataRepo, userTranslator, groupTranslator);
             });
 
             // Register composite IScimRepository
             services.AddScoped<IScimRepository>(sp =>
             {
-                var userRepo = sp.GetRequiredService<IScimUserRepository<ScimUser>>();
-                var groupRepo = sp.GetRequiredService<IScimGroupRepository<ScimGroup>>();
+                var userRepo = sp.GetRequiredService<IScimUserOnlyRepository<ScimUser>>();
+                var groupRepo = sp.GetRequiredService<IScimUserGroupRepository<ScimUser, ScimGroup>>();
                 var dbContext = sp.GetRequiredService<ScimDbContext>();
                 
                 // Create a composite repository that delegates to both and implements PATCH
@@ -158,13 +163,13 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
     /// </summary>
     private class CompositeScimRepository : IScimRepository
     {
-        private readonly IScimUserRepository<ScimUser> _userRepo;
-        private readonly IScimGroupRepository<ScimGroup> _groupRepo;
+        private readonly IScimUserOnlyRepository<ScimUser> _userRepo;
+        private readonly IScimUserGroupRepository<ScimUser, ScimGroup> _groupRepo;
         private readonly ScimDbContext _dbContext;
 
         public CompositeScimRepository(
-            IScimUserRepository<ScimUser> userRepo,
-            IScimGroupRepository<ScimGroup> groupRepo,
+            IScimUserOnlyRepository<ScimUser> userRepo,
+            IScimUserGroupRepository<ScimUser, ScimGroup> groupRepo,
             ScimDbContext dbContext)
         {
             _userRepo = userRepo;

@@ -1,4 +1,4 @@
-﻿# Exemple d'intégration rapide - Repository → SCIM
+﻿﻿# Exemple d'intégration rapide - Repository → SCIM
 
 ## Scénario: Vous avez déjà une base de données d'utilisateurs
 
@@ -74,7 +74,7 @@ public class EmployeeRepository : IUserDataRepository<Employee>
         _context = context;
     }
 
-    public async Task<Employee?> GetAsync(string id)
+    public async Task<Employee?> GetUserAsync(string id)
     {
         if (Guid.TryParse(id, out var guid))
             return await _context.Employees.FindAsync(guid);
@@ -82,12 +82,12 @@ public class EmployeeRepository : IUserDataRepository<Employee>
     }
 
     // IMPORTANT: Retourner IQueryable pour filtrage server-side
-    public IQueryable<Employee> Query()
+    public IQueryable<Employee> QueryUsers()
     {
         return _context.Employees.AsQueryable();
     }
 
-    public async Task<Employee> CreateAsync(Employee employee)
+    public async Task<Employee> CreateUserAsync(Employee employee)
     {
         employee.Id = Guid.NewGuid();
         _context.Employees.Add(employee);
@@ -95,7 +95,7 @@ public class EmployeeRepository : IUserDataRepository<Employee>
         return employee;
     }
 
-    public async Task<Employee?> UpdateAsync(string id, Employee employee)
+    public async Task<Employee?> UpdateUserAsync(string id, Employee employee)
     {
         if (!Guid.TryParse(id, out var guid))
             return null;
@@ -109,7 +109,7 @@ public class EmployeeRepository : IUserDataRepository<Employee>
         return employee;
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<bool> DeleteUserAsync(string id)
     {
         if (!Guid.TryParse(id, out var guid))
             return false;
@@ -147,7 +147,7 @@ builder.Services.AddScoped<IUserDataRepository<Employee>, EmployeeRepository>();
 builder.Services.AddScoped<IScimFilterTranslator<Employee>, GenericScimFilterTranslator<Employee>>();
 
 // 3️⃣ Adaptateur SCIM
-builder.Services.AddScoped<IScimUserRepository<ScimUser>>(sp =>
+builder.Services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
 {
     var dataRepo = sp.GetRequiredService<IUserDataRepository<Employee>>();
     var translator = sp.GetRequiredService<IScimFilterTranslator<Employee>>();
@@ -205,7 +205,7 @@ FilterExpression filter = parser.Parse("active eq true and givenName sw \"John\"
 
 ### 2. Adaptateur applique le filtre
 ```csharp
-var query = _dataRepository.Query(); // IQueryable<Employee>
+var query = _dataRepository.QueryUsers(); // IQueryable<Employee>
 query = _translator.Apply(query, filter);
 ```
 
@@ -319,7 +319,7 @@ POST /scim/Users
 ```csharp
 public class EmployeeRepository : IUserDataRepository<Employee>
 {
-    public IQueryable<Employee> Query()
+    public IQueryable<Employee> QueryUsers()
     {
         return _context.Employees
             .Include(e => e.Department)
@@ -332,7 +332,7 @@ public class EmployeeRepository : IUserDataRepository<Employee>
 ### Ajouter un filtre global (soft delete)
 
 ```csharp
-public IQueryable<Employee> Query()
+public IQueryable<Employee> QueryUsers()
 {
     return _context.Employees
         .Where(e => !e.IsDeleted) // Global filter

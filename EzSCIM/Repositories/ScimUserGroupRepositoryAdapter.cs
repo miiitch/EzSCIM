@@ -1,4 +1,4 @@
-using EzSCIM.Constants;
+﻿using EzSCIM.Constants;
 using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
 using EzSCIM.Models;
@@ -9,72 +9,155 @@ using EzSCIM.DataRepositories;
 namespace EzSCIM.Repositories
 {
     /// <summary>
-    /// Adapter that bridges IGroupDataRepository to IScimGroupRepository.
-    /// Maps between TGroup (your domain model) and ScimGroup using [ScimProperty] attributes.
+    /// Adapter that bridges IUserGroupDataRepository to IScimUserGroupRepository.
+    /// Maps between TUser/TGroup (your domain models) and ScimUser/ScimGroup using [ScimProperty] attributes.
     /// Uses IScimFilterTranslator to execute filters server-side on IQueryable.
     /// </summary>
+    /// <typeparam name="TUser">Your user class annotated with [ScimProperty] attributes</typeparam>
     /// <typeparam name="TGroup">Your group class annotated with [ScimProperty] attributes</typeparam>
-    public class ScimGroupRepositoryAdapter<TGroup> : IScimGroupRepository<ScimGroup> 
+    public class ScimUserGroupRepositoryAdapter<TUser, TGroup> : IScimUserGroupRepository<ScimUser, ScimGroup>
+        where TUser : class
         where TGroup : class
     {
-        private readonly IGroupDataRepository<TGroup> _dataRepository;
-        private readonly IScimFilterTranslator<TGroup> _filterTranslator;
-        private readonly GroupMapper<TGroup> _mapper;
+        private readonly IUserGroupDataRepository<TUser, TGroup> _dataRepository;
+        private readonly IScimFilterTranslator<TUser> _userFilterTranslator;
+        private readonly IScimFilterTranslator<TGroup> _groupFilterTranslator;
+        private readonly UserMapper<TUser> _userMapper;
+        private readonly GroupMapper<TGroup> _groupMapper;
 
-        public ScimGroupRepositoryAdapter(
-            IGroupDataRepository<TGroup> dataRepository,
-            IScimFilterTranslator<TGroup> filterTranslator)
+        public ScimUserGroupRepositoryAdapter(
+            IUserGroupDataRepository<TUser, TGroup> dataRepository,
+            IScimFilterTranslator<TUser> userFilterTranslator,
+            IScimFilterTranslator<TGroup> groupFilterTranslator)
         {
             _dataRepository = dataRepository;
-            _filterTranslator = filterTranslator;
-            _mapper = new GroupMapper<TGroup>();
+            _userFilterTranslator = userFilterTranslator;
+            _groupFilterTranslator = groupFilterTranslator;
+            _userMapper = new UserMapper<TUser>();
+            _groupMapper = new GroupMapper<TGroup>();
         }
+
+        #region User Operations
+
+        public async Task<ScimUser?> GetUserAsync(string id)
+        {
+            var user = await _dataRepository.GetUserAsync(id);
+            return user == null ? null : _userMapper.ToScimUser(user);
+        }
+
+        public Task<ScimUser?> GetUserByUserNameAsync(string userName)
+        {
+            var filter = new ComparisonFilter(
+                ScimAttributeNames.User.UserName,
+                FilterOperator.Equals,
+                new StringValue(userName));
+            var predicate = _userFilterTranslator.BuildPredicate(filter);
+
+            if (predicate == null)
+                return Task.FromResult<ScimUser?>(null);
+
+            var user = _dataRepository.QueryUsers().Where(predicate).FirstOrDefault();
+            var result = user == null ? null : _userMapper.ToScimUser(user);
+            return Task.FromResult(result);
+        }
+
+        public Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100)
+        {
+            var query = _dataRepository.QueryUsers();
+
+            if (filter != null)
+            {
+                query = _userFilterTranslator.Apply(query, filter);
+            }
+
+            var totalResults = query.Count();
+
+            var users = query
+                .Skip(startIndex - 1)
+                .Take(count)
+                .ToList();
+
+            var scimUsers = users.Select(u => _userMapper.ToScimUser(u)).ToList();
+
+            var response = new ScimListResponse<ScimUser>
+            {
+                TotalResults = totalResults,
+                StartIndex = startIndex,
+                ItemsPerPage = scimUsers.Count,
+                Resources = scimUsers
+            };
+
+            return Task.FromResult(response);
+        }
+
+        public async Task<ScimUser> CreateUserAsync(ScimUser user)
+        {
+            var domainUser = _userMapper.FromScimUser(user);
+            var created = await _dataRepository.CreateUserAsync(domainUser);
+            return _userMapper.ToScimUser(created);
+        }
+
+        public async Task<ScimUser?> UpdateUserAsync(string id, ScimUser user)
+        {
+            var domainUser = _userMapper.FromScimUser(user);
+            var updated = await _dataRepository.UpdateUserAsync(id, domainUser);
+            return updated == null ? null : _userMapper.ToScimUser(updated);
+        }
+
+        public Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
+        {
+            // TODO: Implement PATCH mapping
+            throw new NotImplementedException("PATCH operations require custom implementation per domain model");
+        }
+
+        public async Task<bool> DeleteUserAsync(string id)
+        {
+            return await _dataRepository.DeleteUserAsync(id);
+        }
+
+        #endregion
+
+        #region Group Operations
 
         public async Task<ScimGroup?> GetGroupAsync(string id)
         {
-            var group = await _dataRepository.GetAsync(id);
-            return group == null ? null : _mapper.ToScimGroup(group);
+            var group = await _dataRepository.GetGroupAsync(id);
+            return group == null ? null : _groupMapper.ToScimGroup(group);
         }
 
         public Task<ScimGroup?> GetGroupByDisplayNameAsync(string displayName)
         {
-            // Use SCIM filter translator to find by displayName
             var filter = new ComparisonFilter(
-                ScimAttributeNames.Group.DisplayName, 
-                FilterOperator.Equals, 
+                ScimAttributeNames.Group.DisplayName,
+                FilterOperator.Equals,
                 new StringValue(displayName));
-            var predicate = _filterTranslator.BuildPredicate(filter);
-            
+            var predicate = _groupFilterTranslator.BuildPredicate(filter);
+
             if (predicate == null)
                 return Task.FromResult<ScimGroup?>(null);
 
-            var group = _dataRepository.Query().Where(predicate).FirstOrDefault();
-            var result = group == null ? null : _mapper.ToScimGroup(group);
+            var group = _dataRepository.QueryGroups().Where(predicate).FirstOrDefault();
+            var result = group == null ? null : _groupMapper.ToScimGroup(group);
             return Task.FromResult(result);
         }
 
         public Task<ScimListResponse<ScimGroup>> GetGroupsAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100)
         {
-            // Start with queryable source
-            var query = _dataRepository.Query();
+            var query = _dataRepository.QueryGroups();
 
-            // Apply SCIM filter using translator (server-side filtering)
             if (filter != null)
             {
-                query = _filterTranslator.Apply(query, filter);
+                query = _groupFilterTranslator.Apply(query, filter);
             }
 
-            // Get total count before pagination
             var totalResults = query.Count();
 
-            // Apply pagination
             var groups = query
                 .Skip(startIndex - 1)
                 .Take(count)
                 .ToList();
 
-            // Map to ScimGroup
-            var scimGroups = groups.Select(g => _mapper.ToScimGroup(g)).ToList();
+            var scimGroups = groups.Select(g => _groupMapper.ToScimGroup(g)).ToList();
 
             var response = new ScimListResponse<ScimGroup>
             {
@@ -89,16 +172,16 @@ namespace EzSCIM.Repositories
 
         public async Task<ScimGroup> CreateGroupAsync(ScimGroup group)
         {
-            var domainGroup = _mapper.FromScimGroup(group);
-            var created = await _dataRepository.CreateAsync(domainGroup);
-            return _mapper.ToScimGroup(created);
+            var domainGroup = _groupMapper.FromScimGroup(group);
+            var created = await _dataRepository.CreateGroupAsync(domainGroup);
+            return _groupMapper.ToScimGroup(created);
         }
 
         public async Task<ScimGroup?> UpdateGroupAsync(string id, ScimGroup group)
         {
-            var domainGroup = _mapper.FromScimGroup(group);
-            var updated = await _dataRepository.UpdateAsync(id, domainGroup);
-            return updated == null ? null : _mapper.ToScimGroup(updated);
+            var domainGroup = _groupMapper.FromScimGroup(group);
+            var updated = await _dataRepository.UpdateGroupAsync(id, domainGroup);
+            return updated == null ? null : _groupMapper.ToScimGroup(updated);
         }
 
         public Task<ScimGroup?> PatchGroupAsync(string id, ScimPatchRequest patchRequest)
@@ -109,8 +192,10 @@ namespace EzSCIM.Repositories
 
         public async Task<bool> DeleteGroupAsync(string id)
         {
-            return await _dataRepository.DeleteAsync(id);
+            return await _dataRepository.DeleteGroupAsync(id);
         }
+
+        #endregion
     }
 
     /// <summary>

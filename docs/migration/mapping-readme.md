@@ -1,4 +1,4 @@
-﻿# ⚡ Résumé Ultra-Rapide - SCIM Repository Mapping
+﻿﻿# ⚡ Résumé Ultra-Rapide - SCIM Repository Mapping
 
 **Version:** 1.1.0 (Users + Groups)  
 **Date:** 2026-02-12
@@ -14,10 +14,10 @@ Connectez votre repository existant (Users ET Groups) à SCIM en **3 lignes de c
 [ScimProperty(ScimAttributeNames.User.UserName, "string", Required = true)]
 
 // 2. Implémentez
-public IQueryable<TUser> Query() => _context.Users;
+public IQueryable<TUser> QueryUsers() => _context.Users;
 
 // 3. Configurez DI
-services.AddScoped<IScimUserRepository<ScimUser>>(sp => 
+services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp => 
     new ScimUserRepositoryAdapter<MyUser>(...));
 ```
 
@@ -34,7 +34,7 @@ services.AddScoped<IScimUserRepository<ScimUser>>(sp =>
 - 26 tests (100% ✅)
 
 ### ✅ Pour les Groups
-- Interface `IGroupDataRepository<TGroup>`
+- Interface `IUserGroupDataRepository<TUser, TGroup>` (inherits from IUserDataRepository)
 - Traducteur AST → IQueryable  
 - Adaptateur vers SCIM
 - 13 tests (100% ✅)
@@ -77,14 +77,14 @@ public class Employee
 // Votre repository
 public class EmployeeRepo : IUserDataRepository<Employee>
 {
-    public IQueryable<Employee> Query() => _dbContext.Employees;
+    public IQueryable<Employee> QueryUsers() => _dbContext.Employees;
     // ... 4 autres méthodes
 }
 
 // Configuration
 services.AddScoped<IUserDataRepository<Employee>, EmployeeRepo>();
 services.AddScoped<IScimFilterTranslator<Employee>, GenericScimFilterTranslator<Employee>>();
-services.AddScoped<IScimUserRepository<ScimUser>>(sp => 
+services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp => 
     new ScimUserRepositoryAdapter<Employee>(
         sp.GetRequiredService<IUserDataRepository<Employee>>(),
         sp.GetRequiredService<IScimFilterTranslator<Employee>>()));

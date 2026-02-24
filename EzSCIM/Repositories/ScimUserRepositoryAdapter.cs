@@ -9,12 +9,12 @@ using EzSCIM.DataRepositories;
 namespace EzSCIM.Repositories
 {
     /// <summary>
-    /// Adapter that bridges IUserDataRepository to IScimUserRepository.
+    /// Adapter that bridges IUserDataRepository to IScimUserOnlyRepository.
     /// Maps between TUser (your domain model) and ScimUser using [ScimProperty] attributes.
     /// Uses IScimFilterTranslator to execute filters server-side on IQueryable.
     /// </summary>
     /// <typeparam name="TUser">Your user class annotated with [ScimProperty] attributes</typeparam>
-    public class ScimUserRepositoryAdapter<TUser> : IScimUserRepository<ScimUser> 
+    public class ScimUserRepositoryAdapter<TUser> : IScimUserOnlyRepository<ScimUser> 
         where TUser : class
     {
         private readonly IUserDataRepository<TUser> _dataRepository;
@@ -32,7 +32,7 @@ namespace EzSCIM.Repositories
 
         public async Task<ScimUser?> GetUserAsync(string id)
         {
-            var user = await _dataRepository.GetAsync(id);
+            var user = await _dataRepository.GetUserAsync(id);
             return user == null ? null : _mapper.ToScimUser(user);
         }
 
@@ -48,14 +48,14 @@ namespace EzSCIM.Repositories
             if (predicate == null)
                 return Task.FromResult<ScimUser?>(null);
 
-            var user = _dataRepository.Query().Where(predicate).FirstOrDefault();
+            var user = _dataRepository.QueryUsers().Where(predicate).FirstOrDefault();
             var result = user == null ? null : _mapper.ToScimUser(user);
             return Task.FromResult(result);
         }
         public Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter = null, int startIndex = 1, int count = 100)
         {
             // Start with queryable source
-            var query = _dataRepository.Query();
+            var query = _dataRepository.QueryUsers();
 
             // Apply SCIM filter using translator (server-side filtering)
             if (filter != null)
@@ -89,14 +89,14 @@ namespace EzSCIM.Repositories
         public async Task<ScimUser> CreateUserAsync(ScimUser user)
         {
             var domainUser = _mapper.FromScimUser(user);
-            var created = await _dataRepository.CreateAsync(domainUser);
+            var created = await _dataRepository.CreateUserAsync(domainUser);
             return _mapper.ToScimUser(created);
         }
 
         public async Task<ScimUser?> UpdateUserAsync(string id, ScimUser user)
         {
             var domainUser = _mapper.FromScimUser(user);
-            var updated = await _dataRepository.UpdateAsync(id, domainUser);
+            var updated = await _dataRepository.UpdateUserAsync(id, domainUser);
             return updated == null ? null : _mapper.ToScimUser(updated);
         }
 
@@ -108,7 +108,7 @@ namespace EzSCIM.Repositories
 
         public async Task<bool> DeleteUserAsync(string id)
         {
-            return await _dataRepository.DeleteAsync(id);
+            return await _dataRepository.DeleteUserAsync(id);
         }
     }
 

@@ -1,4 +1,4 @@
-﻿# 📝 Session complète - Repository Mapping + Groups + Constants
+﻿﻿# 📝 Session complète - Repository Mapping + Groups + Constants
 
 **Date:** 2026-02-12  
 **Durée:** Session unique  
@@ -37,7 +37,7 @@
 ✅ ScimAPI/Repositories/IUserDataRepository.cs                   (31 lignes)
 ✅ ScimAPI/Repositories/ScimUserRepositoryAdapter.cs             (235 lignes)
 ✅ ScimAPI/Examples/CustomUser.cs                                (57 lignes)
-✅ ScimAPI/Examples/CustomUserRepository.cs                      (60 lignes)
+✅ ScimAPI/Examples/CustomUserGroupRepository.cs                  (merged user+group)
 ```
 
 #### Tests
@@ -68,10 +68,10 @@
 ```
 ✅ ScimAPI/Constants/ScimAttributeNames.cs                       (~150 lignes)
 ✅ ScimAPI/Filtering/ScimGroupFilterTranslator.cs                (~230 lignes)
-✅ ScimAPI/Repositories/IGroupDataRepository.cs                  (~40 lignes)
-✅ ScimAPI/Repositories/ScimGroupRepositoryAdapter.cs            (~240 lignes)
+✅ ScimAPI/Repositories/IUserGroupDataRepository.cs              (~40 lignes)
+✅ ScimAPI/Repositories/ScimUserGroupRepositoryAdapter.cs        (~240 lignes)
 ✅ ScimAPI/Examples/CustomGroup.cs                               (~60 lignes)
-✅ ScimAPI/Examples/CustomGroupRepository.cs                     (~65 lignes)
+✅ (merged into CustomUserGroupRepository.cs)
 ```
 
 #### Fichiers modifiés
@@ -135,9 +135,9 @@
 - [x] 40 tests (100% ✅)
 
 ### ✅ Support Groups
-- [x] Interface `IGroupDataRepository<TGroup>`
+- [x] Interface `IUserGroupDataRepository<TUser, TGroup>`
 - [x] Traducteur AST → LINQ pour ScimGroup
-- [x] Adaptateur ScimGroupRepositoryAdapter<TGroup>
+- [x] Adaptateur ScimUserGroupRepositoryAdapter<TUser, TGroup>
 - [x] Mapping bidirectionnel via [ScimProperty]
 - [x] Filtrage server-side (IQueryable)
 - [x] Support CRUD complet

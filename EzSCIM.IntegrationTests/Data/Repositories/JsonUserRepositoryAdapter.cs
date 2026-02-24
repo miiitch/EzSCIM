@@ -1,4 +1,4 @@
-﻿using EzSCIM.DataRepositories;
+﻿﻿using EzSCIM.DataRepositories;
 using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
 using EzSCIM.IntegrationTests.Data.Entities;
@@ -11,7 +11,7 @@ namespace EzSCIM.IntegrationTests.Data.Repositories;
 /// <summary>
 /// SCIM User repository adapter for UserEntity with JSON multi-valued attributes
 /// </summary>
-public class JsonUserRepositoryAdapter : IScimUserRepository<ScimUser>
+public class JsonUserRepositoryAdapter : IScimUserOnlyRepository<ScimUser>
 {
     private readonly IUserDataRepository<UserEntity> _dataRepo;
     private readonly IScimFilterTranslator<UserEntity> _filterTranslator;
@@ -26,13 +26,13 @@ public class JsonUserRepositoryAdapter : IScimUserRepository<ScimUser>
 
     public async Task<ScimUser?> GetUserAsync(string id)
     {
-        var user = await _dataRepo.GetAsync(id);
+        var user = await _dataRepo.GetUserAsync(id);
         return user?.ToScimUser();
     }
 
     public async Task<ScimUser?> GetUserByUserNameAsync(string userName)
     {
-        var user = await _dataRepo.Query()
+        var user = await _dataRepo.QueryUsers()
             .Where(u => u.UserName.ToLower() == userName.ToLower())
             .FirstOrDefaultAsync();
 
@@ -44,7 +44,7 @@ public class JsonUserRepositoryAdapter : IScimUserRepository<ScimUser>
         int startIndex = 1,
         int count = 100)
     {
-        var query = _dataRepo.Query();
+        var query = _dataRepo.QueryUsers();
 
         // Apply filter if provided
         if (filter != null)
@@ -84,26 +84,26 @@ public class JsonUserRepositoryAdapter : IScimUserRepository<ScimUser>
 
         entity.UpdateFromScimUser(scimUser);
 
-        var created = await _dataRepo.CreateAsync(entity);
+        var created = await _dataRepo.CreateUserAsync(entity);
         return created.ToScimUser();
     }
 
     public async Task<ScimUser?> UpdateUserAsync(string id, ScimUser scimUser)
     {
-        var existing = await _dataRepo.GetAsync(id);
+        var existing = await _dataRepo.GetUserAsync(id);
         if (existing == null)
             return null;
 
         existing.UpdateFromScimUser(scimUser);
         existing.ModifiedAt = DateTime.UtcNow;
 
-        var updated = await _dataRepo.UpdateAsync(id, existing);
+        var updated = await _dataRepo.UpdateUserAsync(id, existing);
         return updated?.ToScimUser();
     }
 
     public async Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
     {
-        var existing = await _dataRepo.GetAsync(id);
+        var existing = await _dataRepo.GetUserAsync(id);
         if (existing == null)
             return null;
 
@@ -111,13 +111,13 @@ public class JsonUserRepositoryAdapter : IScimUserRepository<ScimUser>
         UserEntityPatchApplier.ApplyPatch(existing, patchRequest.Operations);
         existing.ModifiedAt = DateTime.UtcNow;
 
-        var updated = await _dataRepo.UpdateAsync(id, existing);
+        var updated = await _dataRepo.UpdateUserAsync(id, existing);
         return updated?.ToScimUser();
     }
 
     public async Task<bool> DeleteUserAsync(string id)
     {
-        return await _dataRepo.DeleteAsync(id);
+        return await _dataRepo.DeleteUserAsync(id);
     }
 }
 

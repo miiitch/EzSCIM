@@ -1,4 +1,4 @@
-﻿# SCIM Schema Extension Guide
+﻿﻿# SCIM Schema Extension Guide
 
 Ce guide explique comment étendre le système de schémas SCIM en créant des types personnalisés basés sur `ScimUser` et `ScimGroup`.
 
@@ -153,7 +153,7 @@ using MyCompany.Scim.Models;
 
 namespace MyCompany.Scim.Repositories
 {
-    public class EnterpriseUserRepository : IScimUserRepository<EnterpriseUser>
+    public class EnterpriseUserRepository : IScimUserOnlyRepository<EnterpriseUser>
     {
         private readonly Dictionary<string, EnterpriseUser> _users = new();
         
@@ -170,26 +170,26 @@ namespace MyCompany.Scim.Repositories
 
 **Enregistrement dans Program.cs** :
 ```csharp
-builder.Services.AddSingleton<IScimUserRepository<EnterpriseUser>, EnterpriseUserRepository>();
+builder.Services.AddSingleton<IScimUserOnlyRepository<EnterpriseUser>, EnterpriseUserRepository>();
 ```
 
 ### Option 2 : Repository combiné (Users + Groups)
 
 ```csharp
 public class EnterpriseScimRepository : 
-    IScimUserRepository<EnterpriseUser>, 
-    IScimGroupRepository<ScimGroup>
+    IScimUserGroupRepository<EnterpriseUser, ScimGroup>
 {
-    // Implémentation des deux interfaces
+    // Implements both user and group operations
+    // Groups inherit user operations via interface hierarchy
 }
 ```
 
 **Enregistrement dans Program.cs** :
 ```csharp
 builder.Services.AddSingleton<EnterpriseScimRepository>();
-builder.Services.AddSingleton<IScimUserRepository<EnterpriseUser>>(sp => 
+builder.Services.AddSingleton<IScimUserOnlyRepository<EnterpriseUser>>(sp => 
     sp.GetRequiredService<EnterpriseScimRepository>());
-builder.Services.AddSingleton<IScimGroupRepository<ScimGroup>>(sp => 
+builder.Services.AddSingleton<IScimUserGroupRepository<EnterpriseUser, ScimGroup>>(sp => 
     sp.GetRequiredService<EnterpriseScimRepository>());
 ```
 

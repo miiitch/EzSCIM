@@ -11,28 +11,28 @@ namespace EzSCIM.DataRepositories
         /// <summary>
         /// Gets a user by unique identifier.
         /// </summary>
-        Task<TUser?> GetAsync(string id);
+        Task<TUser?> GetUserAsync(string id);
 
         /// <summary>
         /// Returns a queryable source of all users.
         /// This will be used with IScimFilterTranslator to apply SCIM filters server-side.
         /// </summary>
-        IQueryable<TUser> Query();
+        IQueryable<TUser> QueryUsers();
 
         /// <summary>
         /// Creates a new user.
         /// </summary>
-        Task<TUser> CreateAsync(TUser user);
+        Task<TUser> CreateUserAsync(TUser user);
 
         /// <summary>
         /// Updates an existing user.
         /// </summary>
-        Task<TUser?> UpdateAsync(string id, TUser user);
+        Task<TUser?> UpdateUserAsync(string id, TUser user);
 
         /// <summary>
         /// Deletes a user.
         /// </summary>
-        Task<bool> DeleteAsync(string id);
+        Task<bool> DeleteUserAsync(string id);
     }
 }
 

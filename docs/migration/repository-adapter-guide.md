@@ -1,4 +1,4 @@
-﻿# Guide d'intégration SCIM avec repository personnalisé
+﻿﻿# Guide d'intégration SCIM avec repository personnalisé
 
 ## Vue d'ensemble
 
@@ -17,7 +17,7 @@ Ce guide explique comment intégrer votre système de gestion d'utilisateurs exi
            │
            v
 ┌─────────────────────────────────┐
-│ IScimUserRepository<ScimUser>   │ (interface SCIM)
+│ IScimUserOnlyRepository<ScimUser>  │ (interface SCIM)
 └──────────┬──────────────────────┘
            │
            v
@@ -178,7 +178,7 @@ builder.Services.AddScoped<IUserDataRepository<MyUser>, MyUserRepository>();
 builder.Services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
 
 // Adaptateur SCIM
-builder.Services.AddScoped<IScimUserRepository<ScimUser>>(sp =>
+builder.Services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
 {
     var dataRepo = sp.GetRequiredService<IUserDataRepository<MyUser>>();
     var translator = sp.GetRequiredService<IScimFilterTranslator<MyUser>>();

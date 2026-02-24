@@ -1,8 +1,10 @@
-﻿## 🚀 Quick Guide - Switching Between Provider Types
+﻿## Quick Guide - Switching Between Provider Types
 
-### Current Setup: Users + Groups + Schemas
+### Current Setup: Users + Groups
 
-Your current implementation supports **all three resources**.
+Your current implementation supports **both User and Group resources**.
+
+> **Note:** A groups-only mode is not supported. In SCIM, groups always reference users, so group operations require user operations to be available.
 
 ---
 
@@ -14,7 +16,7 @@ Your current implementation supports **all three resources**.
 builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
 
 // NEW
-builder.Services.AddSingleton<IScimUserRepository, UsersOnlyRepository>();
+builder.Services.AddSingleton<IScimUserOnlyRepository<ScimUser>, UsersOnlyRepository>();
 ```
 
 ### Step 2: Update Controllers
@@ -23,7 +25,7 @@ builder.Services.AddSingleton<IScimUserRepository, UsersOnlyRepository>();
 public UsersController(IScimRepository repository) { ... }
 
 // NEW
-public UsersController(IScimUserRepository repository) { ... }
+public UsersController(IScimUserOnlyRepository<ScimUser> repository) { ... }
 ```
 
 ### Step 3: Update ResourceTypes (in ScimConfigController.cs)
@@ -43,44 +45,7 @@ var resourceTypes = new List<ScimResourceType>
 
 ---
 
-## To Switch to Groups Only
-
-### Step 1: Update Program.cs
-```csharp
-// OLD
-builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
-
-// NEW
-builder.Services.AddSingleton<IScimGroupRepository, GroupsOnlyRepository>();
-```
-
-### Step 2: Update Controllers
-```csharp
-// OLD
-public GroupsController(IScimRepository repository) { ... }
-
-// NEW
-public GroupsController(IScimGroupRepository repository) { ... }
-```
-
-### Step 3: Update ResourceTypes
-```csharp
-// Only return Group ResourceType
-var resourceTypes = new List<ScimResourceType>
-{
-    new ScimResourceType
-    {
-        Id = "Group",
-        Name = "Group",
-        Endpoint = "/Groups",
-        Schema = "urn:ietf:params:scim:schemas:core:2.0:Group"
-    }
-};
-```
-
----
-
-## To Switch to Users + Groups (Keep Current)
+## To Keep Users + Groups (Current)
 
 No changes needed! Keep using:
 
@@ -104,14 +69,13 @@ var resourceTypes = new List<ScimResourceType>
 
 ## Comparison Table
 
-| Feature | Users Only | Groups Only | Users + Groups |
-|---------|-----------|------------|----------------|
-| **Interface** | IScimUserRepository | IScimGroupRepository | IScimRepository |
-| **Implementation** | UsersOnlyRepository | GroupsOnlyRepository | InMemoryScimRepository |
-| **User Endpoints** | ✅ | ❌ | ✅ |
-| **Group Endpoints** | ❌ | ✅ | ✅ |
-| **Schema Endpoints** | ❌ | ❌ | ✅ |
-| **ResourceTypes** | User only | Group only | User + Group |
+| Feature | Users Only | Users + Groups |
+|---------|-----------|----------------|
+| **Interface** | IScimUserOnlyRepository | IScimRepository |
+| **Implementation** | UsersOnlyRepository | InMemoryScimRepository |
+| **User Endpoints** | ✅ | ✅ |
+| **Group Endpoints** | ❌ | ✅ |
+| **ResourceTypes** | User only | User + Group |
 
 ---
 
@@ -121,15 +85,12 @@ You can also use environment variables:
 
 ```csharp
 // In Program.cs
-var mode = builder.Configuration["Scim:ProviderMode"]; // "UsersOnly", "GroupsOnly", "Both"
+var mode = builder.Configuration["Scim:ProviderMode"]; // "UsersOnly", "Both"
 
 switch (mode)
 {
     case "UsersOnly":
-        builder.Services.AddSingleton<IScimUserRepository, UsersOnlyRepository>();
-        break;
-    case "GroupsOnly":
-        builder.Services.AddSingleton<IScimGroupRepository, GroupsOnlyRepository>();
+        builder.Services.AddSingleton<IScimUserOnlyRepository<ScimUser>, UsersOnlyRepository>();
         break;
     default: // "Both"
         builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
@@ -141,7 +102,7 @@ Then in appsettings.json:
 ```json
 {
   "Scim": {
-    "ProviderMode": "Both"  // or "UsersOnly" or "GroupsOnly"
+    "ProviderMode": "Both"  // or "UsersOnly"
   }
 }
 ```
@@ -159,15 +120,6 @@ curl -H "Authorization: Bearer $token" https://localhost:7001/scim/Users
 curl -H "Authorization: Bearer $token" https://localhost:7001/scim/ResourceTypes
 ```
 
-### Test Groups Only
-```powershell
-# Should work
-curl -H "Authorization: Bearer $token" https://localhost:7001/scim/Groups
-
-# Should return ResourceTypes with only Group
-curl -H "Authorization: Bearer $token" https://localhost:7001/scim/ResourceTypes
-```
-
 ### Test Users + Groups
 ```powershell
 # Both should work
@@ -182,7 +134,7 @@ curl -H "Authorization: Bearer $token" https://localhost:7001/scim/ResourceTypes
 
 ## Summary
 
-✅ **Current Mode:** Users + Groups + Schemas  
+✅ **Current Mode:** Users + Groups  
 ✅ **Easy to Switch:** Just change 2-3 lines  
 ✅ **Type Safe:** Proper interface injection  
 ✅ **Standards Compliant:** ResourceTypes declares support  

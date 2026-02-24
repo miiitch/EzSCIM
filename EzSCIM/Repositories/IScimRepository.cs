@@ -4,11 +4,12 @@ using EzSCIM.Models;
 namespace EzSCIM.Repositories
 {
     /// <summary>
-    /// Repository interface for SCIM User resource management.
+    /// Repository interface for SCIM User resource management only.
     /// Handles all User CRUD operations and queries.
+    /// Use this when your provider only supports User resources.
     /// </summary>
     /// <typeparam name="TUser">The user type, must inherit from ScimUser</typeparam>
-    public interface IScimUserRepository<TUser> where TUser : ScimUser
+    public interface IScimUserOnlyRepository<TUser> where TUser : ScimUser
     {
         /// <summary>
         /// Gets a user by unique identifier.
@@ -47,11 +48,15 @@ namespace EzSCIM.Repositories
     }
 
     /// <summary>
-    /// Repository interface for SCIM Group resource management.
-    /// Handles all Group CRUD operations and queries.
+    /// Repository interface for SCIM User and Group resource management.
+    /// Inherits all User operations from IScimUserOnlyRepository and adds Group operations.
+    /// In SCIM, groups always reference users, so a group-only repository has no meaning.
     /// </summary>
+    /// <typeparam name="TUser">The user type, must inherit from ScimUser</typeparam>
     /// <typeparam name="TGroup">The group type, must inherit from ScimGroup</typeparam>
-    public interface IScimGroupRepository<TGroup> where TGroup : ScimGroup
+    public interface IScimUserGroupRepository<TUser, TGroup> : IScimUserOnlyRepository<TUser>
+        where TUser : ScimUser
+        where TGroup : ScimGroup
     {
         /// <summary>
         /// Gets a group by unique identifier.
@@ -91,11 +96,10 @@ namespace EzSCIM.Repositories
 
     /// <summary>
     /// Main SCIM repository interface that combines User and Group management.
-    /// This interface indicates that the provider supports both User and Group resources.
+    /// This is a backward-compatible alias for IScimUserGroupRepository with concrete types.
     /// Inherit from this interface if your implementation supports both Users and Groups.
-    /// Uses concrete types (ScimUser, ScimGroup) to maintain DI compatibility.
     /// </summary>
-    public interface IScimRepository : IScimUserRepository<ScimUser>, IScimGroupRepository<ScimGroup>
+    public interface IScimRepository : IScimUserGroupRepository<ScimUser, ScimGroup>
     {
     }
 }

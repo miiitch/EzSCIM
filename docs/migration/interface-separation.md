@@ -1,11 +1,11 @@
-﻿✅ INTERFACE SEPARATION IMPLEMENTATION COMPLETE
+﻿# INTERFACE SEPARATION IMPLEMENTATION COMPLETE
 
 ## Architecture Overview
 
-The IScimRepository interface has been split into three separate, focused interfaces:
+The SCIM repository interfaces follow a user-first hierarchy where groups always depend on users:
 
-### 1. IScimUserRepository
-Manages User resource operations:
+### 1. IScimUserOnlyRepository<TUser>
+Manages User resource operations only. Use this when your provider only supports Users:
 - GetUserAsync(id)
 - GetUserByUserNameAsync(userName)
 - GetUsersAsync(filter, startIndex, count)
@@ -14,8 +14,9 @@ Manages User resource operations:
 - PatchUserAsync(id, patchRequest)
 - DeleteUserAsync(id)
 
-### 2. IScimGroupRepository
-Manages Group resource operations:
+### 2. IScimUserGroupRepository<TUser, TGroup> : IScimUserOnlyRepository<TUser>
+Inherits all User operations and adds Group operations. In SCIM, groups always reference users, so a group-only repository has no meaning:
+- (inherits all User methods)
 - GetGroupAsync(id)
 - GetGroupByDisplayNameAsync(displayName)
 - GetGroupsAsync(filter, startIndex, count)
@@ -24,26 +25,40 @@ Manages Group resource operations:
 - PatchGroupAsync(id, patchRequest)
 - DeleteGroupAsync(id)
 
-### 3. IScimSchemaRepository
-Manages Schema operations:
-- GetCustomSchemasAsync()
-- AddCustomSchemaAsync(schema)
-
-### 4. IScimRepository (Main Interface)
-Inherits from all three interfaces for backward compatibility:
+### 3. IScimRepository (Main Interface)
+Backward-compatible alias with concrete types:
 ```csharp
-public interface IScimRepository : IScimUserRepository, IScimGroupRepository, IScimSchemaRepository
+public interface IScimRepository : IScimUserGroupRepository<ScimUser, ScimGroup>
 {
 }
 ```
 
+## Data Layer Hierarchy
+
+The data layer follows the same pattern:
+
+### IUserDataRepository<TUser>
+- GetUserAsync(id)
+- QueryUsers()
+- CreateUserAsync(user)
+- UpdateUserAsync(id, user)
+- DeleteUserAsync(id)
+
+### IUserGroupDataRepository<TUser, TGroup> : IUserDataRepository<TUser>
+- (inherits all User methods)
+- GetGroupAsync(id)
+- QueryGroups()
+- CreateGroupAsync(group)
+- UpdateGroupAsync(id, group)
+- DeleteGroupAsync(id)
+
 ## Usage Examples
 
 ### Option 1: Users Only Provider
-If you only support Users, implement IScimUserRepository:
+If you only support Users, implement IScimUserOnlyRepository:
 
 ```csharp
-public class UsersOnlyRepository : IScimUserRepository
+public class UsersOnlyRepository : IScimUserOnlyRepository<ScimUser>
 {
     public Task<ScimUser?> GetUserAsync(string id) { ... }
     public Task<ScimUser?> GetUserByUserNameAsync(string userName) { ... }
@@ -51,43 +66,27 @@ public class UsersOnlyRepository : IScimUserRepository
 }
 
 // Register in Program.cs
-builder.Services.AddSingleton<IScimUserRepository, UsersOnlyRepository>();
+builder.Services.AddSingleton<IScimUserOnlyRepository<ScimUser>, UsersOnlyRepository>();
 ```
 
-### Option 2: Groups Only Provider
-If you only support Groups, implement IScimGroupRepository:
-
-```csharp
-public class GroupsOnlyRepository : IScimGroupRepository
-{
-    public Task<ScimGroup?> GetGroupAsync(string id) { ... }
-    public Task<ScimGroup?> GetGroupByDisplayNameAsync(string displayName) { ... }
-    // ... other Group methods
-}
-
-// Register in Program.cs
-builder.Services.AddSingleton<IScimGroupRepository, GroupsOnlyRepository>();
-```
-
-### Option 3: Users + Groups Provider (Current)
+### Option 2: Users + Groups Provider (Recommended)
 If you support both Users and Groups, implement IScimRepository:
 
 ```csharp
 public class InMemoryScimRepository : IScimRepository
 {
-    // All User methods from IScimUserRepository
+    // All User methods from IScimUserOnlyRepository
     public Task<ScimUser?> GetUserAsync(string id) { ... }
     
-    // All Group methods from IScimGroupRepository
+    // All Group methods from IScimUserGroupRepository
     public Task<ScimGroup?> GetGroupAsync(string id) { ... }
-    
-    // All Schema methods from IScimSchemaRepository
-    public Task<List<ScimSchema>> GetCustomSchemasAsync() { ... }
 }
 
 // Register in Program.cs
 builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
 ```
+
+> **Note:** A groups-only provider is not supported. In SCIM, groups always reference users, so group operations require user operations to be available.
 
 ## Controller Injection Examples
 
@@ -97,22 +96,9 @@ builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
 [Route("scim")]
 public class UsersController : ControllerBase
 {
-    public UsersController(IScimUserRepository repository)
+    public UsersController(IScimUserOnlyRepository<ScimUser> repository)
     {
         // Only has access to User operations
-    }
-}
-```
-
-### For Groups Only Provider
-```csharp
-[ApiController]
-[Route("scim")]
-public class GroupsController : ControllerBase
-{
-    public GroupsController(IScimGroupRepository repository)
-    {
-        // Only has access to Group operations
     }
 }
 ```
@@ -125,61 +111,27 @@ public class ScimController : ControllerBase
 {
     public ScimController(IScimRepository repository)
     {
-        // Has access to User, Group, and Schema operations
+        // Has access to User and Group operations
     }
 }
 ```
 
-## Benefits of Separation
+## Adapter Classes
 
-1. **Clear Responsibility** - Each interface has a single concern
-2. **Flexibility** - Can implement only what you need
-3. **Backward Compatibility** - IScimRepository still works as before
-4. **Type Safety** - Inject only the interface you need
-5. **Documentation** - Clear what each provider supports
-6. **Testing** - Easier to mock specific repositories
+### ScimUserRepositoryAdapter<TUser>
+Bridges `IUserDataRepository<TUser>` to `IScimUserOnlyRepository<ScimUser>` using `[ScimProperty]` attribute mapping.
 
-## Declare Support in ServiceProviderConfig
+### ScimUserGroupRepositoryAdapter<TUser, TGroup>
+Bridges `IUserGroupDataRepository<TUser, TGroup>` to `IScimUserGroupRepository<ScimUser, ScimGroup>` using `[ScimProperty]` attribute mapping for both users and groups.
 
-In ResourceTypes endpoint, declare which types you support:
+## Benefits of This Design
 
-### Users Only
-```json
-{
-  "id": "User",
-  "name": "User",
-  "endpoint": "/Users",
-  "schema": "urn:ietf:params:scim:schemas:core:2.0:User"
-}
-```
-
-### Groups Only
-```json
-{
-  "id": "Group",
-  "name": "Group",
-  "endpoint": "/Groups",
-  "schema": "urn:ietf:params:scim:schemas:core:2.0:Group"
-}
-```
-
-### Users + Groups (Current)
-```json
-[
-  {
-    "id": "User",
-    "name": "User",
-    "endpoint": "/Users",
-    "schema": "urn:ietf:params:scim:schemas:core:2.0:User"
-  },
-  {
-    "id": "Group",
-    "name": "Group",
-    "endpoint": "/Groups",
-    "schema": "urn:ietf:params:scim:schemas:core:2.0:Group"
-  }
-]
-```
+1. **User-First Hierarchy** — Groups always depend on users (SCIM specification)
+2. **Clear Responsibility** — Each interface has a focused scope
+3. **Flexibility** — Implement user-only or user+group as needed
+4. **Backward Compatibility** — IScimRepository still works as before
+5. **Type Safety** — Inject only the interface you need
+6. **No Duplication** — Group interface inherits user operations
 
 ## Backward Compatibility
 
@@ -190,6 +142,6 @@ In ResourceTypes endpoint, declare which types you support:
 
 ## Status
 
-🟢 **INTERFACE SEPARATION COMPLETE**
+🟢 **INTERFACE HIERARCHY COMPLETE**
 
-All three interfaces (User, Group, Schema) are now properly separated while maintaining backward compatibility through the main IScimRepository interface.
+Two-level hierarchy (UserOnly → UserGroup → IScimRepository) properly implemented with backward compatibility through the main IScimRepository interface.

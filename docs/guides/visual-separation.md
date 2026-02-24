@@ -1,138 +1,148 @@
-﻿## 📊 Interface Separation - Visual Overview
+﻿## Interface Hierarchy - Visual Overview
 
-### BEFORE: Monolithic Interface
+### BEFORE: Flat Separated Interfaces
 
 ```
-┌─────────────────────────────────────────────┐
-│         IScimRepository                     │
-├─────────────────────────────────────────────┤
-│ User Operations:                            │
-│  • GetUserAsync()                           │
-│  • GetUsersAsync()                          │
-│  • CreateUserAsync()                        │
-│  • UpdateUserAsync()                        │
-│  • PatchUserAsync()                         │
-│  • DeleteUserAsync()                        │
-│                                             │
-│ Group Operations:                           │
-│  • GetGroupAsync()                          │
-│  • GetGroupsAsync()                         │
-│  • CreateGroupAsync()                       │
-│  • UpdateGroupAsync()                       │
-│  • PatchGroupAsync()                        │
-│  • DeleteGroupAsync()                       │
-│                                             │
-│ Schema Operations:                          │
-│  • GetCustomSchemasAsync()                  │
-│  • AddCustomSchemaAsync()                   │
-└─────────────────────────────────────────────┘
+┌─────────────────────────┐  ┌─────────────────────────┐
+│ IScimUserRepository     │  │ IScimGroupRepository    │
+├─────────────────────────┤  ├─────────────────────────┤
+│ • GetUserAsync()        │  │ • GetGroupAsync()       │
+│ • GetUsersAsync()       │  │ • GetGroupsAsync()      │
+│ • CreateUserAsync()     │  │ • CreateGroupAsync()    │
+│ • UpdateUserAsync()     │  │ • UpdateGroupAsync()    │
+│ • PatchUserAsync()      │  │ • PatchGroupAsync()     │
+│ • DeleteUserAsync()     │  │ • DeleteGroupAsync()    │
+└─────────────────────────┘  └─────────────────────────┘
 
-❌ Mixed responsibilities
-❌ Hard to implement single-resource providers
-❌ All-or-nothing approach
+❌ Groups without users has no meaning in SCIM
+❌ Duplicated responsibility possible
+❌ GroupsOnlyRepository was misleading
 ```
 
 ---
 
-### AFTER: Separated Interfaces
+### AFTER: User-First Hierarchy
 
 ```
-┌─────────────────────────┐
-│ IScimUserRepository     │
-├─────────────────────────┤
-│ • GetUserAsync()        │
-│ • GetUsersAsync()       │
-│ • CreateUserAsync()     │
-│ • UpdateUserAsync()     │
-│ • PatchUserAsync()      │
-│ • DeleteUserAsync()     │
-└─────────────────────────┘
-         ▲
-         │
-         │
-┌─────────────────────────┐
-│  IScimRepository        │
-│   (Main Interface)      │
-│   ◄────────┐            │
-│            │            │
-├─────────────────────────┤
-│  Inherits from:         │
-│  • IScimUserRepository  │◄─────┐
-│  • IScimGroupRepository │      │
-│  • IScimSchemaRepository│      │
-└─────────────────────────┘      │
-         ▲                        │
-         │                        │
-         │         ┌──────────────┘
-         │         │
-         │         ▼
-         │  ┌─────────────────────────┐
-         │  │ IScimGroupRepository    │
-         │  ├─────────────────────────┤
-         │  │ • GetGroupAsync()       │
-         │  │ • GetGroupsAsync()      │
-         │  │ • CreateGroupAsync()    │
-         │  │ • UpdateGroupAsync()    │
-         │  │ • PatchGroupAsync()     │
-         │  │ • DeleteGroupAsync()    │
-         │  └─────────────────────────┘
-         │
-         │
-         ├──────────────────────────┐
-         │                          │
-         │         ┌────────────────┘
-         │         │
-         │         ▼
-         │  ┌──────────────────────┐
-         │  │IScimSchemaRepository │
-         │  ├──────────────────────┤
-         │  │ • GetCustomSchemas() │
-         │  │ • AddCustomSchema()  │
-         │  └──────────────────────┘
-         │
-         │
-    ┌────┴──────────────────────────────┐
-    │                                   │
-    ▼                                   ▼
-┌────────────────────┐    ┌──────────────────────┐
-│ InMemoryScimRepo   │    │ UsersOnlyRepository  │
-│ (Users + Groups)   │    │ (Users Only) - NEW   │
-└────────────────────┘    └──────────────────────┘
-    │                           ▲
-    ▼                           │
-Implements:              Implements:
-IScimRepository          IScimUserRepository
-    │                           │
-    ├─ User ops          ├─ User ops
-    ├─ Group ops         └─ NO Group ops
-    └─ Schema ops
-                        ┌──────────────────────┐
-                        │GroupsOnlyRepository  │
-                        │(Groups Only) - NEW   │
-                        └──────────────────────┘
-                             ▲
-                             │
-                        Implements:
-                        IScimGroupRepository
-                             │
-                        ├─ NO User ops
-                        └─ Group ops
+┌──────────────────────────────────────┐
+│  IScimUserOnlyRepository<TUser>      │
+├──────────────────────────────────────┤
+│ • GetUserAsync()                     │
+│ • GetUserByUserNameAsync()           │
+│ • GetUsersAsync()                    │
+│ • CreateUserAsync()                  │
+│ • UpdateUserAsync()                  │
+│ • PatchUserAsync()                   │
+│ • DeleteUserAsync()                  │
+└──────────────────┬───────────────────┘
+                   │ inherits
+                   ▼
+┌──────────────────────────────────────┐
+│  IScimUserGroupRepository<TUser,     │
+│                           TGroup>    │
+├──────────────────────────────────────┤
+│ (all User methods inherited)         │
+│ • GetGroupAsync()                    │
+│ • GetGroupByDisplayNameAsync()       │
+│ • GetGroupsAsync()                   │
+│ • CreateGroupAsync()                 │
+│ • UpdateGroupAsync()                 │
+│ • PatchGroupAsync()                  │
+│ • DeleteGroupAsync()                 │
+└──────────────────┬───────────────────┘
+                   │ inherits
+                   ▼
+┌──────────────────────────────────────┐
+│  IScimRepository                     │
+│  (backward-compatible alias)         │
+│  = IScimUserGroupRepository          │
+│    <ScimUser, ScimGroup>             │
+└──────────────────────────────────────┘
 
-✅ Single responsibility
-✅ Flexible deployment
-✅ Type-safe injection
-✅ Clear capabilities
+✅ Groups always have users (SCIM spec)
+✅ No duplication
+✅ Clear hierarchy
+✅ Backward compatible
 ```
 
 ---
 
-## 📋 Deployment Scenarios
+### Data Layer Hierarchy
+
+```
+┌──────────────────────────────────────┐
+│  IUserDataRepository<TUser>          │
+├──────────────────────────────────────┤
+│ • GetUserAsync(id)                   │
+│ • QueryUsers()                       │
+│ • CreateUserAsync(user)              │
+│ • UpdateUserAsync(id, user)          │
+│ • DeleteUserAsync(id)                │
+└──────────────────┬───────────────────┘
+                   │ inherits
+                   ▼
+┌──────────────────────────────────────┐
+│  IUserGroupDataRepository            │
+│    <TUser, TGroup>                   │
+├──────────────────────────────────────┤
+│ (all User methods inherited)         │
+│ • GetGroupAsync(id)                  │
+│ • QueryGroups()                      │
+│ • CreateGroupAsync(group)            │
+│ • UpdateGroupAsync(id, group)        │
+│ • DeleteGroupAsync(id)               │
+└──────────────────────────────────────┘
+```
+
+---
+
+## Implementation Classes
+
+```
+┌──────────────────────────┐
+│ UsersOnlyRepository      │
+│ : IScimUserOnlyRepository│
+├──────────────────────────┤
+│ User operations only     │
+│ (example implementation) │
+└──────────────────────────┘
+
+┌──────────────────────────┐
+│ InMemoryScimRepository   │
+│ : IScimRepository        │
+├──────────────────────────┤
+│ User + Group operations  │
+│ (reference impl for dev) │
+└──────────────────────────┘
+
+┌────────────────────────────────────────────┐
+│ ScimUserRepositoryAdapter<TUser>           │
+│ : IScimUserOnlyRepository<ScimUser>        │
+├────────────────────────────────────────────┤
+│ Bridges IUserDataRepository to SCIM        │
+│ Uses [ScimProperty] attribute mapping      │
+└────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────┐
+│ ScimUserGroupRepositoryAdapter<TUser,TGrp> │
+│ : IScimUserGroupRepository<ScimUser,       │
+│                             ScimGroup>     │
+├────────────────────────────────────────────┤
+│ Bridges IUserGroupDataRepository to SCIM   │
+│ Uses [ScimProperty] attribute mapping      │
+│ for both users and groups                  │
+└────────────────────────────────────────────┘
+```
+
+---
+
+## Deployment Scenarios
 
 ### Scenario 1: Users Only
 ```
 Application
     │
-    ├─> IScimUserRepository (injected)
+    ├─> IScimUserOnlyRepository<ScimUser> (injected)
     │       │
     │       └─> UsersOnlyRepository (implementation)
     │               │
@@ -142,21 +152,7 @@ Application
             └─> Only "User" type
 ```
 
-### Scenario 2: Groups Only
-```
-Application
-    │
-    ├─> IScimGroupRepository (injected)
-    │       │
-    │       └─> GroupsOnlyRepository (implementation)
-    │               │
-    │               └─ Group endpoints only
-    │
-    └─> ResourceTypes
-            └─> Only "Group" type
-```
-
-### Scenario 3: Users + Groups (Current)
+### Scenario 2: Users + Groups (Current)
 ```
 Application
     │
@@ -165,8 +161,7 @@ Application
     │       └─> InMemoryScimRepository (implementation)
     │               │
     │               ├─ User endpoints
-    │               ├─ Group endpoints
-    │               └─ Schema endpoints
+    │               └─ Group endpoints
     │
     └─> ResourceTypes
             ├─> "User" type
@@ -175,23 +170,21 @@ Application
 
 ---
 
-## 🔄 Switching Costs
+## Switching Costs
 
 | Operation | Cost | Effort |
 |-----------|------|--------|
 | **Keep Current (Users+Groups)** | 0 lines | None |
 | **Switch to Users Only** | 3 lines | 5 minutes |
-| **Switch to Groups Only** | 3 lines | 5 minutes |
-| **Switch to Custom Combo** | 10 lines | 15 minutes |
 
 ---
 
-## ✅ Checklist
+## Checklist
 
-- ✅ Interfaces separated and documented
+- ✅ User-first interface hierarchy implemented
 - ✅ Example implementations provided
 - ✅ Backward compatibility maintained
-- ✅ SCIM standards compliance
+- ✅ SCIM standards compliance (groups reference users)
 - ✅ Type safety achieved
 - ✅ Documentation complete
 - ✅ Ready for production

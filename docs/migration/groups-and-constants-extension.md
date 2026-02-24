@@ -1,4 +1,4 @@
-﻿# 🎉 Extension complète - Support des Groupes + Constantes SCIM
+﻿﻿# 🎉 Extension complète - Support des Groupes + Constantes SCIM
 
 **Date:** 2026-02-12  
 **Extension:** Support des groupes + ScimAttributeNames constantes
@@ -34,18 +34,24 @@ Classe statique avec constantes pour tous les attributs SCIM :
 ### 2. Support des Groupes
 
 #### Interface repository
-**Fichier:** `ScimAPI/Repositories/IGroupDataRepository.cs` (~40 lignes)
+**Fichier:** `EzSCIM/DataRepositories/IUserGroupDataRepository.cs`
+
+Groups are now managed through `IUserGroupDataRepository<TUser, TGroup>` which inherits from `IUserDataRepository<TUser>`:
 
 ```csharp
-public interface IGroupDataRepository<TGroup> where TGroup : class
+public interface IUserGroupDataRepository<TUser, TGroup> : IUserDataRepository<TUser>
+    where TUser : class
+    where TGroup : class
 {
-    Task<TGroup?> GetAsync(string id);
-    IQueryable<TGroup> Query();
-    Task<TGroup> CreateAsync(TGroup group);
-    Task<TGroup?> UpdateAsync(string id, TGroup group);
-    Task<bool> DeleteAsync(string id);
+    Task<TGroup?> GetGroupAsync(string id);
+    IQueryable<TGroup> QueryGroups();
+    Task<TGroup> CreateGroupAsync(TGroup group);
+    Task<TGroup?> UpdateGroupAsync(string id, TGroup group);
+    Task<bool> DeleteGroupAsync(string id);
 }
 ```
+
+> **Note:** `IGroupDataRepository<TGroup>` has been removed. Groups always depend on users in SCIM, so the combined `IUserGroupDataRepository` enforces this at the type level.
 
 #### Traducteur de filtres
 **Fichier:** `ScimAPI/Filtering/ScimGroupFilterTranslator.cs` (~230 lignes)
@@ -56,18 +62,18 @@ Traduit les filtres SCIM en expressions LINQ pour ScimGroup :
 - Utilise les constantes ScimAttributeNames
 
 #### Adaptateur repository
-**Fichier:** `ScimAPI/Repositories/ScimGroupRepositoryAdapter.cs` (~240 lignes)
+**Fichier:** `EzSCIM/Repositories/ScimUserGroupRepositoryAdapter.cs`
 
-Adapte `IGroupDataRepository<TGroup>` vers `IScimGroupRepository<ScimGroup>` :
-- Mapping bidirectionnel TGroup ↔ ScimGroup
+Adapte `IUserGroupDataRepository<TUser, TGroup>` vers `IScimUserGroupRepository<ScimUser, ScimGroup>` :
+- Mapping bidirectionnel TUser ↔ ScimUser et TGroup ↔ ScimGroup
 - Filtrage server-side via IQueryable
 - Pagination automatique
 - Mapping via attributs [ScimProperty]
 
 #### Exemples
 **Fichiers:**
-- `ScimAPI/Examples/CustomGroup.cs` (~60 lignes) - Modèle groupe avec attributs
-- `ScimAPI/Examples/CustomGroupRepository.cs` (~65 lignes) - Implémentation exemple
+- `EzSCIM.EntraID.Demo/Examples/CustomGroup.cs` (~60 lignes) - Modèle groupe avec attributs
+- `EzSCIM.EntraID.Demo/Examples/CustomUserGroupRepository.cs` - Combined user+group repository
 
 ---
 
@@ -134,9 +140,9 @@ public string Username { get; set; }
 ## 🎯 Fonctionnalités ajoutées
 
 ### ✅ Support complet des groupes
-- [x] IGroupDataRepository<TGroup>
+- [x] IUserGroupDataRepository<TUser, TGroup> (inherits from IUserDataRepository)
 - [x] ScimGroupFilterTranslator
-- [x] ScimGroupRepositoryAdapter<TGroup>
+- [x] ScimUserGroupRepositoryAdapter<TUser, TGroup>
 - [x] Mapping via [ScimProperty]
 - [x] Filtrage server-side (IQueryable)
 - [x] Pagination
@@ -176,33 +182,38 @@ public class MyGroup
 
 #### 2. Implémenter le repository
 ```csharp
-public class MyGroupRepository : IGroupDataRepository<MyGroup>
+public class MyUserGroupRepository : IUserGroupDataRepository<MyUser, MyGroup>
 {
     private readonly AppDbContext _context;
 
-    public IQueryable<MyGroup> Query() => _context.Groups;
+    // User methods (from IUserDataRepository<MyUser>)
+    public IQueryable<MyUser> QueryUsers() => _context.Users;
+    public async Task<MyUser?> GetUserAsync(string id) => await _context.Users.FindAsync(id);
+    // ... other user methods
 
-    public async Task<MyGroup?> GetAsync(string id)
-        => await _context.Groups.FindAsync(id);
-
-    // ... autres méthodes
+    // Group methods
+    public IQueryable<MyGroup> QueryGroups() => _context.Groups;
+    public async Task<MyGroup?> GetGroupAsync(string id) => await _context.Groups.FindAsync(id);
+    // ... other group methods
 }
 ```
 
 #### 3. Configurer DI
 ```csharp
-// Repository de données
-services.AddScoped<IGroupDataRepository<MyGroup>, MyGroupRepository>();
+// Combined user+group data repository
+services.AddScoped<IUserGroupDataRepository<MyUser, MyGroup>, MyUserGroupRepository>();
 
-// Traducteur de filtres
+// Filter translators
+services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
 services.AddScoped<IScimFilterTranslator<MyGroup>, GenericScimFilterTranslator<MyGroup>>();
 
-// Adaptateur SCIM
-services.AddScoped<IScimGroupRepository<ScimGroup>>(sp =>
+// Combined SCIM adapter
+services.AddScoped<IScimUserGroupRepository<ScimUser, ScimGroup>>(sp =>
 {
-    var dataRepo = sp.GetRequiredService<IGroupDataRepository<MyGroup>>();
-    var translator = sp.GetRequiredService<IScimFilterTranslator<MyGroup>>();
-    return new ScimGroupRepositoryAdapter<MyGroup>(dataRepo, translator);
+    var dataRepo = sp.GetRequiredService<IUserGroupDataRepository<MyUser, MyGroup>>();
+    var userTranslator = sp.GetRequiredService<IScimFilterTranslator<MyUser>>();
+    var groupTranslator = sp.GetRequiredService<IScimFilterTranslator<MyGroup>>();
+    return new ScimUserGroupRepositoryAdapter<MyUser, MyGroup>(dataRepo, userTranslator, groupTranslator);
 });
 ```
 
@@ -367,13 +378,12 @@ scimwork/
 │   │   └── GenericScimFilterTranslator.cs
 │   ├── Repositories/
 │   │   ├── IUserDataRepository.cs
-│   │   ├── IGroupDataRepository.cs                  ✅ NEW
+│   │   ├── IUserGroupDataRepository.cs              ✅ NEW
 │   │   ├── ScimUserRepositoryAdapter.cs             🔄 UPDATED
-│   │   └── ScimGroupRepositoryAdapter.cs            ✅ NEW
+│   │   └── ScimUserGroupRepositoryAdapter.cs        ✅ NEW
 │   └── Examples/
 │       ├── CustomUser.cs                            🔄 UPDATED
-│       ├── CustomUserRepository.cs
-│       ├── CustomGroup.cs                           ✅ NEW
+│       └── CustomUserGroupRepository.cs              ✅ MERGED
 │       └── CustomGroupRepository.cs                 ✅ NEW
 │
 └── ScimAPI.Tests/
@@ -389,9 +399,9 @@ scimwork/
 
 ### Code
 - [x] ScimAttributeNames créé et complet
-- [x] IGroupDataRepository créé
+- [x] IUserGroupDataRepository créé
 - [x] ScimGroupFilterTranslator implémenté
-- [x] ScimGroupRepositoryAdapter implémenté
+- [x] ScimUserGroupRepositoryAdapter implémenté
 - [x] CustomGroup/Repository exemples créés
 - [x] CustomUser mis à jour avec constantes
 - [x] ScimUserFilterTranslator mis à jour
