@@ -214,7 +214,7 @@ See [docs/status/migration-summary.md](./status/migration-summary.md) for comple
 
 ---
 
-**Last Updated**: February 23, 2026  
+**Last Updated**: April 15, 2026  
 **Convention Version**: 1.1  
 **Language**: English only
 
