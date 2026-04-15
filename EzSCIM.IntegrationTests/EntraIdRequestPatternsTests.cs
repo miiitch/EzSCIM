@@ -17,7 +17,7 @@ namespace EzSCIM.IntegrationTests;
 /// These tests verify that the SCIM API correctly handles all operations that Entra ID performs.
 /// </summary>
 [Collection("EntraIdIntegration")]
-public class EntraIdRequestPatternsTests : IClassFixture<ScimWebApplicationFactory>, IAsyncLifetime
+public class EntraIdRequestPatternsTests : IAsyncLifetime
 {
     private readonly ScimWebApplicationFactory _factory;
     private readonly HttpClient _client;

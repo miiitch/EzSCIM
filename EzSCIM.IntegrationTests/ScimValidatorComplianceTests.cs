@@ -24,7 +24,7 @@ namespace EzSCIM.IntegrationTests;
 /// Source data: docs/scim-test-results/scim-results-01.json through scim-results-04.json
 /// </summary>
 [Collection("ScimValidatorCompliance")]
-public class ScimValidatorComplianceTests : IClassFixture<ScimWebApplicationFactory>, IAsyncLifetime
+public class ScimValidatorComplianceTests : IAsyncLifetime
 {
     private readonly ScimWebApplicationFactory _factory;
     private readonly HttpClient _client;
