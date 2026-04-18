@@ -1,6 +1,7 @@
 ﻿﻿using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
 using EzSCIM.Models;
+using EzSCIM.Services;
 using Microsoft.Extensions.Logging;
 
 namespace EzSCIM.Repositories
@@ -129,19 +130,7 @@ namespace EzSCIM.Repositories
                 return Task.FromResult<ScimUser?>(null);
             }
 
-            // Simple PATCH implementation (in production, implement full PATCH semantics)
-            foreach (var operation in patchRequest.Operations)
-            {
-                if (operation.Op == "replace")
-                {
-                    if (operation.Path == "active" && operation.Value is bool active)
-                    {
-                        user.Active = active;
-                    }
-                }
-            }
-
-            user.Meta.LastModified = DateTime.UtcNow;
+            ScimPatchService.ApplyPatch(user, patchRequest);
             _logger.LogInformation("Patched user: {UserId}", id);
             return Task.FromResult<ScimUser?>(user);
         }

@@ -5,6 +5,7 @@ using EzSCIM.Models;
 using System.Reflection;
 using EzSCIM.Attributes;
 using EzSCIM.DataRepositories;
+using EzSCIM.Services;
 
 namespace EzSCIM.Repositories
 {
@@ -104,10 +105,17 @@ namespace EzSCIM.Repositories
             return updated == null ? null : _userMapper.ToScimUser(updated);
         }
 
-        public Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
+        public async Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
         {
-            // TODO: Implement PATCH mapping
-            throw new NotImplementedException("PATCH operations require custom implementation per domain model");
+            var domainUser = await _dataRepository.GetUserAsync(id);
+            if (domainUser == null) return null;
+
+            var scimUser = _userMapper.ToScimUser(domainUser);
+            ScimPatchService.ApplyPatch(scimUser, patchRequest);
+
+            var updatedDomainUser = _userMapper.FromScimUser(scimUser);
+            var saved = await _dataRepository.UpdateUserAsync(id, updatedDomainUser);
+            return saved == null ? null : _userMapper.ToScimUser(saved);
         }
 
         public async Task<bool> DeleteUserAsync(string id)
@@ -184,10 +192,17 @@ namespace EzSCIM.Repositories
             return updated == null ? null : _groupMapper.ToScimGroup(updated);
         }
 
-        public Task<ScimGroup?> PatchGroupAsync(string id, ScimPatchRequest patchRequest)
+        public async Task<ScimGroup?> PatchGroupAsync(string id, ScimPatchRequest patchRequest)
         {
-            // TODO: Implement PATCH mapping
-            throw new NotImplementedException("PATCH operations require custom implementation per domain model");
+            var domainGroup = await _dataRepository.GetGroupAsync(id);
+            if (domainGroup == null) return null;
+
+            var scimGroup = _groupMapper.ToScimGroup(domainGroup);
+            ScimPatchService.ApplyPatch(scimGroup, patchRequest);
+
+            var updatedDomainGroup = _groupMapper.FromScimGroup(scimGroup);
+            var saved = await _dataRepository.UpdateGroupAsync(id, updatedDomainGroup);
+            return saved == null ? null : _groupMapper.ToScimGroup(saved);
         }
 
         public async Task<bool> DeleteGroupAsync(string id)
@@ -278,7 +293,11 @@ namespace EzSCIM.Repositories
                 {
                     try
                     {
-                        var memberInfos = System.Text.Json.JsonSerializer.Deserialize<List<MemberInfo>>(membersJson);
+                        var memberJsonOptions = new System.Text.Json.JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        };
+                        var memberInfos = System.Text.Json.JsonSerializer.Deserialize<List<MemberInfo>>(membersJson, memberJsonOptions);
                         if (memberInfos != null && memberInfos.Count > 0)
                         {
                             scimGroup.Members = memberInfos.Select(m => new ScimMember

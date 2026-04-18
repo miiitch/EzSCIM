@@ -1,264 +1,141 @@
-﻿﻿# 📚 Index - Mapping Repository → SCIM
+﻿# Index - Repository -> SCIM Mapping
 
-Guide de navigation rapide pour l'implémentation du mapping repository vers SCIM.
-
----
-
-## 🚀 Démarrage rapide
-
-**Vous voulez intégrer SCIM en 15 minutes ?**
-
-→ Lisez : **[QUICK-START-REPOSITORY-INTEGRATION.md](QUICK-START-REPOSITORY-INTEGRATION.md)**
+Quick navigation guide for repository-to-SCIM integration documentation.
 
 ---
 
-## 📖 Documentation par rôle
+## Quick start
 
-### 👨‍💻 Développeur - Première intégration
+Want to integrate SCIM in about 15 minutes?
 
-1. **[QUICK-START-REPOSITORY-INTEGRATION.md](QUICK-START-REPOSITORY-INTEGRATION.md)**  
-   Guide pas-à-pas pour intégrer votre repository existant (15 min)
-
-2. **[REPOSITORY-ADAPTER-GUIDE.md](REPOSITORY-ADAPTER-GUIDE.md)**  
-   Guide complet avec exemples et cas d'usage avancés
-
-### 🏗️ Architecte - Comprendre le système
-
-1. **[REPOSITORY-MAPPING-README.md](REPOSITORY-MAPPING-README.md)**  
-   Vue d'ensemble de l'architecture et des composants
-
-2. **[REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md](REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md)**  
-   Détails techniques d'implémentation et workflow
-
-### 📊 Chef de projet - Résumé exécutif
-
-1. **[FINAL-SUMMARY.md](FINAL-SUMMARY.md)**  
-   Résumé complet : composants, tests, performance, ROI
+Start with [`quick-start-repository.md`](./quick-start-repository.md)
 
 ---
 
-## 🎯 Documentation par besoin
+## Documentation by role
 
-### Je veux...
+### Developer - first integration
 
-| Besoin | Document | Temps |
-|--------|----------|-------|
-| **Intégrer rapidement** | QUICK-START-REPOSITORY-INTEGRATION.md | 15 min |
-| **Comprendre l'architecture** | REPOSITORY-MAPPING-README.md | 10 min |
-| **Voir des exemples** | REPOSITORY-ADAPTER-GUIDE.md | 20 min |
-| **Détails techniques** | REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md | 30 min |
-| **Résumé exécutif** | FINAL-SUMMARY.md | 5 min |
+1. [`quick-start-repository.md`](./quick-start-repository.md)  
+   Step-by-step integration guide for your existing repository.
 
----
+2. [`repository-adapter-guide.md`](./repository-adapter-guide.md)  
+   Full guide with examples and advanced use cases.
 
-## 📦 Composants créés
+### Architect - system understanding
 
-### Code source
+1. [`mapping-readme.md`](./mapping-readme.md)  
+   Architecture and component overview.
 
-**Interfaces:**
-- `ScimAPI/Filtering/IScimFilterTranslator.cs` - Traduction AST → LINQ
-- `ScimAPI/Repositories/IUserDataRepository.cs` - Repository générique
+2. [`repository-mapping-overview.md`](./repository-mapping-overview.md)  
+   Design-level summary and mapping model.
 
-**Implémentations:**
-- `ScimAPI/Filtering/ScimUserFilterTranslator.cs` - Pour ScimUser
-- `ScimAPI/Filtering/GenericScimFilterTranslator.cs` - Pour TUser générique
-- `ScimAPI/Repositories/ScimUserRepositoryAdapter.cs` - Adaptateur
+3. [`interface-separation.md`](./interface-separation.md)  
+   Interface hierarchy and rationale.
 
-**Exemples:**
-- `ScimAPI/Examples/CustomUser.cs` - Modèle annoté
-- `EzSCIM.EntraID.Demo/Examples/CustomUserGroupRepository.cs` - Combined user+group example implementation
+### Project lead - executive summary
 
-### Tests
-
-**Tests unitaires:**
-- `ScimAPI.Tests/Filtering/ScimUserFilterTranslatorTests.cs` (13 tests)
-- `ScimAPI.Tests/Filtering/GenericScimFilterTranslatorTests.cs` (13 tests)
-
-**Tests d'intégration:**
-- `ScimAPI.Tests/Integration/RepositoryAdapterIntegrationTests.cs` (14 tests)
-
-**Total:** 40 tests ✅ (100% de succès)
+1. [`mapping-readme.md`](./mapping-readme.md)  
+   High-level status and implementation value.
 
 ---
 
-## 🎓 Parcours d'apprentissage
+## Documentation by need
 
-### Niveau 1 : Débutant (30 minutes)
-
-1. Lire QUICK-START-REPOSITORY-INTEGRATION.md (15 min)
-2. Copier/adapter l'exemple CustomUser (5 min)
-3. Configurer DI selon le guide (5 min)
-4. Tester avec quelques requêtes SCIM (5 min)
-
-**Résultat:** API SCIM fonctionnelle ✅
-
-### Niveau 2 : Intermédiaire (1 heure)
-
-1. Lire REPOSITORY-ADAPTER-GUIDE.md (20 min)
-2. Comprendre le mapping via attributs (10 min)
-3. Explorer les cas d'usage avancés (15 min)
-4. Personnaliser pour votre modèle (15 min)
-
-**Résultat:** Intégration optimisée pour votre cas ✅
-
-### Niveau 3 : Avancé (2 heures)
-
-1. Lire REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md (30 min)
-2. Comprendre la traduction AST → LINQ (30 min)
-3. Étudier les tests d'intégration (30 min)
-4. Créer un traducteur personnalisé (30 min)
-
-**Résultat:** Maîtrise complète du système ✅
+| Need | Document | Typical time |
+|---|---|---|
+| Integrate quickly | `quick-start-repository.md` | 15 min |
+| Understand architecture | `repository-mapping-overview.md` | 10 min |
+| Review implementation details | `repository-adapter-guide.md` | 30 min |
+| Understand interfaces | `interface-separation.md` | 15 min |
+| Add groups support | `groups-and-constants-extension.md` | 20 min |
 
 ---
 
-## 🔍 Recherche rapide
+## Key implementation components
 
-### Par mot-clé
+### Source code
 
-**AST (Abstract Syntax Tree)**
-- REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md § Traduction AST → LINQ
-- REPOSITORY-ADAPTER-GUIDE.md § Fonctionnement du filtrage
+**Interfaces**
+- `EzSCIM/Filtering/IScimFilterTranslator.cs` - AST to LINQ translation contract
+- `EzSCIM/DataRepositories/IUserDataRepository.cs` - Generic user data contract
+- `EzSCIM/DataRepositories/IUserGroupDataRepository.cs` - Combined user+group data contract
 
-**IQueryable**
-- QUICK-START-REPOSITORY-INTEGRATION.md § Étape 3
-- REPOSITORY-ADAPTER-GUIDE.md § Avantages
+**Implementations**
+- `EzSCIM/Filtering/ScimUserFilterTranslator.cs` - `ScimUser` translator
+- `EzSCIM/Filtering/GenericScimFilterTranslator.cs` - Generic translator
+- `EzSCIM/Filtering/ScimGroupFilterTranslator.cs` - Group translator
+- `EzSCIM/Repositories/ScimUserRepositoryAdapter.cs` - User adapter
+- `EzSCIM/Repositories/ScimUserGroupRepositoryAdapter.cs` - User+group adapter
 
-**[ScimProperty] attributs**
-- QUICK-START-REPOSITORY-INTEGRATION.md § Étape 1
-- REPOSITORY-ADAPTER-GUIDE.md § Étape 1
-
-**Performance**
-- FINAL-SUMMARY.md § Performance
-- QUICK-START-REPOSITORY-INTEGRATION.md § Performance
-
-**EF Core / Entity Framework**
-- REPOSITORY-ADAPTER-GUIDE.md § Étape 2
-- QUICK-START-REPOSITORY-INTEGRATION.md § Étape 3
-
-**Azure AD / Entra ID**
-- QUICK-START-REPOSITORY-INTEGRATION.md § Intégration avec Azure AD
-- FINAL-SUMMARY.md § Cas d'usage validés
-
-**Okta**
-- QUICK-START-REPOSITORY-INTEGRATION.md § Intégration avec Okta
-- FINAL-SUMMARY.md § Cas d'usage validés
+**Examples**
+- `EzSCIM.EntraID.Demo/Examples/CustomUser.cs` - Annotated custom user model
+- `EzSCIM.EntraID.Demo/Examples/CustomGroup.cs` - Annotated custom group model
+- `EzSCIM.EntraID.Demo/Examples/CustomUserGroupRepository.cs` - Combined repository example
 
 ---
 
-## 🧪 Tests
+## Suggested learning path
 
-### Exécuter tous les tests
+### Level 1 - Beginner (30 minutes)
+1. Read `quick-start-repository.md` (15 min)
+2. Copy/adapt the `CustomUser` example (5 min)
+3. Configure DI as shown in the guide (5 min)
+4. Run basic SCIM requests (5 min)
 
-```bash
-dotnet test --filter "FullyQualifiedName~FilterTranslator"
-```
+**Outcome:** A working SCIM user integration.
 
-### Exécuter par catégorie
+### Level 2 - Intermediate (1 hour)
+1. Read `repository-adapter-guide.md` (20 min)
+2. Review attribute mapping conventions (10 min)
+3. Explore advanced scenarios (15 min)
+4. Tailor mapping for your model (15 min)
 
-```bash
-# Tests unitaires ScimUser
-dotnet test --filter "FullyQualifiedName~ScimUserFilterTranslatorTests"
+**Outcome:** An optimized integration for your domain model.
 
-# Tests unitaires génériques
-dotnet test --filter "FullyQualifiedName~GenericScimFilterTranslatorTests"
+### Level 3 - Advanced (2 hours)
+1. Read `repository-mapping-overview.md` (20 min)
+2. Study AST to LINQ translation flow (30 min)
+3. Review integration tests in `EzSCIM.IntegrationTests` (40 min)
+4. Implement a custom translator extension if needed (30 min)
 
-# Tests d'intégration
-dotnet test --filter "FullyQualifiedName~RepositoryAdapterIntegrationTests"
-```
-
----
-
-## 📊 Statistiques du projet
-
-**Code créé:**
-- 6 fichiers de production (~900 lignes)
-- 3 fichiers de tests (~ 650 lignes)
-- 2 fichiers d'exemples (~120 lignes)
-
-**Documentation créée:**
-- 5 guides markdown (~1 500 lignes)
-
-**Tests:**
-- 40 tests automatisés
-- ✅ 100% de succès
-
-**Temps d'implémentation:**
-- Implémentation: ~4 heures
-- Tests: ~2 heures
-- Documentation: ~2 heures
-- **Total: ~8 heures**
-
-**ROI pour utilisateur:**
-- Temps d'intégration: 15 minutes
-- Gain de temps: ~7h45 (97% de réduction)
-- Performance: jusqu'à 1000x plus rapide
+**Outcome:** Full mastery of repository-to-SCIM customization.
 
 ---
 
-## 🎯 Checklist d'intégration
+## Keyword navigation
 
-Utilisez cette checklist pour votre intégration :
+### AST (`FilterExpression`)
+- `repository-adapter-guide.md`
+- `repository-mapping-overview.md`
 
-- [ ] Lire QUICK-START-REPOSITORY-INTEGRATION.md
-- [ ] Annoter mon modèle avec [ScimProperty]
-- [ ] Implémenter IUserDataRepository<TUser>
-- [ ] Configurer DI (3 lignes)
-- [ ] Tester : GET /scim/Users
-- [ ] Tester : GET /scim/Users?filter=...
-- [ ] Tester : POST /scim/Users
-- [ ] Tester : PUT /scim/Users/{id}
-- [ ] Tester : DELETE /scim/Users/{id}
-- [ ] Vérifier la performance (SQL server-side)
-- [ ] Déployer en production
+### `IQueryable`
+- `quick-start-repository.md`
+- `repository-adapter-guide.md`
 
----
+### `[ScimProperty]`
+- `quick-start-repository.md`
+- `repository-adapter-guide.md`
+- `groups-and-constants-extension.md`
 
-## 💡 FAQ rapide
+### Performance
+- `mapping-readme.md`
+- `repository-mapping-overview.md`
 
-**Q: Dois-je modifier mon modèle existant ?**  
-R: Non, il suffit d'ajouter des attributs `[ScimProperty]`. Vos propriétés restent inchangées.
-
-**Q: Ça fonctionne avec EF Core ?**  
-R: Oui ! C'est justement optimisé pour. Les filtres SCIM sont traduits en SQL.
-
-**Q: Je dois réécrire mon repository ?**  
-R: Non, vous implémentez juste `IUserDataRepository<TUser>` (5 méthodes).
-
-**Q: Ça supporte les propriétés complexes ?**  
-R: Oui, avec des attributs imbriqués comme `name.givenName`.
-
-**Q: C'est performant ?**  
-R: Très ! Filtrage SQL server-side, jusqu'à 1000x plus rapide.
-
-**Q: Ça marche avec Azure AD ?**  
-R: Oui, totalement compatible avec Azure AD, Okta, etc.
+### Groups support
+- `groups-and-constants-extension.md`
+- `interface-separation.md`
 
 ---
 
-## 🔗 Liens rapides
+## Related docs
 
-| Document | Description |
-|----------|-------------|
-| [QUICK-START-REPOSITORY-INTEGRATION.md](QUICK-START-REPOSITORY-INTEGRATION.md) | 🚀 Démarrage rapide 15 min |
-| [REPOSITORY-ADAPTER-GUIDE.md](REPOSITORY-ADAPTER-GUIDE.md) | 📖 Guide complet |
-| [REPOSITORY-MAPPING-README.md](REPOSITORY-MAPPING-README.md) | 📊 Vue d'ensemble |
-| [REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md](REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md) | 🏗️ Détails techniques |
-| [FINAL-SUMMARY.md](FINAL-SUMMARY.md) | ✅ Résumé exécutif |
+- [`README.md`](./README.md)
+- [`repository-mapping-overview.md`](./repository-mapping-overview.md)
+- [`repository-adapter-guide.md`](./repository-adapter-guide.md)
+- [`quick-start-repository.md`](./quick-start-repository.md)
+- [`groups-and-constants-extension.md`](./groups-and-constants-extension.md)
 
 ---
 
-## 📞 Support
-
-Pour des questions ou problèmes :
-
-1. Consultez la documentation appropriée (voir ci-dessus)
-2. Regardez les exemples dans `ScimAPI/Examples/`
-3. Étudiez les tests dans `ScimAPI.Tests/`
-
----
-
-**Dernière mise à jour:** 2026-02-12  
-**Version:** 1.0.0  
-**Status:** ✅ Production Ready
-
+**Last Updated:** April 2026

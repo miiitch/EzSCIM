@@ -1,172 +1,154 @@
 ﻿# SCIM Run 06 - Documentation Index
 
-This index provides quick navigation to all documentation related to the SCIM Validator Run 06 error analysis and test implementation.
+This index provides quick navigation to all documentation related to SCIM Validator Run 06 error analysis and fix validation.
 
 ---
 
-## 📚 Documentation Files
+## Documentation files
 
-### 1. Complete Summary (START HERE)
+### 1) Complete summary (start here)
 **File**: [`scim-run06-complete-summary.md`](./scim-run06-complete-summary.md)  
 **Language**: English  
-**Content**: Executive summary, deliverables, quick reference commands
+**Content**: executive summary, deliverables, quick reference commands
 
-### 2. Detailed Error Analysis
+### 2) Detailed error analysis
 **File**: [`scim-run06-patch-error-analysis.md`](./scim-run06-patch-error-analysis.md)  
 **Language**: English  
-**Content**: 
-- Test scenario reproduction
-- Request/response examples
-- Root cause deep-dive
-- Proposed solutions (3 options)
+**Content**:
+- test scenario reproduction
+- request/response examples
+- root cause deep dive
+- proposed solutions
 - SCIM compliance impact
 
-### 3. Test Implementation Guide
+### 3) Test implementation guide
 **File**: [`scim-run06-tests-implementation.md`](./scim-run06-tests-implementation.md)  
 **Language**: English  
 **Content**:
-- Test methodology
-- Test structure and organization
-- Success criteria
-- Next steps guide
+- test methodology
+- test structure and organization
+- success criteria
+- next steps
 
-### 4. Résumé en Français
+### 4) Implementation summary
 **File**: [`IMPLEMENTATION-RUN06-FR.md`](./IMPLEMENTATION-RUN06-FR.md)  
-**Language**: Français  
+**Language**: English (legacy filename retained)  
 **Content**:
-- Résumé exécutif
-- Guide de référence rapide
-- Instructions d'utilisation des tests
+- implementation summary
+- root cause and impact
+- regression and verification scope
+
+### 5) Fix implementation details
+**File**: [`scim-run06-fix-implementation-fr.md`](./scim-run06-fix-implementation-fr.md)  
+**Language**: English (legacy filename retained)  
+**Content**:
+- code changes
+- normalization/mapping strategy
+- unit test additions
 
 ---
 
-## 🧪 Test Files
+## Test files
 
-### Integration Tests
+### Integration tests
 **File**: [`../../EzSCIM.IntegrationTests/ScimValidatorComplianceTests.cs`](../../EzSCIM.IntegrationTests/ScimValidatorComplianceTests.cs)
 
-**Tests Created** (9 total):
+**Tests created**:
 
-#### Main Regression Test
-- `PatchUser_ReplaceFilteredMultiValuedAttributes_Run06_ShouldPersistAll`
-  - Lines: ~180 lines
-  - Reproduces exact Run 06 scenario
-
-#### Verification Tests (8)
-- `PatchUser_AddFilteredEmail_ShouldAddNewEmail`
-- `PatchUser_RemoveFilteredEmail_ShouldRemoveMatchingEmail`
-- `PatchUser_MixedOperations_AddReplaceRemove_ShouldApplyAllCorrectly`
-- `PatchUser_ReplaceEmailByTypeFilter_ShouldUpdateCorrectEmail`
-- `PatchUser_ReplaceMultipleAddressFields_ShouldUpdateAllFields`
-- `PatchUser_ReplaceOneField_ShouldPreserveOtherFields`
-- `PatchGroup_ReplaceMembers_ShouldUpdateMembersList`
-- `PatchGroup_RemoveSpecificMember_ShouldRemoveOnlyThatMember`
+- Main regression test: `PatchUser_ReplaceFilteredMultiValuedAttributes_Run06_ShouldPersistAll`
+- Verification tests for filtered and mixed PATCH operations
 
 ---
 
-## 📊 Source Data
+## Source data
 
-### SCIM Validator Results
+### SCIM Validator results
 **File**: [`../scim-test-results/scim-results-06.json`](../scim-test-results/scim-results-06.json)  
-**Correlation ID**: 79a7b13c-08a6-4619-9444-955bcafa30bf  
-**Failed Test ID**: 72  
-**Test Name**: "Patch User - Replace Attributes"
+**Correlation ID**: `79a7b13c-08a6-4619-9444-955bcafa30bf`  
+**Failed Test ID**: `72`  
+**Test Name**: `Patch User - Replace Attributes`
 
 ---
 
-## 🔧 Code References
+## Code references
 
-### Files with Issues
+### Files with issues
 
-1. **ScimPatchApplier.cs**
-   - Path: `EzSCIM.IntegrationTests/ScimPatchApplier.cs`
-   - Method: `ApplyOperation` (lines 111-145)
-   - Issue: Silent failure on filtered path lookup
+1. `EzSCIM.IntegrationTests/ScimPatchApplier.cs`
+   - Method: `ApplyOperation`
+   - Issue: silent failure on filtered path lookup
 
-2. **CompositeScimRepository.cs**
-   - Path: `EzSCIM.IntegrationTests/ScimWebApplicationFactory.cs`
-   - Method: `PatchUserAsync` (lines 180-195)
-   - Context: Uses ScimPatchApplier
+2. `EzSCIM.IntegrationTests/ScimWebApplicationFactory.cs`
+   - Method: `PatchUserAsync`
+   - Context: patch execution and persistence logging
 
-3. **UserEntity.cs**
-   - Path: `EzSCIM.IntegrationTests/Data/Entities/UserEntity.cs`
-   - Attributes: `ScimProperty("emails[0].value")` mappings
+3. `EzSCIM.IntegrationTests/Data/Entities/UserEntity.cs`
+   - Mapping source for array-style paths such as `emails[0].value`
 
-### Reference Implementation
+### Reference implementation
 
-**InMemoryScimRepository.cs**
-- Path: `EzSCIM/Repositories/InMemoryScimRepository.cs`
-- Method: `ApplyUserPatchOperation` (lines 200-300)
-- Note: Working implementation that handles filtered paths correctly
+- `EzSCIM/Repositories/InMemoryScimRepository.cs`
+- Method: `ApplyUserPatchOperation`
+- Note: working filtered-path handling pattern
 
 ---
 
-## 🎯 Quick Navigation by Task
+## Quick navigation by task
 
-### I want to understand the bug
-→ Read [`scim-run06-patch-error-analysis.md`](./scim-run06-patch-error-analysis.md)
+### Understand the bug
+Read [`scim-run06-patch-error-analysis.md`](./scim-run06-patch-error-analysis.md)
 
-### I want to see the tests
-→ Open [`ScimValidatorComplianceTests.cs`](../../EzSCIM.IntegrationTests/ScimValidatorComplianceTests.cs)  
-→ Search for "Run06" or "Additional PATCH Verification Tests"
+### Review tests
+Open [`ScimValidatorComplianceTests.cs`](../../EzSCIM.IntegrationTests/ScimValidatorComplianceTests.cs)
 
-### I want a quick summary
-→ Read [`scim-run06-complete-summary.md`](./scim-run06-complete-summary.md)
+### Get a concise summary
+Read [`scim-run06-complete-summary.md`](./scim-run06-complete-summary.md)
 
-### I want to run the tests
-→ See "Quick Reference Commands" in [`scim-run06-complete-summary.md`](./scim-run06-complete-summary.md)
+### Run tests
+See command references in [`scim-run06-complete-summary.md`](./scim-run06-complete-summary.md)
 
-### I want to implement the fix
-→ See "Proposed Solutions" in [`scim-run06-patch-error-analysis.md`](./scim-run06-patch-error-analysis.md)
-
-### Je préfère lire en français
-→ Lire [`IMPLEMENTATION-RUN06-FR.md`](./IMPLEMENTATION-RUN06-FR.md)
+### Review fix details
+Read [`scim-run06-fix-implementation-fr.md`](./scim-run06-fix-implementation-fr.md)
 
 ---
 
-## 📋 Document Structure
+## Document structure
 
-```
+```text
 docs/status/
-├── scim-run06-complete-summary.md      ← Executive summary
-├── scim-run06-patch-error-analysis.md  ← Technical deep-dive
-├── scim-run06-tests-implementation.md  ← Test implementation guide
-├── IMPLEMENTATION-RUN06-FR.md          ← Résumé en français
-└── scim-run06-index.md                 ← This file
+├── scim-run06-complete-summary.md        # Executive summary
+├── scim-run06-patch-error-analysis.md    # Technical analysis
+├── scim-run06-tests-implementation.md    # Test implementation guide
+├── IMPLEMENTATION-RUN06-FR.md            # Implementation summary (English content)
+├── scim-run06-fix-implementation-fr.md   # Fix details (English content)
+└── scim-run06-index.md                   # This index
 ```
 
 ---
 
-## ✅ Checklist
+## Checklist
 
 ### Completed
 - [x] Bug analyzed and documented
 - [x] Root cause identified
-- [x] Regression test created (Run 06)
-- [x] Verification tests added (8 tests)
-- [x] All tests compile successfully
-- [x] Documentation complete (4 files)
-- [x] Index created
+- [x] Regression test created
+- [x] Verification tests added
+- [x] Documentation completed
 
 ### Pending
-- [ ] Tests verified to fail (documenting bug)
-- [ ] Fix implemented
-- [ ] Tests verified to pass
-- [ ] SCIM validator re-run
-- [ ] Compliance achieved
+- [ ] Re-run validator and confirm end-to-end compliance report
 
 ---
 
-## 🔗 Related Documentation
+## Related documentation
 
-- **Main Documentation Index**: [`../README.md`](../README.md)
-- **Status Reports**: [`./INDEX.md`](./INDEX.md)
-- **SCIM Validator Errors**: [`./SCIM-VALIDATOR-ERRORS-ANALYSIS.md`](./SCIM-VALIDATOR-ERRORS-ANALYSIS.md)
-- **Repository Guidelines**: [`../../.github/copilot-instructions.md`](../../.github/copilot-instructions.md)
+- [`../README.md`](../README.md)
+- [`./INDEX.md`](./INDEX.md)
+- [`./SCIM-VALIDATOR-ERRORS-ANALYSIS.md`](./SCIM-VALIDATOR-ERRORS-ANALYSIS.md)
+- [`../../.github/copilot-instructions.md`](../../.github/copilot-instructions.md)
 
 ---
 
 **Created**: February 22, 2026  
-**Last Updated**: February 22, 2026  
-**Version**: 1.0
-
+**Last Updated**: April 15, 2026  
+**Version**: 1.1

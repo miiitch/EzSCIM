@@ -159,8 +159,8 @@ This appears to be related to the primary PATCH issue (Issue #1) where multiple 
 
 ### French Error Messages in Responses
 The API is returning error messages in French:
-- Example: `"detail": "Utilisateur existe déjà"` (User already exists)
-- Example: `"detail": "Groupe 8520e858-aa38-42d4-9b67-392bc433d330 non trouvé"` (Group not found)
+- Example: `"detail": "<legacy French duplicate-user message>"` (`User already exists`)
+- Example: `"detail": "<legacy French group-not-found message>"` (`Group not found`)
 
 **Note**: According to project coding standards, all error messages should be in English for API consistency and international compatibility.
 
@@ -219,5 +219,3 @@ The API is returning error messages in French:
 3. Update error messages to English
 4. Re-run validation test suite
 5. Verify SFCompliance flag (currently: SFComplianceFailed: true)
-
-

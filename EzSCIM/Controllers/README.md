@@ -1,34 +1,34 @@
 ﻿# EzSCIM Controllers
 
-## Vue d'ensemble
+## Overview
 
-Les contrôleurs SCIM ont été déplacés dans la bibliothèque EzSCIM pour permettre leur réutilisation dans n'importe quelle application ASP.NET Core.
+The SCIM controllers have been moved into the EzSCIM library to allow reuse in any ASP.NET Core application.
 
-## Contrôleurs disponibles
+## Available Controllers
 
 ### ScimUsersController
 - **Route**: `scim/Users`
-- **Fonctionnalités**:
-  - `GET /scim/Users` - Liste des utilisateurs avec filtrage, pagination
-  - `GET /scim/Users/{id}` - Récupère un utilisateur par ID
-  - `POST /scim/Users` - Crée un nouvel utilisateur
-  - `PUT /scim/Users/{id}` - Met à jour un utilisateur existant
-  - `PATCH /scim/Users/{id}` - Applique des modifications partielles
-  - `DELETE /scim/Users/{id}` - Supprime un utilisateur
+- **Features**:
+  - `GET /scim/Users` - List users with filtering and pagination
+  - `GET /scim/Users/{id}` - Retrieve a user by ID
+  - `POST /scim/Users` - Create a new user
+  - `PUT /scim/Users/{id}` - Replace an existing user
+  - `PATCH /scim/Users/{id}` - Apply partial modifications
+  - `DELETE /scim/Users/{id}` - Delete a user
 
 ### ScimGroupsController
 - **Route**: `scim/Groups`
-- **Fonctionnalités**:
-  - `GET /scim/Groups` - Liste des groupes avec filtrage, pagination
-  - `GET /scim/Groups/{id}` - Récupère un groupe par ID
-  - `POST /scim/Groups` - Crée un nouveau groupe
-  - `PUT /scim/Groups/{id}` - Met à jour un groupe existant
-  - `PATCH /scim/Groups/{id}` - Applique des modifications partielles
-  - `DELETE /scim/Groups/{id}` - Supprime un groupe
+- **Features**:
+  - `GET /scim/Groups` - List groups with filtering and pagination
+  - `GET /scim/Groups/{id}` - Retrieve a group by ID
+  - `POST /scim/Groups` - Create a new group
+  - `PUT /scim/Groups/{id}` - Replace an existing group
+  - `PATCH /scim/Groups/{id}` - Apply partial modifications
+  - `DELETE /scim/Groups/{id}` - Delete a group
 
-## Utilisation
+## Usage
 
-### 1. Configuration dans Program.cs
+### 1. Configuration in Program.cs
 
 ```csharp
 using EzSCIM.Controllers;
@@ -36,10 +36,10 @@ using EzSCIM.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Enregistrer le repository SCIM
+// Register the SCIM repository
 builder.Services.AddSingleton<IScimRepository, YourScimRepositoryImplementation>();
 
-// Ajouter les contrôleurs SCIM
+// Add SCIM controllers
 builder.Services.AddScimControllers()
     .AddJsonOptions(options =>
     {
@@ -47,11 +47,11 @@ builder.Services.AddScimControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
 
-// Configurer l'authentification
+// Configure authentication
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        // Votre configuration JWT
+        // Your JWT configuration
     });
 
 builder.Services.AddAuthorization();
@@ -65,23 +65,23 @@ app.MapControllers();
 app.Run();
 ```
 
-### 2. Méthode d'extension AddScimControllers()
+### 2. AddScimControllers() Extension Method
 
-La méthode `AddScimControllers()` :
-- Enregistre automatiquement les contrôleurs SCIM depuis la bibliothèque EzSCIM
-- Retourne un `IMvcBuilder` pour permettre le chaînage avec d'autres configurations (comme `AddJsonOptions`)
-- Charge les contrôleurs via `AddApplicationPart`
+The `AddScimControllers()` method:
+- Automatically registers the SCIM controllers from the EzSCIM library
+- Returns an `IMvcBuilder` to allow chaining with other configurations (e.g., `AddJsonOptions`)
+- Loads controllers via `AddApplicationPart`
 
-### 3. Exemple de requêtes
+### 3. Example Requests
 
 ```bash
-# Lister les utilisateurs
+# List users
 GET /scim/Users
 
-# Filtrer les utilisateurs
+# Filter users
 GET /scim/Users?filter=userName eq "john.doe@example.com"&startIndex=1&count=10
 
-# Créer un utilisateur
+# Create a user
 POST /scim/Users
 {
   "userName": "john.doe@example.com",
@@ -96,14 +96,14 @@ POST /scim/Users
   }]
 }
 
-# Mettre à jour un utilisateur
+# Replace a user
 PUT /scim/Users/{id}
 {
   "userName": "john.doe@example.com",
   "active": true
 }
 
-# Patch un utilisateur
+# Patch a user
 PATCH /scim/Users/{id}
 {
   "Operations": [{
@@ -113,44 +113,44 @@ PATCH /scim/Users/{id}
   }]
 }
 
-# Supprimer un utilisateur
+# Delete a user
 DELETE /scim/Users/{id}
 ```
 
-## Authentification
+## Authentication
 
-Les contrôleurs sont décorés avec `[Authorize]`, donc :
-- L'authentification doit être configurée dans votre application
-- Toutes les requêtes doivent inclure un token d'authentification valide
-- Le format attendu est : `Authorization: Bearer {token}`
+Controllers are decorated with `[Authorize]`, therefore:
+- Authentication must be configured in your application
+- All requests must include a valid authentication token
+- Expected format: `Authorization: Bearer {token}`
 
-## Format de réponse
+## Response Format
 
-Les contrôleurs retournent :
-- **200 OK** - Opération réussie
-- **201 Created** - Ressource créée (POST)
-- **204 No Content** - Suppression réussie (DELETE)
-- **400 Bad Request** - Filtre invalide ou données incorrectes
-- **404 Not Found** - Ressource non trouvée
-- **409 Conflict** - Ressource existe déjà
-- **500 Internal Server Error** - Erreur interne
+Controllers return:
+- **200 OK** - Successful operation
+- **201 Created** - Resource created (POST)
+- **204 No Content** - Successfully deleted (DELETE)
+- **400 Bad Request** - Invalid filter or incorrect data
+- **404 Not Found** - Resource not found
+- **409 Conflict** - Resource already exists
+- **500 Internal Server Error** - Internal error
 
-Toutes les réponses sont au format `application/scim+json`.
+All responses use the `application/scim+json` format.
 
-## Migration depuis les contrôleurs Demo
+## Migration from Demo Controllers
 
-Si vous utilisiez les contrôleurs dans `EzSCIM.EntraID.Demo` :
+If you were using controllers in `EzSCIM.EntraID.Demo`:
 
-1. Les contrôleurs Demo sont maintenant obsolètes et marqués avec `[Obsolete]`
-2. Ils restent disponibles sur la route `scim/demo/Users` et `scim/demo/Groups` pour la compatibilité
-3. Les nouveaux contrôleurs EzSCIM sont sur `scim/Users` et `scim/Groups`
-4. Mettez à jour vos clients pour utiliser les nouvelles routes
+1. Demo controllers are now obsolete and marked with `[Obsolete]`
+2. They remain available at `scim/demo/Users` and `scim/demo/Groups` for backward compatibility
+3. The new EzSCIM controllers are at `scim/Users` and `scim/Groups`
+4. Update your clients to use the new routes
 
-## Personnalisation
+## Customization
 
-Pour personnaliser les contrôleurs :
+To customize the controllers:
 
-1. **Option 1** : Hériter des contrôleurs EzSCIM
+1. **Option 1**: Inherit from EzSCIM controllers
 ```csharp
 public class CustomUsersController : ScimUsersController
 {
@@ -159,11 +159,11 @@ public class CustomUsersController : ScimUsersController
     {
     }
     
-    // Ajouter des méthodes personnalisées
+    // Add custom methods
 }
 ```
 
-2. **Option 2** : Créer vos propres contrôleurs et utiliser `IScimRepository`
+2. **Option 2**: Create your own controllers and use `IScimRepository`
 ```csharp
 [ApiController]
 [Route("custom/users")]
@@ -176,25 +176,25 @@ public class MyCustomController : ControllerBase
         _repository = repository;
     }
     
-    // Vos méthodes personnalisées
+    // Your custom methods
 }
 ```
 
-## Dépendances requises
+## Required Dependencies
 
-Les contrôleurs nécessitent :
-- `IScimRepository` - Doit être enregistré dans le conteneur DI
-- `ILogger<T>` - Fourni automatiquement par ASP.NET Core
-- ASP.NET Core 10.0 ou supérieur
+Controllers require:
+- `IScimRepository` - Must be registered in the DI container
+- `ILogger<T>` - Automatically provided by ASP.NET Core
+- ASP.NET Core 10.0 or higher
 
-## Notes importantes
+## Important Notes
 
-1. Les contrôleurs utilisent le filtrage SCIM via `FilterParser`
-2. La pagination est gérée avec `startIndex` et `count`
-3. Les erreurs de filtrage retournent un `ScimError` avec code 400
-4. Tous les contrôleurs sont thread-safe et peuvent être utilisés dans des environnements multi-threads
+1. Controllers use SCIM filtering via `FilterParser`
+2. Pagination is handled with `startIndex` and `count`
+3. Filter errors return a `ScimError` with status code 400
+4. All controllers are thread-safe and can be used in multi-threaded environments
 
-## Voir aussi
+## See Also
 
 - [SCIM Filter Documentation](../SCIM-FILTER-DOCUMENTATION.md)
 - [Repository Guide](../REPOSITORY-ADAPTER-GUIDE.md)

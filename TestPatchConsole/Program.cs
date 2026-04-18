@@ -1,8 +1,8 @@
-﻿using EzSCIM.IntegrationTests;
+﻿using EzSCIM.Services;
 using EzSCIM.IntegrationTests.Data.Entities;
 using EzSCIM.Models;
 
-Console.WriteLine("=== Testing ScimPatchApplier ===\n");
+Console.WriteLine("=== Testing ScimPatchService ===\n");
 
 // Test 1: Filtered path
 Console.WriteLine("Test 1: Filtered path emails[primary eq true].value");
@@ -27,7 +27,7 @@ try
         }
     };
 
-    var result1 = ScimPatchApplier.ApplyPatch(user1, operations1);
+    var result1 = ScimPatchService.ApplyPatch(user1, operations1);
     Console.WriteLine($"  ApplyPatch returned: {result1}");
     Console.WriteLine($"  Updated Email: {user1.Email}");
     
@@ -74,7 +74,7 @@ try
         }
     };
 
-    var result2 = ScimPatchApplier.ApplyPatch(user2, operations2);
+    var result2 = ScimPatchService.ApplyPatch(user2, operations2);
     Console.WriteLine($"  ApplyPatch returned: {result2}");
     Console.WriteLine($"  Updated Email: {user2.Email}");
     
@@ -97,4 +97,3 @@ catch (Exception ex)
 }
 
 Console.WriteLine("\n=== Tests Complete ===");
-

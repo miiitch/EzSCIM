@@ -28,7 +28,7 @@
 ## 📋 Error Messages Issue
 
 **Problem**: Error messages are in French instead of English
-- Example: `"detail": "Utilisateur existe déjà"` 
+- Example: `"detail": "<legacy French duplicate-user message>"` 
 - Should be: `"detail": "User already exists"`
 
 **Fix**: Create centralized error message service with English messages
@@ -83,5 +83,3 @@
 - Full analysis: [SCIM-VALIDATOR-ERRORS-ANALYSIS.md](./SCIM-VALIDATOR-ERRORS-ANALYSIS.md)
 - Implementation guide: [ACTION-PLAN-FIX-SCIM-ERRORS.md](./ACTION-PLAN-FIX-SCIM-ERRORS.md)
 - Validator results: [scim-results-03.json](../scim-test-results/scim-results-03.json)
-
-

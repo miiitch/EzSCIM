@@ -15,7 +15,7 @@
 | `scim-run06-complete-summary.md` | Executive summary |
 | `scim-run06-patch-error-analysis.md` | Technical analysis |
 | `scim-run06-tests-implementation.md` | Test guide |
-| `IMPLEMENTATION-RUN06-FR.md` | Résumé français |
+| `IMPLEMENTATION-RUN06-FR.md` | Legacy filename, English implementation summary |
 
 ## 🧪 Tests Created
 
@@ -61,4 +61,3 @@ dotnet build EzSCIM.IntegrationTests
 
 **Created**: 2026-02-22  
 **See**: `scim-run06-index.md` for full navigation
-

@@ -1,108 +1,108 @@
-# Tests Unitaires - ScimAPI
+# Unit Tests - ScimAPI
 
-Ce projet contient les tests unitaires pour l'implémentation SCIM de l'API.
+This project contains unit tests for the SCIM API implementation.
 
-## Structure des Tests
+## Test Structure
 
 ### InMemoryScimRepositoryTests.cs
-Tests de l'implémentation en mémoire du repository SCIM avec **60+ tests** couvrant :
+Tests for the in-memory SCIM repository implementation with **60+ tests** covering:
 
-#### CRUD Utilisateurs (7 tests)
-- Création avec génération automatique d'ID et métadonnées
-- Récupération par ID
-- Mise à jour complète
-- Suppression
+#### User CRUD (7 tests)
+- Creation with automatic ID generation and metadata
+- Retrieval by ID
+- Full update
+- Deletion
 
-#### Filtres Utilisateurs (14 tests)
-- Opérateurs de base : `eq`, `sw`, `co`, `pr`
-- Opérateurs logiques : `and`, `or`, `not`
-- Expressions complexes avec parenthèses
-- Filtres sur tous les champs (userName, active, displayName, name.givenName, name.familyName, emails)
+#### User Filters (14 tests)
+- Basic operators: `eq`, `sw`, `co`, `pr`
+- Logical operators: `and`, `or`, `not`
+- Complex expressions with parentheses
+- Filters on all fields (userName, active, displayName, name.givenName, name.familyName, emails)
 
 #### Pagination (2 tests)
-- Pagination première page
-- Pagination pages suivantes
+- First page pagination
+- Subsequent page pagination
 
-#### PATCH Utilisateurs (4 tests)
-- Remplacement de champs simples (active, displayName)
-- Remplacement de champs imbriqués (name.givenName)
-- Opérations multiples
+#### User PATCH (4 tests)
+- Replacement of simple fields (active, displayName)
+- Replacement of nested fields (name.givenName)
+- Multiple operations
 
-#### CRUD Groupes (4 tests)
-- Création, récupération, mise à jour, suppression
+#### Group CRUD (4 tests)
+- Create, retrieve, update, delete
 
-#### Filtres Groupes (3 tests)
-- Filtres par displayName : `eq`, `co`, `sw`
+#### Group Filters (3 tests)
+- Filters by displayName: `eq`, `co`, `sw`
 
-#### PATCH Groupes (2 tests)
-- Ajout de membres
-- Retrait de membres
+#### Group PATCH (2 tests)
+- Add members
+- Remove members
 
-#### Schémas (2 tests)
-- Ajout de schémas personnalisés
-- Récupération de schémas
+#### Schemas (2 tests)
+- Add custom schemas
+- Retrieve schemas
 
-#### Cas limites (7 tests)
-- Gestion des valeurs null
-- Recherche case-insensitive
-- Résultats vides
+#### Edge Cases (7 tests)
+- Null value handling
+- Case-insensitive search
+- Empty results
 
 ### UsersControllerTests.cs
-Tests du controller des utilisateurs avec **25 tests** couvrant :
-- GET /scim/Users (avec/sans filtres, pagination, erreurs)
+Tests for the users controller with **25 tests** covering:
+- GET /scim/Users (with/without filters, pagination, errors)
 - GET /scim/Users/{id}
-- POST /scim/Users (création, conflits)
+- POST /scim/Users (creation, conflicts)
 - PUT /scim/Users/{id}
 - PATCH /scim/Users/{id}
 - DELETE /scim/Users/{id}
 
 ### GroupsControllerTests.cs
-Tests du controller des groupes avec **18 tests** couvrant :
-- GET /scim/Groups (avec/sans filtres, erreurs)
+Tests for the groups controller with **18 tests** covering:
+- GET /scim/Groups (with/without filters, errors)
 - GET /scim/Groups/{id}
-- POST /scim/Groups (création, conflits)
+- POST /scim/Groups (creation, conflicts)
 - PUT /scim/Groups/{id}
-- PATCH /scim/Groups/{id} (ajout/retrait membres)
+- PATCH /scim/Groups/{id} (add/remove members)
 - DELETE /scim/Groups/{id}
 
-## Exécution des Tests
+## Running Tests
 
-### Tous les tests
+### All tests
 ```bash
 dotnet test
 ```
 
-### Tests d'un fichier spécifique
+### Tests from a specific file
 ```bash
 dotnet test --filter "FullyQualifiedName~InMemoryScimRepositoryTests"
 dotnet test --filter "FullyQualifiedName~UsersControllerTests"
 dotnet test --filter "FullyQualifiedName~GroupsControllerTests"
 ```
 
-### Un test spécifique
+### A specific test
 ```bash
 dotnet test --filter "FullyQualifiedName~GetUsers_FilterWithComplexExpression"
 ```
 
-### Avec rapport détaillé
+### With detailed output
 ```bash
 dotnet test --verbosity detailed
 ```
 
-### Avec couverture de code
+### With code coverage
 ```bash
 dotnet test --collect:"XPlat Code Coverage"
 ```
 
-## Outils Utilisés
+## Tools Used
 
-- **xUnit** - Framework de tests
-- **Shouldly** - Assertions lisibles et expressives (MIT License - gratuite)
-- **Moq** - Mock des dépendances pour les tests de controllers
+- **xUnit** - Test framework
+- **Shouldly** - Readable and expressive assertions (MIT License - free)
+- **Moq** - Mocking dependencies for controller tests
 
-## Exemples de Tests
+## Test Examples
 
-### Test de filtre simple
+### Simple filter test
 ```csharp
 [Fact]
 public async Task GetUsers_FilterByUserName_Eq_ShouldReturnMatchingUser()
@@ -120,7 +120,7 @@ public async Task GetUsers_FilterByUserName_Eq_ShouldReturnMatchingUser()
 }
 ```
 
-### Test de filtre complexe
+### Complex filter test
 ```csharp
 [Fact]
 public async Task GetUsers_FilterWithComplexExpression_ShouldReturnMatchingUsers()
@@ -140,7 +140,7 @@ public async Task GetUsers_FilterWithComplexExpression_ShouldReturnMatchingUsers
 }
 ```
 
-### Test de controller
+### Controller test
 ```csharp
 [Fact]
 public async Task CreateUser_WhenValid_ShouldReturnCreated()
@@ -162,67 +162,67 @@ public async Task CreateUser_WhenValid_ShouldReturnCreated()
 }
 ```
 
-## Couverture de Code
+## Code Coverage
 
-Les tests couvrent :
-- ✅ 100% des méthodes publiques du repository
-- ✅ 100% des endpoints des controllers
-- ✅ Tous les opérateurs de filtrage SCIM
-- ✅ Tous les cas d'erreur (404, 409, 500)
-- ✅ Opérations PATCH complètes
-- ✅ Cas limites et edge cases
+Tests cover:
+- ✅ 100% of public repository methods
+- ✅ 100% of controller endpoints
+- ✅ All SCIM filter operators
+- ✅ All error cases (404, 409, 500)
+- ✅ Complete PATCH operations
+- ✅ Edge cases
 
-## Scénarios Microsoft Entra Testés
+## Microsoft Entra Scenarios Tested
 
-Les tests valident tous les scénarios d'utilisation de Microsoft Entra :
-1. Vérification d'existence par userName
-2. Recherche par externalId (Azure Object ID)
-3. Filtrage des utilisateurs actifs
-4. Création/mise à jour avec gestion des conflits
-5. Désactivation d'utilisateurs (PATCH active = false)
-6. Gestion des groupes et de leurs membres
+Tests validate all Microsoft Entra usage scenarios:
+1. Existence check by userName
+2. Search by externalId (Azure Object ID)
+3. Active user filtering
+4. Create/update with conflict handling
+5. User deactivation (PATCH active = false)
+6. Group and member management
 
-## Intégration Continue
+## Continuous Integration
 
-Les tests sont conçus pour être exécutés dans un pipeline CI/CD :
-- Rapides (< 5 secondes pour tous les tests)
-- Isolés (chaque test est indépendant)
-- Déterministes (pas de dépendances externes)
-- Reproductibles (mêmes résultats à chaque exécution)
+Tests are designed to run in a CI/CD pipeline:
+- Fast (< 5 seconds for all tests)
+- Isolated (each test is independent)
+- Deterministic (no external dependencies)
+- Reproducible (same results on every run)
 
-## Ajout de Nouveaux Tests
+## Adding New Tests
 
-Pour ajouter un nouveau test :
+To add a new test:
 
-1. Choisir le fichier approprié (Repository ou Controller)
-2. Utiliser le pattern **Arrange-Act-Assert**
-3. Nom descriptif : `MethodName_Scenario_ExpectedResult`
-4. Utiliser Shouldly pour les assertions (syntaxe simple et lisible)
-5. Mocker les dépendances si nécessaire
+1. Choose the appropriate file (Repository or Controller)
+2. Use the **Arrange-Act-Assert** pattern
+3. Descriptive name: `MethodName_Scenario_ExpectedResult`
+4. Use Shouldly for assertions (simple and readable syntax)
+5. Mock dependencies if necessary
 
-Exemple :
+Example:
 ```csharp
 [Fact]
-public async Task MonNouveauTest_QuandCondition_DevraitRetournerResultat()
+public async Task MyNewTest_WhenCondition_ShouldReturnResult()
 {
     // Arrange
-    // Préparer les données de test
+    // Prepare test data
     
     // Act
-    // Exécuter la méthode à tester
+    // Execute the method under test
     
     // Assert
-    // Vérifier le résultat avec Shouldly
+    // Verify the result with Shouldly
     result.ShouldBe(expected);
     result.ShouldNotBeNull();
     result.Count.ShouldBe(5);
 }
 ```
 
-### Syntaxe Shouldly Courante
+### Common Shouldly Syntax
 
 ```csharp
-// Égalité
+// Equality
 value.ShouldBe(expected);
 value.ShouldNotBe(unexpected);
 
@@ -230,7 +230,7 @@ value.ShouldNotBe(unexpected);
 value.ShouldBeNull();
 value.ShouldNotBeNull();
 
-// Booléens
+// Booleans
 condition.ShouldBeTrue();
 condition.ShouldBeFalse();
 
@@ -239,7 +239,7 @@ collection.Count.ShouldBe(5);
 collection.ShouldBeEmpty();
 collection.ShouldContain(item);
 
-// Comparaisons
+// Comparisons
 number.ShouldBeGreaterThan(10);
 number.ShouldBeLessThan(100);
 date.ShouldBeInRange(start, end);
@@ -248,17 +248,16 @@ date.ShouldBeInRange(start, end);
 object.ShouldBeOfType<MyType>();
 ```
 
-## Dépannage
+## Troubleshooting
 
-### Tests qui échouent aléatoirement
-- Vérifier l'isolation des tests
-- S'assurer qu'il n'y a pas d'état partagé
+### Randomly failing tests
+- Check test isolation
+- Ensure there is no shared state
 
 ### StackOverflowException
-- Les filtres complexes avec parenthèses mal équilibrées peuvent causer des récursions infinies
-- Solution implémentée : suppression des parenthèses externes avant traitement
+- Complex filters with unbalanced parentheses can cause infinite recursion
+- Implemented solution: removal of outer parentheses before processing
 
-### Tests lents
-- Les tests en mémoire doivent être rapides
-- Si lent : vérifier les énumérations multiples ou les opérations coûteuses
-
+### Slow tests
+- In-memory tests should be fast
+- If slow: check for multiple enumerations or expensive operations

@@ -109,15 +109,13 @@ Example: ?filter=displayName eq "Admin"&excludedAttributes=members
 
 | Service | Endpoint | Before | After |
 |---------|----------|--------|-------|
-| Users | GET /{id} | "Utilisateur {id} non trouvé" | "User {id} not found" |
-| Users | POST / | "Utilisateur existe déjà" | "User already exists" |
-| Users | POST / | "Erreur interne" | "Internal server error" |
-| Users | PUT /{id} | "Utilisateur {id} non trouvé" | "User {id} not found" |
-| Groups | GET /{id} | "Groupe {id} non trouvé" | "Group {id} not found" |
-| Groups | POST / | "Groupe existe déjà" | "Group already exists" |
-| Groups | POST / | "Erreur interne" | "Internal server error" |
-| Groups | PUT /{id} | "Groupe {id} non trouvé" | "Group {id} not found" |
-| Groups | PATCH /{id} | "Groupe {id} non trouvé" | "Group {id} not found" |
+| Users | GET /{id} | Legacy French not-found message | "User {id} not found" |
+| Users | POST / | Legacy French duplicate-user message | "User already exists" |
+| Users | PUT /{id} | Legacy French not-found message | "User {id} not found" |
+| Groups | GET /{id} | Legacy French not-found message | "Group {id} not found" |
+| Groups | POST / | Legacy French duplicate-group message | "Group already exists" |
+| Groups | PUT /{id} | Legacy French not-found message | "Group {id} not found" |
+| Groups | PATCH /{id} | Legacy French not-found message | "Group {id} not found" |
 
 ---
 
@@ -247,5 +245,3 @@ For questions about the implementation:
 - See ACTION-PLAN-FIX-SCIM-ERRORS.md for technical details
 
 All files are in the `docs/status/` directory.
-
-

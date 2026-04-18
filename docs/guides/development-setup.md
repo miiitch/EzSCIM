@@ -1,61 +1,70 @@
-﻿# Instructions de Développement TestSCIM
+﻿# TestSCIM Development Instructions
 
-## Gestion des Fichiers Temporaires
+## Temporary file management
 
-### Règle Générale
-✅ **Tous les fichiers temporaires créés doivent être placés dans le dossier `tmp/` à la racine de la solution**
+### General rule
 
-### Pourquoi ?
-- Le dossier `tmp/` est défini dans le `.gitignore` et ne sera jamais commité
-- Cela maintient la propreté du repository
-- Les fichiers temporaires ne polluent pas l'historique Git
+All temporary files created during development must be written to the `tmp/` folder at the repository root.
 
-### Exemples de fichiers temporaires
-- Résultats de tests
-- Fichiers de log
-- Fichiers de sortie des scripts
-- Fichiers de cache ou temporaires
-- Fichiers de débogage
+### Why
 
-### Comment l'implémenter dans le code
+- `tmp/` is already covered by `.gitignore`, so files are never committed
+- Keeps the repository clean
+- Prevents temporary artifacts from polluting Git history
+
+### Typical temporary files
+
+- Test outputs
+- Log files
+- Script output files
+- Cache or scratch files
+- Debug dumps
+
+### Implementation example
+
 ```csharp
-// Bonne pratique
 string tmpFolder = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "tmp");
 string logFile = Path.Combine(tmpFolder, "myapp.log");
 File.WriteAllText(logFile, "log content");
 ```
 
-## Exposition en DevTunnel
+## DevTunnel exposure
 
-### ScimAPI - Exposition Anonyme
-Le projet `TestSCIM.AppHost` expose le `ScimAPI` de manière anonyme via devtunnel.
+### ScimAPI - anonymous exposure
 
-**Configuration dans `Program.cs`:**
+`TestSCIM.AppHost` exposes `ScimAPI` anonymously through DevTunnel.
+
+**Configuration in `Program.cs`:**
+
 ```csharp
 builder.AddProject<Projects.ScimAPI>("scimapi")
-    .WithExternalHttpEndpoints();  // Expose les endpoints publiquement
+    .WithExternalHttpEndpoints();  // Expose endpoints publicly
 ```
 
-**Résultats:**
-- Une URL publique est générée automatiquement
-- Accessible de façon anonyme sans authentification
-- Parfait pour les tests et démonstrations
-- Les détails sont affichés dans la console lors du démarrage
+**Result:**
+- A public URL is generated automatically
+- Accessible anonymously without authentication
+- Useful for integration tests and demos
+- Connection details are printed in the startup console
 
-## Accès au ScimAPI
+## Accessing ScimAPI
 
-### Localement
-```
+### Local
+
+```text
 http://localhost:5000
 ```
 
-### Via DevTunnel
-Une URL publique sera affichée lors du démarrage:
-```
+### Through DevTunnel
+
+A public URL is displayed on startup:
+
+```text
 https://<random-id>.devtunnels.ms/
 ```
 
-## Ressources Importantes
-- [SCIM_FILTERS.md](../SCIM_FILTERS.md) - Documentation des filtres SCIM
-- [ENTRA_INTEGRATION.md](../ENTRA_INTEGRATION.md) - Intégration Entra ID
-- [README.md](../README.md) - Documentation générale
+## Important resources
+
+- [`../filters/overview.md`](../filters/overview.md) - SCIM filter documentation
+- [`../tests/entra-integration.md`](../tests/entra-integration.md) - Entra ID integration testing
+- [`../README.md`](../README.md) - Documentation index

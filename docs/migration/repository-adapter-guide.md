@@ -1,48 +1,37 @@
-﻿﻿# Guide d'intégration SCIM avec repository personnalisé
+﻿# SCIM Integration Guide with a Custom Repository
 
-## Vue d'ensemble
+## Overview
 
-Ce guide explique comment intégrer votre système de gestion d'utilisateurs existant avec SCIM en utilisant les composants fournis :
+This guide explains how to integrate an existing user management system with SCIM using:
 
-1. **IUserDataRepository<TUser>** - Interface pour votre source de données
-2. **IScimFilterTranslator<TUser>** - Traduction AST → IQueryable
-3. **ScimUserRepositoryAdapter<TUser>** - Adaptateur SCIM
+1. `IUserDataRepository<TUser>` - data access contract
+2. `IScimFilterTranslator<TUser>` - AST -> `IQueryable` translation
+3. `ScimUserRepositoryAdapter<TUser>` - SCIM adapter layer
 
 ## Architecture
 
-```
-┌─────────────────────┐
-│  SCIM Controller    │
-└──────────┬──────────┘
-           │
-           v
-┌─────────────────────────────────┐
-│ IScimUserOnlyRepository<ScimUser>  │ (interface SCIM)
-└──────────┬──────────────────────┘
-           │
-           v
-┌─────────────────────────────────┐
-│ ScimUserRepositoryAdapter<TUser>│ (adaptateur)
-└──────────┬──────────────────────┘
-           │
-           ├─────────────────────────────┐
-           │                             │
-           v                             v
-┌──────────────────────┐    ┌──────────────────────────┐
-│IUserDataRepository   │    │IScimFilterTranslator     │
-│    <TUser>           │    │    <TUser>               │
-└──────────┬───────────┘    └──────────┬───────────────┘
-           │                           │
-           v                           v
-┌──────────────────────┐    ┌──────────────────────────┐
-│  Votre base de       │    │  AST → Expression<Func>  │
-│  données (EF, SQL)   │    │  (filtrage server-side)  │
-└──────────────────────┘    └──────────────────────────┘
+```text
+SCIM Controller
+    |
+    v
+IScimUserOnlyRepository<ScimUser>
+    |
+    v
+ScimUserRepositoryAdapter<TUser>
+    |                          |
+    v                          v
+IUserDataRepository<TUser>     IScimFilterTranslator<TUser>
+    |                          |
+    v                          v
+Your data source               AST -> Expression<Func<TUser, bool>>
+(EF Core / SQL / Dapper)       (server-side filtering)
 ```
 
-## Étape 1 : Annoter votre modèle utilisateur
+---
 
-Ajoutez les attributs `[ScimProperty]` sur les propriétés de votre classe utilisateur :
+## Step 1 - Annotate your user model
+
+Add `[ScimProperty]` attributes to the fields you want to expose.
 
 ```csharp
 using ScimAPI.Attributes;
@@ -72,266 +61,154 @@ public class MyUser
     [ScimProperty("title", "string")]
     public string JobTitle { get; set; } = string.Empty;
 
-    // Propriétés non-SCIM (pas d'attribut)
+    // Internal fields (not exposed to SCIM)
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
 ```
 
-### Attributs supportés
+### Common attributes
 
-| Attribut SCIM | Type | Description |
-|---------------|------|-------------|
-| userName | string | Identifiant unique (REQUIS) |
-| email | string | Adresse email |
-| givenName | string | Prénom |
-| familyName | string | Nom de famille |
-| displayName | string | Nom d'affichage |
-| active | boolean | Statut actif/inactif |
-| title | string | Titre/poste |
-| externalId | string | ID système externe |
-| name.givenName | string | Prénom (attribut imbriqué) |
-| name.familyName | string | Nom (attribut imbriqué) |
+| SCIM attribute | Type | Notes |
+|---|---|---|
+| `userName` | `string` | Required unique identifier |
+| `email` | `string` | Email address |
+| `givenName` | `string` | First name |
+| `familyName` | `string` | Last name |
+| `displayName` | `string` | Display name |
+| `active` | `boolean` | Active/inactive status |
+| `title` | `string` | Job title |
+| `externalId` | `string` | External source identifier |
+| `name.givenName` | `string` | Nested attribute |
+| `name.familyName` | `string` | Nested attribute |
 
-## Étape 2 : Implémenter IUserDataRepository
+---
 
-Créez un repository qui expose vos données sous forme d'IQueryable :
+## Step 2 - Implement `IUserDataRepository<TUser>`
+
+Expose your data as `IQueryable` so filtering can run server-side.
 
 ```csharp
-using ScimAPI.Repositories;
-
 public class MyUserRepository : IUserDataRepository<MyUser>
 {
-    private readonly MyDbContext _context;
+    private readonly AppDbContext _db;
 
-    public MyUserRepository(MyDbContext context)
+    public MyUserRepository(AppDbContext db)
     {
-        _context = context;
+        _db = db;
     }
 
-    public async Task<MyUser?> GetAsync(string id)
-    {
-        return await _context.Users.FindAsync(id);
-    }
+    public Task<MyUser?> GetUserAsync(string id)
+        => _db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-    // IMPORTANT : Retourner IQueryable pour permettre le filtrage server-side
-    public IQueryable<MyUser> Query()
-    {
-        return _context.Users.AsQueryable();
-    }
+    public IQueryable<MyUser> QueryUsers()
+        => _db.Users.AsQueryable();
 
-    public async Task<MyUser> CreateAsync(MyUser user)
+    public async Task<MyUser> CreateUserAsync(MyUser user)
     {
-        if (string.IsNullOrEmpty(user.Id))
-        {
-            user.Id = Guid.NewGuid().ToString();
-        }
-        
-        user.CreatedAt = DateTime.UtcNow;
-        user.UpdatedAt = DateTime.UtcNow;
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
         return user;
     }
 
-    public async Task<MyUser?> UpdateAsync(string id, MyUser user)
+    public async Task<MyUser?> UpdateUserAsync(string id, MyUser user)
     {
-        var existing = await _context.Users.FindAsync(id);
-        if (existing == null)
-            return null;
+        var existing = await GetUserAsync(id);
+        if (existing == null) return null;
 
-        user.Id = id;
-        user.UpdatedAt = DateTime.UtcNow;
-        
-        _context.Entry(existing).CurrentValues.SetValues(user);
-        await _context.SaveChangesAsync();
-        
-        return user;
+        existing.Username = user.Username;
+        existing.EmailAddress = user.EmailAddress;
+        existing.FirstName = user.FirstName;
+        existing.LastName = user.LastName;
+        existing.DisplayName = user.DisplayName;
+        existing.IsActive = user.IsActive;
+        existing.JobTitle = user.JobTitle;
+
+        await _db.SaveChangesAsync();
+        return existing;
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<bool> DeleteUserAsync(string id)
     {
-        var user = await _context.Users.FindAsync(id);
-        if (user == null)
-            return false;
+        var existing = await GetUserAsync(id);
+        if (existing == null) return false;
 
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
+        _db.Users.Remove(existing);
+        await _db.SaveChangesAsync();
         return true;
     }
 }
 ```
 
-## Étape 3 : Configurer les services (Program.cs / Startup.cs)
+---
 
-Enregistrez les services dans le conteneur DI :
+## Step 3 - Register DI
 
 ```csharp
-using ScimAPI.Repositories;
-using ScimAPI.Filtering;
-
-// Votre repository
 builder.Services.AddScoped<IUserDataRepository<MyUser>, MyUserRepository>();
-
-// Traducteur de filtres (AST → IQueryable)
 builder.Services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
 
-// Adaptateur SCIM
 builder.Services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
-{
-    var dataRepo = sp.GetRequiredService<IUserDataRepository<MyUser>>();
-    var translator = sp.GetRequiredService<IScimFilterTranslator<MyUser>>();
-    return new ScimUserRepositoryAdapter<MyUser>(dataRepo, translator);
-});
+    new ScimUserRepositoryAdapter<MyUser>(
+        sp.GetRequiredService<IUserDataRepository<MyUser>>(),
+        sp.GetRequiredService<IScimFilterTranslator<MyUser>>()));
 ```
 
-## Étape 4 : Utilisation
+If your app uses `IScimRepository`, add a wrapper registration that delegates to your user-only repository.
 
-Le contrôleur SCIM existant utilisera automatiquement votre adaptateur :
+---
 
-```csharp
-// GET /scim/Users?filter=userName eq "john.doe@example.com"
-// Le filtre SCIM sera converti en :
-// context.Users.Where(u => u.Username.Equals("john.doe@example.com", StringComparison.OrdinalIgnoreCase))
+## How filtering works
 
-// GET /scim/Users?filter=active eq true and givenName sw "John"
-// Sera converti en :
-// context.Users.Where(u => u.IsActive == true && u.FirstName.StartsWith("John", StringComparison.OrdinalIgnoreCase))
+1. The controller parses the filter string into a `FilterExpression`.
+2. The adapter asks `IScimFilterTranslator<TUser>` to build a LINQ expression.
+3. The expression is applied to `QueryUsers()`.
+4. The provider (EF Core, SQL translator) executes the query server-side.
+
+Example:
+
+```text
+SCIM: userName sw "john" and active eq true
+LINQ: u => u.Username.StartsWith("john") && u.IsActive
+SQL : WHERE Username LIKE 'john%' AND IsActive = 1
 ```
 
-## Fonctionnement du filtrage
+---
 
-### Traduction AST → LINQ
+## Troubleshooting
 
-Le `GenericScimFilterTranslator` convertit l'AST de filtre SCIM en arbre d'expressions LINQ :
+### No results returned
 
-```
-Filtre SCIM : userName eq "john" and active eq true
+- Verify `[ScimProperty]` names match the filter fields.
+- Verify your translator supports the requested operators.
+- Ensure `QueryUsers()` returns an `IQueryable` from your provider.
 
-AST :
-AndFilter
-├── ComparisonFilter(userName, eq, "john")
-└── ComparisonFilter(active, eq, true)
+### Filters evaluated in memory
 
-Expression LINQ :
-user => user.Username.Equals("john", StringComparison.OrdinalIgnoreCase) 
-        && user.IsActive == true
-```
+- Check that `QueryUsers()` does not call `ToList()` before filtering.
+- Keep the query provider active until final projection.
 
-### Opérateurs supportés
+### Nested attributes not mapped
 
-| SCIM | Description | Exemple |
-|------|-------------|---------|
-| eq | Égal | `userName eq "john"` |
-| ne | Différent | `active ne false` |
-| co | Contient | `email co "@example.com"` |
-| sw | Commence par | `userName sw "john"` |
-| ew | Termine par | `email ew ".com"` |
-| pr | Présent (non null/vide) | `email pr` |
-| gt | Supérieur | `age gt 18` |
-| ge | Supérieur ou égal | `age ge 18` |
-| lt | Inférieur | `age lt 65` |
-| le | Inférieur ou égal | `age le 65` |
-| and | ET logique | `active eq true and email pr` |
-| or | OU logique | `userName sw "john" or userName sw "jane"` |
-| not | NON logique | `not(active eq false)` |
+- Use dot notation (`name.givenName`) consistently.
+- Ensure mappings exist for nested paths in your translator.
 
-### Exemples de filtres
+---
 
-```csharp
-// Utilisateurs actifs
-GET /scim/Users?filter=active eq true
+## Validation checklist
 
-// Utilisateurs avec email @example.com
-GET /scim/Users?filter=email co "@example.com"
+- [ ] Model is annotated with `[ScimProperty]`
+- [ ] `IUserDataRepository<TUser>` is implemented
+- [ ] DI registrations are correct
+- [ ] `GET /scim/Users` works
+- [ ] Filtered queries return correct results
+- [ ] `POST`, `PUT`, `PATCH`, and `DELETE` flows are validated
 
-// Utilisateurs dont le nom commence par "John"
-GET /scim/Users?filter=givenName sw "John"
+---
 
-// Filtres complexes
-GET /scim/Users?filter=(userName sw "john" or userName sw "jane") and active eq true
+## Related documentation
 
-// Présence d'attribut
-GET /scim/Users?filter=email pr and title pr
-```
-
-## Avantages
-
-✅ **Filtrage server-side** : Les filtres SCIM sont traduits en SQL (via EF Core)  
-✅ **Performance** : Pas de chargement en mémoire, tout s'exécute côté base  
-✅ **Type-safe** : Mapping via attributs, détection d'erreurs à la compilation  
-✅ **Flexible** : Fonctionne avec n'importe quelle classe TUser annotée  
-✅ **Maintenable** : Séparation claire entre modèle métier et SCIM  
-
-## Personnalisation avancée
-
-### Créer un traducteur personnalisé
-
-Si vous avez des besoins spécifiques (propriétés complexes, jointures, etc.) :
-
-```csharp
-public class MyCustomTranslator : IScimFilterTranslator<MyUser>
-{
-    public Expression<Func<MyUser, bool>>? BuildPredicate(FilterExpression? filter)
-    {
-        // Logique personnalisée
-    }
-
-    public IQueryable<MyUser> Apply(IQueryable<MyUser> source, FilterExpression? filter)
-    {
-        var predicate = BuildPredicate(filter);
-        if (predicate == null)
-            return source;
-
-        // Ajouter des jointures, includes, etc.
-        return source
-            .Include(u => u.Department)
-            .Where(predicate);
-    }
-}
-```
-
-### Mapper des attributs complexes
-
-```csharp
-public class MyUser
-{
-    [ScimProperty("name", "complex")]
-    public UserName Name { get; set; } = new();
-}
-
-public class UserName
-{
-    [ScimProperty("givenName", "string")]
-    public string First { get; set; } = string.Empty;
-
-    [ScimProperty("familyName", "string")]
-    public string Last { get; set; } = string.Empty;
-}
-
-// Filtre SCIM : name.givenName eq "John"
-// Sera mappé automatiquement sur : user.Name.First
-```
-
-## Tests
-
-Des tests unitaires sont fournis pour valider le traducteur :
-
-```bash
-# Tester le traducteur générique
-dotnet test --filter GenericScimFilterTranslatorTests
-
-# Tester le traducteur ScimUser
-dotnet test --filter ScimUserFilterTranslatorTests
-```
-
-## Résumé
-
-1. **Annoter** votre modèle avec `[ScimProperty]`
-2. **Implémenter** `IUserDataRepository<TUser>` (retourner `IQueryable`)
-3. **Enregistrer** les services dans DI
-4. **Utiliser** - les filtres SCIM sont automatiquement traduits en requêtes SQL
-
-Le système traduit les filtres SCIM en expressions LINQ qui s'exécutent directement sur votre base de données, garantissant performance et scalabilité.
-
+- [`quick-start-repository.md`](./quick-start-repository.md)
+- [`repository-mapping-overview.md`](./repository-mapping-overview.md)
+- [`groups-and-constants-extension.md`](./groups-and-constants-extension.md)
+- [`interface-separation.md`](./interface-separation.md)

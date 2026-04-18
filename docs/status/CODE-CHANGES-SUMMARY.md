@@ -39,8 +39,8 @@ All critical errors from Microsoft SCIM Validator have been fixed:
 - Added `using EzSCIM.Helpers;` import
 - `GetUsers()`: Updated to use new `AttributeFilterHelper`
 - `GetUser(id)`: Added `excludedAttributes` parameter
-- `CreateUser()`: Changed "Utilisateur existe déjà" → "User already exists"
-- `UpdateUser()`: Changed "Utilisateur {id} non trouvé" → "User {id} not found"
+- `CreateUser()`: Changed legacy French duplicate-user message -> "User already exists"
+- `UpdateUser()`: Changed legacy French not-found message -> "User {id} not found"
 - Removed old `FilterUserAttributes()` method (now in helper)
 
 **Impact**: Medium - API behavior change (added query parameter support)
@@ -54,8 +54,8 @@ All critical errors from Microsoft SCIM Validator have been fixed:
 - Added `using EzSCIM.Helpers;` import
 - `GetGroups()`: Updated to use new `AttributeFilterHelper`
 - `GetGroup(id)`: Added `excludedAttributes` parameter
-- `CreateGroup()`: Changed "Groupe existe déjà" → "Group already exists"
-- `UpdateGroup()`: Changed "Groupe {id} non trouvé" → "Group {id} not found"
+- `CreateGroup()`: Changed legacy French duplicate-group message -> "Group already exists"
+- `UpdateGroup()`: Changed legacy French not-found message -> "Group {id} not found"
 - `PatchGroup()`: Changed error message to English
 - Removed old `FilterGroupAttributes()` method (now in helper)
 
@@ -84,15 +84,15 @@ All critical errors from Microsoft SCIM Validator have been fixed:
 
 | Controller | Method | Original | Updated |
 |------------|--------|----------|---------|
-| Users | GetUser | "Utilisateur {id} non trouvé" | "User {id} not found" |
-| Users | CreateUser | "Utilisateur existe déjà" | "User already exists" |
-| Users | CreateUser | "Erreur interne" | "Internal server error" |
-| Users | UpdateUser | "Utilisateur {id} non trouvé" | "User {id} not found" |
-| Groups | GetGroup | "Groupe {id} non trouvé" | "Group {id} not found" |
-| Groups | CreateGroup | "Groupe existe déjà" | "Group already exists" |
-| Groups | CreateGroup | "Erreur interne" | "Internal server error" |
-| Groups | UpdateGroup | "Groupe {id} non trouvé" | "Group {id} not found" |
-| Groups | PatchGroup | "Groupe {id} non trouvé" | "Group {id} not found" |
+| Users | GetUser | Legacy French not-found message | "User {id} not found" |
+| Users | CreateUser | Legacy French duplicate-user message | "User already exists" |
+| Users | CreateUser | Legacy French internal-error message | "Internal server error" |
+| Users | UpdateUser | Legacy French not-found message | "User {id} not found" |
+| Groups | GetGroup | Legacy French not-found message | "Group {id} not found" |
+| Groups | CreateGroup | Legacy French duplicate-group message | "Group already exists" |
+| Groups | CreateGroup | Legacy French internal-error message | "Internal server error" |
+| Groups | UpdateGroup | Legacy French not-found message | "Group {id} not found" |
+| Groups | PatchGroup | Legacy French not-found message | "Group {id} not found" |
 
 **Total Error Messages Fixed**: 9
 
@@ -238,5 +238,4 @@ If issues are discovered:
 - [x] Controllers updated correctly
 - [x] Repository enhanced correctly
 - [x] No external dependencies added
-
 

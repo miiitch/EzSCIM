@@ -186,8 +186,7 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         public Task<ScimUser?> UpdateUserAsync(string id, ScimUser user) => _userRepo.UpdateUserAsync(id, user);
         
         /// <summary>
-        /// Implements PATCH for users using UserEntityPatchApplier for JSON multi-valued attributes.
-        /// EF Core automatically detects changes on tracked entities.
+        /// Implements PATCH for users by converting to ScimUser, applying patch, and converting back.
         /// </summary>
         public async Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
         {
@@ -195,25 +194,12 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (user == null)
                 return null;
 
-            // Use specialized UserEntityPatchApplier for JSON multi-valued attributes
-            var modified = Data.UserEntityPatchApplier.ApplyPatch(user, patchRequest.Operations);
-            
-            if (!modified)
-            {
-                Console.WriteLine($"[PatchUserAsync] WARNING: No properties were modified for user {id}");
-            }
-            else
-            {
-                Console.WriteLine($"[PatchUserAsync] Successfully modified user {id}");
-            }
+            // Convert to ScimUser, apply PATCH via library, convert back
+            var scimUser = user.ToScimUser();
+            EzSCIM.Services.ScimPatchService.ApplyPatch(scimUser, patchRequest);
+            user.UpdateFromScimUser(scimUser);
 
-            user.ModifiedAt = DateTime.UtcNow;
-            
-            // EF Core change tracking automatically detects modifications to properties
-            // (including JSON columns) since the entity was obtained via FindAsync
             await _dbContext.SaveChangesAsync();
-
-            // Return updated user as ScimUser using extension method
             return user.ToScimUser();
         }
 
@@ -228,8 +214,7 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         public Task<ScimGroup?> UpdateGroupAsync(string id, ScimGroup group) => _groupRepo.UpdateGroupAsync(id, group);
         
         /// <summary>
-        /// Implements PATCH for groups using ScimPatchApplier with ScimProperty attributes.
-        /// Members array is handled separately.
+        /// Implements PATCH for groups by converting to ScimGroup, applying patch, and converting back.
         /// </summary>
         public async Task<ScimGroup?> PatchGroupAsync(string id, ScimPatchRequest patchRequest)
         {
@@ -237,145 +222,13 @@ public class ScimWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (group == null)
                 return null;
 
-            // Separate members operations from scalar operations
-            // Handle both "members" and "members[filter]" paths
-            var membersOps = patchRequest.Operations
-                .Where(op => op.Path != null && 
-                    (string.Equals(op.Path, "members", StringComparison.OrdinalIgnoreCase) ||
-                     op.Path.StartsWith("members[", StringComparison.OrdinalIgnoreCase)))
-                .ToList();
-            var scalarOps = patchRequest.Operations
-                .Where(op => op.Path == null || 
-                    (!string.Equals(op.Path, "members", StringComparison.OrdinalIgnoreCase) &&
-                     !op.Path.StartsWith("members[", StringComparison.OrdinalIgnoreCase)))
-                .ToList();
+            // Convert to ScimGroup, apply PATCH via library, convert back
+            var scimGroup = group.ToScimGroup();
+            EzSCIM.Services.ScimPatchService.ApplyPatch(scimGroup, patchRequest);
+            group.UpdateFromScimGroup(scimGroup);
 
-            // Apply scalar operations using generic ScimPatchApplier
-            ScimPatchApplier.ApplyPatch(group, scalarOps);
-
-            // Handle members operations separately (array type)
-            foreach (var op in membersOps)
-            {
-                ApplyMembersPatchOperation(group, op);
-            }
-
-            group.ModifiedAt = DateTime.UtcNow;
             await _dbContext.SaveChangesAsync();
-
-            // Return updated group as ScimGroup
-            return await GetGroupAsync(id);
-        }
-
-        private void ApplyMembersPatchOperation(Data.Entities.GroupEntity group, ScimPatchOperation op)
-        {
-            var operation = op.Op?.ToLowerInvariant() ?? "replace";
-            var currentMembers = ParseMembersJson(group.MembersJson);
-            
-            // Check if path contains a filter (e.g., members[value eq "userId"])
-            string? filterValue = null;
-            if (op.Path != null && op.Path.Contains("[") && op.Path.Contains("]"))
-            {
-                // Extract filter value from path like: members[value eq "userId"]
-                var match = System.Text.RegularExpressions.Regex.Match(
-                    op.Path, 
-                    @"members\[value\s+eq\s+""([^""]+)""\]",
-                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (match.Success)
-                {
-                    filterValue = match.Groups[1].Value;
-                }
-            }
-            
-            if (operation == "add" && op.Value != null)
-            {
-                var newMembers = ParseMembersFromValue(op.Value);
-                foreach (var member in newMembers)
-                {
-                    if (!currentMembers.Any(m => m.Value == member.Value))
-                        currentMembers.Add(member);
-                }
-                group.MembersJson = System.Text.Json.JsonSerializer.Serialize(currentMembers);
-            }
-            else if (operation == "remove")
-            {
-                if (filterValue != null)
-                {
-                    // Remove specific member matching the filter
-                    currentMembers.RemoveAll(m => m.Value == filterValue);
-                }
-                else if (op.Value != null)
-                {
-                    var membersToRemove = ParseMembersFromValue(op.Value);
-                    currentMembers.RemoveAll(m => membersToRemove.Any(r => r.Value == m.Value));
-                }
-                else
-                {
-                    currentMembers.Clear();
-                }
-                group.MembersJson = System.Text.Json.JsonSerializer.Serialize(currentMembers);
-            }
-            else if (operation == "replace" && op.Value != null)
-            {
-                // Replace entire members list
-                var newMembers = ParseMembersFromValue(op.Value);
-                group.MembersJson = System.Text.Json.JsonSerializer.Serialize(newMembers);
-            }
-        }
-
-        private List<MemberInfo> ParseMembersJson(string? json)
-        {
-            if (string.IsNullOrEmpty(json))
-                return new List<MemberInfo>();
-            
-            try
-            {
-                return System.Text.Json.JsonSerializer.Deserialize<List<MemberInfo>>(json) ?? new List<MemberInfo>();
-            }
-            catch
-            {
-                return new List<MemberInfo>();
-            }
-        }
-
-        private List<MemberInfo> ParseMembersFromValue(object value)
-        {
-            var result = new List<MemberInfo>();
-            
-            if (value is System.Text.Json.JsonElement jsonElement)
-            {
-                if (jsonElement.ValueKind == System.Text.Json.JsonValueKind.Array)
-                {
-                    foreach (var item in jsonElement.EnumerateArray())
-                    {
-                        if (item.TryGetProperty("value", out var valueProperty))
-                        {
-                            var display = item.TryGetProperty("display", out var displayProperty) 
-                                ? displayProperty.GetString() ?? "" 
-                                : "";
-                            result.Add(new MemberInfo { Value = valueProperty.GetString() ?? "", Display = display });
-                        }
-                    }
-                }
-            }
-            else if (value is IEnumerable<object> enumerable)
-            {
-                foreach (var item in enumerable)
-                {
-                    if (item is Dictionary<string, string> dict && dict.TryGetValue("value", out var val))
-                    {
-                        dict.TryGetValue("display", out var display);
-                        result.Add(new MemberInfo { Value = val, Display = display ?? "" });
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        private class MemberInfo
-        {
-            public string Value { get; set; } = "";
-            public string Display { get; set; } = "";
+            return group.ToScimGroup();
         }
 
         public Task<bool> DeleteGroupAsync(string id) => _groupRepo.DeleteGroupAsync(id);

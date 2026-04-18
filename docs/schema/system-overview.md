@@ -1,10 +1,10 @@
-﻿# Système de génération automatique des schémas SCIM
+﻿# SCIM Schema Auto-Generation System
 
-Ce projet implémente un système de génération automatique des schémas SCIM basé sur des attributs C#. Les schémas sont calculés à partir d'annotations sur les classes et propriétés, avec un cache thread-safe via constructeur statique.
+This document describes the automatic SCIM schema generation system based on C# attributes. Schemas are built from annotated classes/properties and cached in thread-safe static initialization.
 
-## 🚀 Quick Start
+## Quick start
 
-### 1. Définir un modèle SCIM
+### 1) Define a SCIM model
 
 ```csharp
 using ScimAPI.Attributes;
@@ -15,81 +15,79 @@ using ScimAPI.Attributes;
     "User Account")]
 public class ScimUser
 {
-    // Propriété système (sans attribut = pas dans le schéma)
+    // System property (not in schema because no attribute)
     public string Id { get; set; }
-    
-    // Attribut SCIM simple
+
+    // Simple SCIM attribute
     [ScimProperty("userName", "string", Required = true, Uniqueness = "server")]
     public string UserName { get; set; }
-    
-    // Attribut complexe
+
+    // Complex attribute
     [ScimProperty("name", "complex")]
     public ScimName Name { get; set; }
-    
-    // Multi-valué
+
+    // Multi-valued attribute
     [ScimProperty("emails", "complex", MultiValued = true)]
     public List<ScimEmail> Emails { get; set; }
 }
 
-// Classe complexe avec sous-attributs
 public class ScimName
 {
     [ScimProperty("givenName", "string")]
     public string? GivenName { get; set; }
-    
+
     [ScimProperty("familyName", "string")]
     public string? FamilyName { get; set; }
 }
 ```
 
-### 2. Accéder aux schémas
+### 2) Access generated schemas
 
 ```csharp
 using ScimAPI.Helpers;
 
-// Schémas pré-calculés (thread-safe, calculés une seule fois)
 var userSchema = ScimSchemaGenerator.UserSchema;
 var groupSchema = ScimSchemaGenerator.GroupSchema;
 
 Console.WriteLine($"User schema: {userSchema.Attributes.Count} attributes");
 ```
 
-### 3. Dans un contrôleur
+### 3) Return schemas in a controller
 
 ```csharp
 [HttpGet("Schemas")]
 public IActionResult GetSchemas()
 {
-    return Ok(new[] 
-    { 
+    return Ok(new[]
+    {
         ScimSchemaGenerator.UserSchema,
-        ScimSchemaGenerator.GroupSchema 
+        ScimSchemaGenerator.GroupSchema
     });
 }
 ```
 
-## 📖 Concepts clés
+## Core concepts
 
-### Approche opt-in
+### Opt-in design
 
-**Seules les propriétés avec `[ScimProperty]` sont incluses dans le schéma.**
+Only properties with `[ScimProperty]` are included in generated schemas.
 
 ```csharp
 public class ScimUser
 {
-    // ❌ Pas dans le schéma (pas d'attribut)
+    // Not included (no attribute)
     public string Id { get; set; }
     public ScimMeta Meta { get; set; }
-    
-    // ✅ Dans le schéma (attribut présent)
+
+    // Included
     [ScimProperty("userName", "string")]
     public string UserName { get; set; }
 }
 ```
 
-### Héritage automatique
+### Inheritance support
 
-Les propriétés annotées de la classe parent sont automatiquement incluses :
+Annotated properties from base classes are included automatically in derived schemas.
 
 ```csharp
 public class ScimUser
@@ -98,20 +96,19 @@ public class ScimUser
     public string UserName { get; set; }
 }
 
-// Hérite userName + ajoute employeeNumber
 public class EnterpriseUser : ScimUser
 {
     [ScimProperty("employeeNumber", "string")]
     public string EmployeeNumber { get; set; }
 }
 
-// Le schéma contiendra userName ET employeeNumber
 var schema = ScimSchemaGenerator.GetSchema<EnterpriseUser>();
+// Includes userName and employeeNumber
 ```
 
-### Types complexes
+### Complex type discovery
 
-Les sous-attributs sont découverts automatiquement :
+Sub-attributes are discovered recursively.
 
 ```csharp
 [ScimProperty("name", "complex")]
@@ -121,62 +118,59 @@ public class ScimName
 {
     [ScimProperty("givenName", "string")]
     public string? GivenName { get; set; }
-    
+
     [ScimProperty("familyName", "string")]
     public string? FamilyName { get; set; }
 }
-
-// Génère automatiquement name.givenName et name.familyName
 ```
 
-### Thread-safety
+### Thread-safe caching
 
-Le constructeur statique garantit un calcul unique et thread-safe :
+`ScimSchemaGenerator` static constructor guarantees one-time initialization.
 
 ```csharp
 public static class ScimSchemaGenerator
 {
     public static ScimSchema UserSchema { get; }
     public static ScimSchema GroupSchema { get; }
-    
+
     static ScimSchemaGenerator()
     {
-        // Exécuté une seule fois, même en multi-thread
         UserSchema = GenerateSchema<ScimUser>();
         GroupSchema = GenerateSchema<ScimGroup>();
     }
 }
 ```
 
-## 🎨 Attributs disponibles
+## Available attributes
 
-### `[ScimResource]` - Niveau classe
+### `[ScimResource]` (class-level)
 
 ```csharp
 [ScimResource(
-    "urn:ietf:params:scim:schemas:core:2.0:User",  // URN du schéma
-    "User",                                          // Nom
-    "User Account"                                   // Description
+    "urn:ietf:params:scim:schemas:core:2.0:User",  // schema URN
+    "User",                                        // resource name
+    "User Account"                                 // description
 )]
 ```
 
-### `[ScimProperty]` - Niveau propriété
+### `[ScimProperty]` (property-level)
 
 ```csharp
 [ScimProperty(
-    "userName",              // Nom de l'attribut (obligatoire)
-    "string",                // Type (obligatoire)
-    Required = true,         // Obligatoire ?
-    MultiValued = false,     // Multi-valué ?
-    Description = "...",     // Description
-    Uniqueness = "server",   // "none", "server", "global"
-    Mutability = "readWrite", // "readOnly", "readWrite", "immutable", "writeOnly"
-    Returned = "default",    // "always", "never", "default", "request"
-    CaseExact = false        // Sensible à la casse ?
+    "userName",                // attribute name (required)
+    "string",                  // SCIM type (required)
+    Required = true,
+    MultiValued = false,
+    Description = "...",
+    Uniqueness = "server",     // none, server, global
+    Mutability = "readWrite",  // readOnly, readWrite, immutable, writeOnly
+    Returned = "default",      // always, never, default, request
+    CaseExact = false
 )]
 ```
 
-**Types SCIM supportés** :
+Supported SCIM primitive/complex types:
 - `string`
 - `boolean`
 - `integer`
@@ -186,9 +180,9 @@ public static class ScimSchemaGenerator
 - `complex`
 - `binary`
 
-## 🔧 Extension du système
+## Extend the system
 
-### Créer un type personnalisé
+### Define a custom resource
 
 ```csharp
 [ScimResource(
@@ -199,10 +193,10 @@ public class EnterpriseUser : ScimUser
 {
     [ScimProperty("employeeNumber", "string", Required = true)]
     public string EmployeeNumber { get; set; }
-    
+
     [ScimProperty("department", "string")]
     public string? Department { get; set; }
-    
+
     [ScimProperty("badge", "complex")]
     public BadgeInfo? Badge { get; set; }
 }
@@ -211,160 +205,71 @@ public class BadgeInfo
 {
     [ScimProperty("badgeNumber", "string")]
     public string? BadgeNumber { get; set; }
-    
+
     [ScimProperty("accessLevel", "integer")]
     public int AccessLevel { get; set; }
 }
 ```
 
-### Générer le schéma
+### Generate custom schema
 
 ```csharp
-// Option 1 : Classe helper statique (RECOMMANDÉ)
+// Recommended: static helper cache
 public static class EnterpriseSchemaGenerator
 {
     public static ScimSchema EnterpriseUserSchema { get; }
-    
+
     static EnterpriseSchemaGenerator()
     {
         EnterpriseUserSchema = ScimSchemaGenerator.GetSchema<EnterpriseUser>();
     }
 }
 
-// Option 2 : À la demande (utilise la réflexion à chaque appel)
+// Alternative: on-demand generation
 var schema = ScimSchemaGenerator.GetSchema<EnterpriseUser>();
 ```
 
-### Utiliser dans un contrôleur
-
-```csharp
-[HttpGet("Schemas")]
-public IActionResult GetSchemas()
-{
-    return Ok(new[] 
-    { 
-        ScimSchemaGenerator.UserSchema,
-        ScimSchemaGenerator.GroupSchema,
-        EnterpriseSchemaGenerator.EnterpriseUserSchema
-    });
-}
-```
-
-## 📚 Documentation complète
-
-- **Guide d'extension détaillé** : `SCHEMA-EXTENSION-GUIDE.md`
-- **Détails d'implémentation** : `SCHEMA-GENERATION-IMPLEMENTATION-COMPLETE.md`
-- **Résumé court** : `SCHEMA-IMPLEMENTATION-COMPLETE.md`
-
-## ✅ Tests
+## Testing commands
 
 ```bash
-# Compilation
-cd ScimAPI
 dotnet build
+dotnet test
+```
 
-# Démarrage
-dotnet run
+If the API is running, verify schema endpoints:
 
-# Test des endpoints
+```bash
 curl http://localhost:5000/scim/Schemas -H "Authorization: Bearer <token>"
-curl "http://localhost:5000/scim/Schemas/urn:ietf:params:scim:schemas:core:2.0:User" \
-  -H "Authorization: Bearer <token>"
+curl "http://localhost:5000/scim/Schemas/urn:ietf:params:scim:schemas:core:2.0:User" -H "Authorization: Bearer <token>"
 ```
 
-## 🎓 Exemples d'utilisation
+## Architecture summary
 
-### Propriétés système exclues
-```csharp
-public class ScimUser
-{
-    // Ces propriétés N'ONT PAS d'attribut = pas dans le schéma
-    public string Id { get; set; }
-    public List<string> Schemas { get; set; }
-    public ScimMeta Meta { get; set; }
-    public Dictionary<string, object> CustomAttributes { get; set; }
-}
+```text
+Annotated models (ScimUser / ScimGroup / custom types)
+            |
+            v
+ScimSchemaGenerator (reflection + recursive discovery)
+            |
+            v
+Static cached schemas (UserSchema / GroupSchema / custom schema)
+            |
+            v
+SCIM controllers (/scim/Schemas)
 ```
 
-### Attributs multi-valués complexes
-```csharp
-[ScimProperty("emails", "complex", MultiValued = true)]
-public List<ScimEmail> Emails { get; set; }
+## Benefits
 
-public class ScimEmail
-{
-    [ScimProperty("value", "string")]
-    public string Value { get; set; }
-    
-    [ScimProperty("type", "string")]
-    public string? Type { get; set; }
-    
-    [ScimProperty("primary", "boolean")]
-    public bool Primary { get; set; }
-}
-```
+- Declarative schema definition on models
+- Type-safe and refactor-friendly
+- High performance through static cache
+- Thread-safe initialization
+- Easy extension for custom resources
+- Reduced data exposure through opt-in design
 
-### Attribut en lecture seule
-```csharp
-[ScimProperty("groups", "complex", MultiValued = true, Mutability = "readOnly")]
-public List<ScimGroupMembership> Groups { get; set; }
-```
+## Related docs
 
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────┐
-│  ScimUser / ScimGroup                   │
-│  (classes avec attributs)               │
-└────────────────┬────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────┐
-│  ScimSchemaGenerator                    │
-│  (constructeur statique)                │
-│  - Réflexion sur les types              │
-│  - Lecture des attributs                │
-│  - Découverte récursive                 │
-└────────────────┬────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────┐
-│  Propriétés statiques (cache)           │
-│  - UserSchema                           │
-│  - GroupSchema                          │
-└────────────────┬────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────┐
-│  Contrôleurs                            │
-│  GET /scim/Schemas                      │
-└─────────────────────────────────────────┘
-```
-
-## 🎯 Avantages
-
-✅ **Déclaratif** : Schémas définis directement sur les modèles  
-✅ **Type-safe** : Validation à la compilation  
-✅ **Performant** : Calcul unique via constructeur statique  
-✅ **Thread-safe** : Garanti par le runtime C#  
-✅ **Extensible** : Support facile de types personnalisés  
-✅ **Sécurisé** : Opt-in évite les fuites de données  
-✅ **Maintenable** : Pas de code de schéma dupliqué  
-
-## 📝 Notes
-
-- Les schémas sont calculés au **premier accès** à `ScimSchemaGenerator.UserSchema` ou `.GroupSchema`
-- Le constructeur statique garantit un **calcul unique** même en environnement multi-thread
-- Les propriétés **héritées** sont automatiquement incluses (`BindingFlags.FlattenHierarchy`)
-- Les types **complexes** sont analysés récursivement pour générer les sous-attributs
-
-## 🤝 Contribution
-
-Pour ajouter un nouveau type de ressource SCIM :
-
-1. Créer la classe héritant de `ScimUser` ou `ScimGroup`
-2. Annoter avec `[ScimResource]` et `[ScimProperty]`
-3. Créer un helper statique pour pré-calculer le schéma
-4. Exposer dans les endpoints `/scim/Schemas`
-
-Voir `SCHEMA-EXTENSION-GUIDE.md` pour des exemples détaillés.
+- [`extension-guide.md`](./extension-guide.md)
+- [`models-required-optional.md`](./models-required-optional.md)
+- [`expected-actual-pattern.md`](./expected-actual-pattern.md)
+- [`testing-scim-schema-validation.md`](./testing-scim-schema-validation.md)

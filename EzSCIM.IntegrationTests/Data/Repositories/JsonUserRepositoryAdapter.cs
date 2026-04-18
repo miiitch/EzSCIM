@@ -107,8 +107,10 @@ public class JsonUserRepositoryAdapter : IScimUserOnlyRepository<ScimUser>
         if (existing == null)
             return null;
 
-        // Use UserEntityPatchApplier for JSON multi-valued attributes
-        UserEntityPatchApplier.ApplyPatch(existing, patchRequest.Operations);
+        // Convert to ScimUser, apply PATCH via library, convert back
+        var scimUser = existing.ToScimUser();
+        EzSCIM.Services.ScimPatchService.ApplyPatch(scimUser, patchRequest);
+        existing.UpdateFromScimUser(scimUser);
         existing.ModifiedAt = DateTime.UtcNow;
 
         var updated = await _dataRepo.UpdateUserAsync(id, existing);

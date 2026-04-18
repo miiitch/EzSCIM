@@ -1,6 +1,7 @@
 ﻿﻿using EzSCIM.IntegrationTests.Data.Entities;
 using EzSCIM.IntegrationTests.Data;
 using EzSCIM.Models;
+using EzSCIM.Services;
 using Xunit.Abstractions;
 
 namespace EzSCIM.IntegrationTests;
@@ -26,27 +27,32 @@ public class ScimPatchApplierUnitTests
             Active = true
         };
 
-        var operations = new[]
+        var patchRequest = new ScimPatchRequest
         {
-            new ScimPatchOperation
+            Operations = new List<ScimPatchOperation>
             {
-                Op = "replace",
-                Path = "emails[primary eq true].value",
-                Value = "updated@example.com"
+                new ScimPatchOperation
+                {
+                    Op = "replace",
+                    Path = "emails[primary eq true].value",
+                    Value = "updated@example.com"
+                }
             }
         };
 
         _output.WriteLine($"Original EmailsJson: {user.EmailsJson}");
 
-        // Act
-        var result = UserEntityPatchApplier.ApplyPatch(user, operations);
+        // Act — round-trip via ScimUser (same as production code)
+        var scimUser = user.ToScimUser();
+        var result = ScimPatchService.ApplyPatch(scimUser, patchRequest);
+        user.UpdateFromScimUser(scimUser);
 
         _output.WriteLine($"ApplyPatch returned: {result}");
         _output.WriteLine($"Updated EmailsJson: {user.EmailsJson}");
 
         // Assert
         Assert.True(result, "ApplyPatch should return true");
-        Assert.Contains("updated@example.com", user.EmailsJson);
+        Assert.Contains("updated@example.com", user.EmailsJson!);
     }
 
     [Fact]
@@ -61,27 +67,32 @@ public class ScimPatchApplierUnitTests
             Active = true
         };
 
-        var operations = new[]
+        var patchRequest = new ScimPatchRequest
         {
-            new ScimPatchOperation
+            Operations = new List<ScimPatchOperation>
             {
-                Op = "replace",
-                Path = "phoneNumbers[primary eq true].value",
-                Value = "999-888-7777"
+                new ScimPatchOperation
+                {
+                    Op = "replace",
+                    Path = "phoneNumbers[primary eq true].value",
+                    Value = "999-888-7777"
+                }
             }
         };
 
         _output.WriteLine($"Original PhoneNumbersJson: {user.PhoneNumbersJson}");
 
         // Act
-        var result = UserEntityPatchApplier.ApplyPatch(user, operations);
+        var scimUser = user.ToScimUser();
+        var result = ScimPatchService.ApplyPatch(scimUser, patchRequest);
+        user.UpdateFromScimUser(scimUser);
 
         _output.WriteLine($"ApplyPatch returned: {result}");
         _output.WriteLine($"Updated PhoneNumbersJson: {user.PhoneNumbersJson}");
 
         // Assert
         Assert.True(result, "ApplyPatch should return true");
-        Assert.Contains("999-888-7777", user.PhoneNumbersJson);
+        Assert.Contains("999-888-7777", user.PhoneNumbersJson!);
     }
 
     [Fact]
@@ -96,27 +107,32 @@ public class ScimPatchApplierUnitTests
             Active = true
         };
 
-        var operations = new[]
+        var patchRequest = new ScimPatchRequest
         {
-            new ScimPatchOperation
+            Operations = new List<ScimPatchOperation>
             {
-                Op = "replace",
-                Path = "emails[0].value",
-                Value = "updated2@example.com"
+                new ScimPatchOperation
+                {
+                    Op = "replace",
+                    Path = "emails",
+                    Value = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(
+                        "[{\"value\":\"updated2@example.com\",\"type\":\"work\",\"primary\":true}]")
+                }
             }
         };
 
         _output.WriteLine($"Original EmailsJson: {user.EmailsJson}");
 
         // Act
-        var result = UserEntityPatchApplier.ApplyPatch(user, operations);
+        var scimUser = user.ToScimUser();
+        var result = ScimPatchService.ApplyPatch(scimUser, patchRequest);
+        user.UpdateFromScimUser(scimUser);
 
         _output.WriteLine($"ApplyPatch returned: {result}");
         _output.WriteLine($"Updated EmailsJson: {user.EmailsJson}");
 
         // Assert
         Assert.True(result, "ApplyPatch should return true");
-        Assert.Contains("updated2@example.com", user.EmailsJson);
+        Assert.Contains("updated2@example.com", user.EmailsJson!);
     }
 }
-

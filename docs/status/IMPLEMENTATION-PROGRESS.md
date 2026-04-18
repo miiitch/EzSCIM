@@ -28,10 +28,10 @@
   - Now applies attribute filtering to single resource responses
   - Changed error message from French to English
 - `CreateUser()` - Changed error messages to English
-  - "Utilisateur existe déjà" → "User already exists"
-  - "Erreur interne" → "Internal server error"
+  - Legacy French duplicate-user message -> "User already exists"
+  - Legacy French internal-error message -> "Internal server error"
 - `UpdateUser()` - Changed error message to English
-  - "Utilisateur {id} non trouvé" → "User {id} not found"
+  - Legacy French not-found user message -> "User {id} not found"
 - Removed old `FilterUserAttributes()` helper method
 
 #### 3. Updated ScimGroupsController.cs
@@ -41,8 +41,8 @@
   - Now applies attribute filtering to single resource responses
   - Changed error message from French to English
 - `CreateGroup()` - Changed error messages to English
-  - "Groupe existe déjà" → "Group already exists"
-  - "Erreur interne" → "Internal server error"
+  - Legacy French duplicate-group message -> "Group already exists"
+  - Legacy French internal-error message -> "Internal server error"
 - `UpdateGroup()` - Changed error message to English
 - `PatchGroup()` - Changed error message to English
 - Removed old `FilterGroupAttributes()` helper method
@@ -51,13 +51,13 @@
 
 | Original (French) | Updated (English) |
 |-------------------|-------------------|
-| "Utilisateur {id} non trouvé" | "User {id} not found" |
-| "Utilisateur existe déjà" | "User already exists" |
-| "Erreur CreateUser" | "Error in CreateUser" |
-| "Erreur interne" | "Internal server error" |
-| "Groupe {id} non trouvé" | "Group {id} not found" |
-| "Groupe existe déjà" | "Group already exists" |
-| "Erreur CreateGroup" | "Error in CreateGroup" |
+| Legacy French user-not-found message | "User {id} not found" |
+| Legacy French duplicate-user message | "User already exists" |
+| Legacy French CreateUser error message | "Error in CreateUser" |
+| Legacy French internal-error message | "Internal server error" |
+| Legacy French group-not-found message | "Group {id} not found" |
+| Legacy French duplicate-group message | "Group already exists" |
+| Legacy French CreateGroup error message | "Error in CreateGroup" |
 
 ### Tests Fixed
 
@@ -121,5 +121,3 @@ EzSCIM/Repositories/
 - [ ] Phase 3: Update repository PATCH handler
 - [ ] Phase 4: Run comprehensive tests
 - [ ] Phase 5: Re-run SCIM Validator
-
-

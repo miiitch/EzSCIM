@@ -110,7 +110,7 @@ public class ScimGroupBase
     public string Id { get; set; }                        // Auto-generated
     [Required] public string DisplayName { get; set; }    // REQUIRED
     public List<string> Schemas { get; set; }             // Auto-initialized
-    public ScimMeta Meta { get; set; }                    // Auto-initialisé
+    public ScimMeta Meta { get; set; }                    // Auto-initialized
 }
 ```
 

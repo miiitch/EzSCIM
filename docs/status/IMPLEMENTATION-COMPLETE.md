@@ -65,14 +65,13 @@
 
 | Location | Original (French) | Updated (English) |
 |----------|-------------------|-------------------|
-| UsersController.GetUser | "Utilisateur {id} non trouvé" | "User {id} not found" |
-| UsersController.CreateUser | "Utilisateur existe déjà" | "User already exists" |
-| UsersController.CreateUser | "Erreur interne" | "Internal server error" |
-| UsersController.UpdateUser | "Utilisateur {id} non trouvé" | "User {id} not found" |
-| GroupsController.GetGroup | "Groupe {id} non trouvé" | "Group {id} not found" |
-| GroupsController.CreateGroup | "Groupe existe déjà" | "Group already exists" |
-| GroupsController.UpdateGroup | "Groupe {id} non trouvé" | "Group {id} not found" |
-| GroupsController.PatchGroup | "Groupe {id} non trouvé" | "Group {id} not found" |
+| UsersController.GetUser | Legacy French not-found message | "User {id} not found" |
+| UsersController.CreateUser | Legacy French duplicate-user message | "User already exists" |
+| UsersController.UpdateUser | Legacy French not-found message | "User {id} not found" |
+| GroupsController.GetGroup | Legacy French not-found message | "Group {id} not found" |
+| GroupsController.CreateGroup | Legacy French duplicate-group message | "Group already exists" |
+| GroupsController.UpdateGroup | Legacy French not-found message | "Group {id} not found" |
+| GroupsController.PatchGroup | Legacy French not-found message | "Group {id} not found" |
 
 All controllers now use consistent English error messages throughout.
 
@@ -138,7 +137,7 @@ EzSCIM -> C:\Users\MichelPerfetti\src\private\scimwork\EzSCIM\bin\Debug\net10.0\
    - Applies attribute filtering when parameter is provided
    - Changed error message to English
 4. `CreateUser()` method:
-   - Changed error message "Utilisateur existe déjà" → "User already exists"
+   - Changed error message from legacy French duplicate-user text -> "User already exists"
 5. `UpdateUser()` method:
    - Changed error message to English
 6. Removed old `FilterUserAttributes()` helper method
@@ -224,5 +223,3 @@ Comprehensive utility class with static methods for:
 - Action Plan: `docs/status/ACTION-PLAN-FIX-SCIM-ERRORS.md`
 - Error Summary: `docs/status/SCIM-ERRORS-SUMMARY.md`
 - Implementation Progress: `docs/status/IMPLEMENTATION-PROGRESS.md`
-
-

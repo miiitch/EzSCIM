@@ -356,7 +356,7 @@ public class PatchRequest
 
 ### Error Details
 - **Problem**: Error messages are returned in French
-- **Example**: `"detail": "Utilisateur existe déjà"` should be `"User already exists"`
+- **Example**: `"detail": "<legacy French duplicate-user message>"` should be `"User already exists"`
 
 ### Files to Modify
 
@@ -601,5 +601,3 @@ public async Task CreateDuplicateUser_ShouldReturnEnglishErrorMessage()
 ✅ All error messages are in English  
 ✅ No regression in other tests  
 ✅ SFComplianceFailed flag is set to false  
-
-

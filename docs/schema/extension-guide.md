@@ -1,23 +1,24 @@
-﻿﻿# SCIM Schema Extension Guide
+﻿# SCIM Schema Extension Guide
 
-Ce guide explique comment étendre le système de schémas SCIM en créant des types personnalisés basés sur `ScimUser` et `ScimGroup`.
+This guide explains how to extend the SCIM schema system by creating custom types based on `ScimUser` and `ScimGroup`.
 
-## Table des matières
+## Table of Contents
 
-1. [Introduction au système d'attributs](#introduction-au-système-dattributs)
-2. [Création d'un type utilisateur personnalisé](#création-dun-type-utilisateur-personnalisé)
-3. [Configuration de l'injection de dépendances](#configuration-de-linjection-de-dépendances)
-4. [Génération des schémas personnalisés](#génération-des-schémas-personnalisés)
-5. [Bonnes pratiques](#bonnes-pratiques)
+1. [Attribute system overview](#attribute-system-overview)
+2. [Create a custom user type](#create-a-custom-user-type)
+3. [Configure dependency injection](#configure-dependency-injection)
+4. [Generate custom schemas](#generate-custom-schemas)
+5. [Best practices](#best-practices)
 
 ---
 
-## Introduction au système d'attributs
+## Attribute system overview
 
-Le système de schémas SCIM utilise une approche **déclarative opt-in** basée sur deux attributs :
+The SCIM schema system uses a declarative **opt-in** approach based on two attributes.
 
-### `[ScimResource]` - Niveau classe
-Définit les métadonnées du schéma SCIM pour une ressource.
+### `[ScimResource]` - class level
+
+Defines SCIM schema metadata for a resource.
 
 ```csharp
 [ScimResource(
@@ -28,35 +29,36 @@ Définit les métadonnées du schéma SCIM pour une ressource.
 public class ScimUser { ... }
 ```
 
-**Propriétés** :
-- `Schema` (obligatoire) : URN du schéma SCIM
-- `Name` (obligatoire) : Nom de la ressource
-- `Description` (obligatoire) : Description de la ressource
+**Properties:**
+- `Schema` (required): SCIM schema URN
+- `Name` (required): Resource name
+- `Description` (required): Resource description
 
-### `[ScimProperty]` - Niveau propriété
-Marque une propriété comme faisant partie du schéma SCIM. **Seules les propriétés annotées sont incluses dans le schéma généré.**
+### `[ScimProperty]` - property level
+
+Marks a property as part of the SCIM schema. **Only annotated properties are included in generated schemas.**
 
 ```csharp
 [ScimProperty("userName", "string", Required = true, Uniqueness = "server")]
 public string UserName { get; set; }
 ```
 
-**Propriétés** :
-- `Name` (obligatoire) : Nom de l'attribut SCIM
-- `Type` (obligatoire) : Type de données SCIM ("string", "boolean", "complex", "reference", "dateTime", "integer", "decimal", "binary")
-- `Required` (défaut: false) : Attribut obligatoire
-- `MultiValued` (défaut: false) : Peut avoir plusieurs valeurs
-- `Description` : Description de l'attribut
-- `Uniqueness` (défaut: "none") : Contrainte d'unicité ("none", "server", "global")
-- `Mutability` (défaut: "readWrite") : Mutabilité ("readOnly", "readWrite", "immutable", "writeOnly")
-- `Returned` (défaut: "default") : Quand retourner l'attribut ("always", "never", "default", "request")
-- `CaseExact` (défaut: false) : Comparaison sensible à la casse
+**Properties:**
+- `Name` (required): SCIM attribute name
+- `Type` (required): SCIM data type (`string`, `boolean`, `complex`, `reference`, `dateTime`, `integer`, `decimal`, `binary`)
+- `Required` (default: `false`): Whether the attribute is required
+- `MultiValued` (default: `false`): Whether multiple values are allowed
+- `Description`: Attribute description
+- `Uniqueness` (default: `none`): Uniqueness constraint (`none`, `server`, `global`)
+- `Mutability` (default: `readWrite`): Mutability (`readOnly`, `readWrite`, `immutable`, `writeOnly`)
+- `Returned` (default: `default`): Return behavior (`always`, `never`, `default`, `request`)
+- `CaseExact` (default: `false`): Case-sensitive comparison
 
 ---
 
-## Création d'un type utilisateur personnalisé
+## Create a custom user type
 
-### Exemple : Utilisateur d'entreprise avec attributs supplémentaires
+### Example: enterprise user with custom attributes
 
 ```csharp
 using ScimAPI.Attributes;
@@ -65,7 +67,7 @@ using ScimAPI.Models;
 namespace MyCompany.Scim.Models
 {
     /// <summary>
-    /// Extension du modèle ScimUser pour inclure des attributs spécifiques à l'entreprise.
+    /// Extends ScimUser with enterprise-specific attributes.
     /// </summary>
     [ScimResource(
         "urn:enterprise:params:scim:schemas:extension:MyCompany:2.0",
@@ -75,77 +77,75 @@ namespace MyCompany.Scim.Models
     public class EnterpriseUser : ScimUser
     {
         /// <summary>
-        /// Numéro d'employé unique
+        /// Unique employee number.
         /// </summary>
-        [ScimProperty("employeeNumber", "string", Required = true, Uniqueness = "server", 
+        [ScimProperty("employeeNumber", "string", Required = true, Uniqueness = "server",
             Description = "Unique employee number")]
         public string EmployeeNumber { get; set; } = string.Empty;
-        
+
         /// <summary>
-        /// Code du département
+        /// Department code.
         /// </summary>
         [ScimProperty("department", "string", Description = "Department code")]
         public string? Department { get; set; }
-        
+
         /// <summary>
-        /// Nom du manager
+        /// Manager reference.
         /// </summary>
         [ScimProperty("manager", "reference", Description = "Reference to manager")]
         public string? ManagerId { get; set; }
-        
+
         /// <summary>
-        /// Date d'embauche
+        /// Employee hire date.
         /// </summary>
         [ScimProperty("hireDate", "dateTime", Description = "Employee hire date")]
         public DateTime? HireDate { get; set; }
-        
+
         /// <summary>
-        /// Centres de coûts (multi-valué)
+        /// Cost centers (multi-valued).
         /// </summary>
-        [ScimProperty("costCenters", "string", MultiValued = true, 
+        [ScimProperty("costCenters", "string", MultiValued = true,
             Description = "Cost centers")]
         public List<string> CostCenters { get; set; } = new();
-        
+
         /// <summary>
-        /// Informations de badge (type complexe)
+        /// Badge information (complex type).
         /// </summary>
         [ScimProperty("badge", "complex", Description = "Badge information")]
         public BadgeInfo? Badge { get; set; }
     }
-    
+
     /// <summary>
-    /// Informations de badge d'employé
+    /// Employee badge data.
     /// </summary>
     public class BadgeInfo
     {
         [ScimProperty("badgeNumber", "string", Description = "Badge number")]
         public string? BadgeNumber { get; set; }
-        
+
         [ScimProperty("issueDate", "dateTime", Description = "Badge issue date")]
         public DateTime? IssueDate { get; set; }
-        
+
         [ScimProperty("expiryDate", "dateTime", Description = "Badge expiry date")]
         public DateTime? ExpiryDate { get; set; }
-        
+
         [ScimProperty("accessLevel", "integer", Description = "Access level")]
         public int AccessLevel { get; set; }
     }
 }
 ```
 
-### Points importants
+### Important notes
 
-1. **Héritage des propriétés** : Toutes les propriétés annotées de `ScimUser` (classe parente) sont automatiquement incluses dans le schéma généré.
-
-2. **URN personnalisé** : Utilisez le format `urn:enterprise:params:scim:schemas:extension:{OrganizationName}:{Version}` pour les schémas d'extension.
-
-3. **Types complexes** : Les types complexes (comme `BadgeInfo`) doivent avoir leurs propriétés annotées avec `[ScimProperty]`.
+1. **Inherited properties**: all annotated properties in `ScimUser` are automatically included in the derived schema.
+2. **Custom URN**: use the format `urn:enterprise:params:scim:schemas:extension:{OrganizationName}:{Version}` for extensions.
+3. **Complex types**: nested complex types (for example `BadgeInfo`) should also use `[ScimProperty]` annotations.
 
 ---
 
-## Configuration de l'injection de dépendances
+## Configure dependency injection
 
-### Option 1 : Repository dédié pour le type personnalisé
+### Option 1: dedicated repository for the custom type
 
 ```csharp
 using ScimAPI.Repositories;
@@ -156,50 +156,51 @@ namespace MyCompany.Scim.Repositories
     public class EnterpriseUserRepository : IScimUserOnlyRepository<EnterpriseUser>
     {
         private readonly Dictionary<string, EnterpriseUser> _users = new();
-        
+
         public Task<EnterpriseUser?> GetUserAsync(string id)
         {
             _users.TryGetValue(id, out var user);
             return Task.FromResult(user);
         }
-        
-        // ... autres méthodes ...
+
+        // ... other methods ...
     }
 }
 ```
 
-**Enregistrement dans Program.cs** :
+Register in `Program.cs`:
+
 ```csharp
 builder.Services.AddSingleton<IScimUserOnlyRepository<EnterpriseUser>, EnterpriseUserRepository>();
 ```
 
-### Option 2 : Repository combiné (Users + Groups)
+### Option 2: combined repository (users + groups)
 
 ```csharp
-public class EnterpriseScimRepository : 
+public class EnterpriseScimRepository :
     IScimUserGroupRepository<EnterpriseUser, ScimGroup>
 {
     // Implements both user and group operations
-    // Groups inherit user operations via interface hierarchy
 }
 ```
 
-**Enregistrement dans Program.cs** :
+Register in `Program.cs`:
+
 ```csharp
 builder.Services.AddSingleton<EnterpriseScimRepository>();
-builder.Services.AddSingleton<IScimUserOnlyRepository<EnterpriseUser>>(sp => 
+builder.Services.AddSingleton<IScimUserOnlyRepository<EnterpriseUser>>(sp =>
     sp.GetRequiredService<EnterpriseScimRepository>());
-builder.Services.AddSingleton<IScimUserGroupRepository<EnterpriseUser, ScimGroup>>(sp => 
+builder.Services.AddSingleton<IScimUserGroupRepository<EnterpriseUser, ScimGroup>>(sp =>
     sp.GetRequiredService<EnterpriseScimRepository>());
 ```
 
 ---
 
-## Génération des schémas personnalisés
+## Generate custom schemas
 
-### Méthode 1 : Classe helper statique (RECOMMANDÉ)
+### Method 1: static helper class (recommended)
 
-Créez une classe helper similaire à `ScimSchemaGenerator` pour vos types personnalisés :
+Create a helper similar to `ScimSchemaGenerator`:
 
 ```csharp
 using ScimAPI.Helpers;
@@ -212,10 +213,10 @@ namespace MyCompany.Scim.Helpers
     {
         /// <summary>
         /// Pre-generated schema for EnterpriseUser.
-        /// Calculated once in static constructor (thread-safe).
+        /// Initialized once in the static constructor.
         /// </summary>
         public static ScimSchema EnterpriseUserSchema { get; }
-        
+
         static EnterpriseSchemaGenerator()
         {
             EnterpriseUserSchema = ScimSchemaGenerator.GetSchema<EnterpriseUser>();
@@ -225,13 +226,14 @@ namespace MyCompany.Scim.Helpers
 }
 ```
 
-**Utilisation dans un contrôleur** :
+Use in a controller:
+
 ```csharp
 [HttpGet("Schemas")]
 public IActionResult GetSchemas()
 {
-    var schemas = new List<ScimSchema> 
-    { 
+    var schemas = new List<ScimSchema>
+    {
         ScimSchemaGenerator.UserSchema,
         ScimSchemaGenerator.GroupSchema,
         EnterpriseSchemaGenerator.EnterpriseUserSchema
@@ -240,88 +242,80 @@ public IActionResult GetSchemas()
 }
 ```
 
-### Méthode 2 : Génération à la demande
-
-Si vous n'avez pas besoin de pré-calcul, appelez directement :
+### Method 2: on-demand generation
 
 ```csharp
 var schema = ScimSchemaGenerator.GetSchema<EnterpriseUser>();
 ```
 
-**⚠️ Note** : Cette méthode utilise la réflexion à chaque appel. Préférez la mise en cache via un helper statique.
+> This uses reflection every call. Prefer a static cached helper in production.
 
 ---
 
-## Bonnes pratiques
+## Best practices
 
-### 1. Convention de nommage des URNs
+### 1) URN naming convention
 
-Pour les schémas d'extension personnalisés :
-```
+For custom extension schemas:
+
+```text
 urn:enterprise:params:scim:schemas:extension:{OrganizationName}:{Version}
 ```
 
-Exemples :
+Examples:
 - `urn:enterprise:params:scim:schemas:extension:Contoso:2.0`
 - `urn:enterprise:params:scim:schemas:extension:AcmeCorp:1.0`
 
-Pour les schémas core SCIM (ne pas modifier) :
+Do not modify SCIM core URNs:
 - `urn:ietf:params:scim:schemas:core:2.0:User`
 - `urn:ietf:params:scim:schemas:core:2.0:Group`
 
-### 2. Approche opt-in
+### 2) Opt-in schema design
 
-**Seules les propriétés avec `[ScimProperty]` sont incluses dans le schéma.** Cela permet de :
-- Exclure les propriétés internes (Id, Schemas, Meta, CustomAttributes)
-- Contrôler précisément ce qui est exposé dans le schéma SCIM
-- Éviter les fuites de données sensibles
+Only properties with `[ScimProperty]` are exposed in generated schemas. This helps:
+- Exclude internal properties (`Id`, `Schemas`, `Meta`, `CustomAttributes`)
+- Precisely control SCIM exposure
+- Reduce accidental data exposure
 
-### 3. Héritage des annotations
+### 3) Annotation inheritance
 
-Les propriétés annotées dans la classe parente (`ScimUser`, `ScimGroup`) sont automatiquement incluses dans les classes dérivées grâce à `BindingFlags.FlattenHierarchy`.
+Annotated properties in base classes (`ScimUser`, `ScimGroup`) are inherited by derived classes.
 
-**Exemple** :
 ```csharp
-// ScimUser a userName annoté
-public class ScimUser 
+public class ScimUser
 {
     [ScimProperty("userName", "string", Required = true)]
     public string UserName { get; set; }
 }
 
-// EnterpriseUser hérite automatiquement de userName dans son schéma
-public class EnterpriseUser : ScimUser 
+public class EnterpriseUser : ScimUser
 {
     [ScimProperty("employeeNumber", "string")]
     public string EmployeeNumber { get; set; }
 }
 ```
 
-Le schéma généré pour `EnterpriseUser` contiendra **à la fois** `userName` et `employeeNumber`.
+The generated `EnterpriseUser` schema contains both `userName` and `employeeNumber`.
 
-### 4. Types complexes imbriqués
+### 4) Nested complex types
 
-Pour les attributs complexes, annotez également les propriétés des types imbriqués :
+Annotate nested properties too:
 
 ```csharp
-// Propriété complexe sur le type principal
 [ScimProperty("address", "complex")]
 public CustomAddress Address { get; set; }
 
-// Propriétés annotées sur le type imbriqué
 public class CustomAddress
 {
     [ScimProperty("street", "string")]
     public string Street { get; set; }
-    
+
     [ScimProperty("city", "string")]
     public string City { get; set; }
 }
 ```
 
-### 5. Multi-valued complex types
-
-Pour les listes de types complexes :
+### 5) Multi-valued complex types
 
 ```csharp
 [ScimProperty("certifications", "complex", MultiValued = true)]
@@ -331,22 +325,21 @@ public class Certification
 {
     [ScimProperty("name", "string")]
     public string Name { get; set; }
-    
+
     [ScimProperty("issueDate", "dateTime")]
     public DateTime IssueDate { get; set; }
 }
 ```
 
-### 6. Validation au démarrage
+### 6) Startup validation
 
-Pour valider que vos schémas sont correctement générés, ajoutez une vérification au démarrage :
+Validate schema generation at startup:
 
 ```csharp
-// Dans Program.cs après builder.Build()
 var schema = EnterpriseSchemaGenerator.EnterpriseUserSchema;
 if (schema.Attributes.Count == 0)
 {
-    app.Logger.LogWarning("EnterpriseUser schema has no attributes!");
+    app.Logger.LogWarning("EnterpriseUser schema has no attributes.");
 }
 else
 {
@@ -356,13 +349,13 @@ else
 
 ---
 
-## Résumé
+## Summary
 
-1. **Annotez votre classe** avec `[ScimResource]` pour définir l'URN et les métadonnées
-2. **Annotez les propriétés** avec `[ScimProperty]` (opt-in : seules les propriétés annotées sont incluses)
-3. **Les propriétés héritées** sont automatiquement incluses
-4. **Créez un helper statique** pour pré-calculer le schéma (thread-safe, performant)
-5. **Utilisez des URNs d'extension** au format `urn:enterprise:params:scim:schemas:extension:{Org}:{Version}`
-6. **Configurez l'injection de dépendances** pour vos repositories personnalisés
+1. Annotate the class with `[ScimResource]`.
+2. Annotate exposed properties with `[ScimProperty]`.
+3. Inherited annotated properties are included automatically.
+4. Use a static schema helper for thread-safe caching and performance.
+5. Use extension URNs in the format `urn:enterprise:params:scim:schemas:extension:{Org}:{Version}`.
+6. Register custom repositories through dependency injection.
 
-Le système de génération de schémas est automatique, type-safe, et optimisé pour la performance grâce aux constructeurs statiques.
+The schema generation system is automatic, type-safe, and efficient when combined with static pre-generation.

@@ -1,15 +1,14 @@
-﻿﻿# Exemple d'intégration rapide - Repository → SCIM
+﻿# Quick Integration Example - Repository -> SCIM
 
-## Scénario: Vous avez déjà une base de données d'utilisateurs
+## Scenario
 
-Vous voulez exposer vos utilisateurs via SCIM sans réécrire votre code existant.
+You already have an existing user database and want to expose users through SCIM without rewriting your current business layer.
 
 ---
 
-## 1️⃣ Votre modèle existant
+## 1) Existing model
 
 ```csharp
-// Votre classe utilisateur existante
 public class Employee
 {
     public Guid Id { get; set; }
@@ -25,7 +24,7 @@ public class Employee
 
 ---
 
-## 2️⃣ Ajoutez les attributs SCIM (2 minutes)
+## 2) Add SCIM attributes (about 2 minutes)
 
 ```csharp
 using ScimAPI.Attributes;
@@ -52,14 +51,14 @@ public class Employee
     [ScimProperty("title", "string")]
     public string Position { get; set; } = string.Empty;
 
-    // Non-SCIM (pas d'attribut)
+    // Non-SCIM field (not exposed)
     public DateTime HireDate { get; set; }
 }
 ```
 
 ---
 
-## 3️⃣ Créez le repository (5 minutes)
+## 3) Create repository implementation (about 5 minutes)
 
 ```csharp
 using ScimAPI.Repositories;
@@ -78,47 +77,44 @@ public class EmployeeRepository : IUserDataRepository<Employee>
     {
         if (Guid.TryParse(id, out var guid))
             return await _context.Employees.FindAsync(guid);
+
         return null;
     }
 
-    // IMPORTANT: Retourner IQueryable pour filtrage server-side
     public IQueryable<Employee> QueryUsers()
     {
         return _context.Employees.AsQueryable();
     }
 
-    public async Task<Employee> CreateUserAsync(Employee employee)
+    public async Task<Employee> CreateUserAsync(Employee user)
     {
-        employee.Id = Guid.NewGuid();
-        _context.Employees.Add(employee);
+        _context.Employees.Add(user);
         await _context.SaveChangesAsync();
-        return employee;
+        return user;
     }
 
-    public async Task<Employee?> UpdateUserAsync(string id, Employee employee)
+    public async Task<Employee?> UpdateUserAsync(string id, Employee user)
     {
-        if (!Guid.TryParse(id, out var guid))
-            return null;
+        var existing = await GetUserAsync(id);
+        if (existing == null) return null;
 
-        var existing = await _context.Employees.FindAsync(guid);
-        if (existing == null)
-            return null;
+        existing.Email = user.Email;
+        existing.FirstName = user.FirstName;
+        existing.LastName = user.LastName;
+        existing.FullName = user.FullName;
+        existing.IsEnabled = user.IsEnabled;
+        existing.Position = user.Position;
 
-        _context.Entry(existing).CurrentValues.SetValues(employee);
         await _context.SaveChangesAsync();
-        return employee;
+        return existing;
     }
 
     public async Task<bool> DeleteUserAsync(string id)
     {
-        if (!Guid.TryParse(id, out var guid))
-            return false;
+        var existing = await GetUserAsync(id);
+        if (existing == null) return false;
 
-        var employee = await _context.Employees.FindAsync(guid);
-        if (employee == null)
-            return false;
-
-        _context.Employees.Remove(employee);
+        _context.Employees.Remove(existing);
         await _context.SaveChangesAsync();
         return true;
     }
@@ -127,106 +123,42 @@ public class EmployeeRepository : IUserDataRepository<Employee>
 
 ---
 
-## 4️⃣ Configurez DI dans Program.cs (3 lignes)
+## 4) Register DI (about 3 minutes)
 
 ```csharp
-using ScimAPI.Repositories;
 using ScimAPI.Filtering;
+using ScimAPI.Repositories;
 using ScimAPI.Models;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Votre DbContext existant
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-// 1️⃣ Votre repository
 builder.Services.AddScoped<IUserDataRepository<Employee>, EmployeeRepository>();
-
-// 2️⃣ Traducteur de filtres SCIM → LINQ
 builder.Services.AddScoped<IScimFilterTranslator<Employee>, GenericScimFilterTranslator<Employee>>();
 
-// 3️⃣ Adaptateur SCIM
 builder.Services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
-{
-    var dataRepo = sp.GetRequiredService<IUserDataRepository<Employee>>();
-    var translator = sp.GetRequiredService<IScimFilterTranslator<Employee>>();
-    return new ScimUserRepositoryAdapter<Employee>(dataRepo, translator);
-});
+    new ScimUserRepositoryAdapter<Employee>(
+        sp.GetRequiredService<IUserDataRepository<Employee>>(),
+        sp.GetRequiredService<IScimFilterTranslator<Employee>>()));
+```
 
-var app = builder.Build();
-app.Run();
+If your application expects `IScimRepository`, you can bridge it:
+
+```csharp
+builder.Services.AddScoped<IScimRepository>(sp =>
+    new ScimRepositoryAdapter(
+        sp.GetRequiredService<IScimUserOnlyRepository<ScimUser>>()));
 ```
 
 ---
 
-## 5️⃣ C'est tout ! ✨
+## 5) Validate with SCIM requests
 
-Vous pouvez maintenant utiliser l'API SCIM :
+### Create user
 
-### Lister tous les employés
 ```http
-GET /scim/Users
-```
+POST /scim/Users
+Content-Type: application/scim+json
 
-### Filtrer par email
-```http
-GET /scim/Users?filter=userName eq "john.doe@company.com"
-```
-
-### Filtrer les employés actifs
-```http
-GET /scim/Users?filter=active eq true
-```
-
-### Recherche par prénom
-```http
-GET /scim/Users?filter=givenName sw "John"
-```
-
-### Filtre complexe
-```http
-GET /scim/Users?filter=(givenName sw "John" or givenName sw "Jane") and active eq true
-```
-
----
-
-## 🎯 Que se passe-t-il sous le capot ?
-
-### Requête SCIM
-```http
-GET /scim/Users?filter=active eq true and givenName sw "John"
-```
-
-### 1. Controller parse le filtre
-```csharp
-FilterExpression filter = parser.Parse("active eq true and givenName sw \"John\"");
-```
-
-### 2. Adaptateur applique le filtre
-```csharp
-var query = _dataRepository.QueryUsers(); // IQueryable<Employee>
-query = _translator.Apply(query, filter);
-```
-
-### 3. Traducteur génère l'expression LINQ
-```csharp
-employee => employee.IsEnabled == true && 
-            employee.FirstName.StartsWith("John", StringComparison.OrdinalIgnoreCase)
-```
-
-### 4. EF Core traduit en SQL
-```sql
-SELECT * FROM Employees
-WHERE IsEnabled = 1 
-  AND FirstName LIKE 'John%'
-```
-
-### 5. Résultats mappés vers SCIM
-```csharp
-// Employee → ScimUser (automatique)
 {
-  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
   "userName": "john.doe@company.com",
   "name": {
     "givenName": "John",
@@ -234,141 +166,83 @@ WHERE IsEnabled = 1
   },
   "displayName": "John Doe",
   "active": true,
-  "title": "Software Engineer"
+  "title": "Developer"
 }
 ```
 
----
-
-## 🚀 Performance
-
-**SANS ce système:**
-```csharp
-// ❌ Charge TOUS les employés en mémoire
-var allEmployees = await _context.Employees.ToListAsync();
-var filtered = allEmployees.Where(e => e.IsEnabled && e.FirstName.StartsWith("John"));
-```
-
-**AVEC ce système:**
-```csharp
-// ✅ Filtre côté SQL, ne charge que les résultats
-var filtered = _context.Employees
-    .Where(e => e.IsEnabled && e.FirstName.StartsWith("John"))
-    .ToList();
-```
-
-Pour 100 000 employés avec 2 résultats :
-- ❌ Sans : Charge 100 000 rows → Filtre en C# → Retourne 2
-- ✅ Avec : SQL filtre → Charge 2 rows → Retourne 2
-
-**Gain:** 50 000x plus rapide ! 🚀
-
----
-
-## 📊 Mapping complet des attributs SCIM
-
-| Attribut SCIM | Type | Votre propriété | Exemple |
-|---------------|------|-----------------|---------|
-| `userName` | string | `Email` | `john.doe@company.com` |
-| `givenName` | string | `FirstName` | `John` |
-| `familyName` | string | `LastName` | `Doe` |
-| `displayName` | string | `FullName` | `John Doe` |
-| `active` | boolean | `IsEnabled` | `true` |
-| `title` | string | `Position` | `Software Engineer` |
-| `externalId` | string | `EmployeeCode` | `EMP-12345` |
-| `email` | string | `EmailAddress` | `john@company.com` |
-
----
-
-## 💡 Cas d'usage réels
-
-### Intégration avec Azure AD / Entra ID
-
-Azure AD peut provisionner automatiquement vos employés :
-
-```
-Azure AD SCIM Client
-    ↓ (Sync employees)
-Votre API SCIM
-    ↓ (via ScimUserRepositoryAdapter)
-Votre base SQL Server
-```
-
-### Intégration avec Okta
+### Filter users
 
 ```http
-POST /scim/Users
-{
-  "userName": "new.hire@company.com",
-  "name": {
-    "givenName": "New",
-    "familyName": "Hire"
-  },
-  "active": true
-}
+GET /scim/Users?filter=active eq true and userName co "@company.com"
 ```
 
-→ Crée automatiquement dans votre base via `EmployeeRepository.CreateAsync()`
+### Filter translation behavior
 
----
-
-## 🔧 Personnalisation avancée
-
-### Ajouter des includes EF Core
-
-```csharp
-public class EmployeeRepository : IUserDataRepository<Employee>
-{
-    public IQueryable<Employee> QueryUsers()
-    {
-        return _context.Employees
-            .Include(e => e.Department)
-            .Include(e => e.Manager)
-            .AsQueryable();
-    }
-}
-```
-
-### Ajouter un filtre global (soft delete)
-
-```csharp
-public IQueryable<Employee> QueryUsers()
-{
-    return _context.Employees
-        .Where(e => !e.IsDeleted) // Global filter
-        .AsQueryable();
-}
-```
-
-### Mapper des propriétés calculées
-
-```csharp
-public class Employee
-{
-    [ScimProperty("displayName", "string")]
-    public string FullName => $"{FirstName} {LastName}";
-}
+```text
+SCIM: active eq true and userName co "@company.com"
+LINQ: u => u.IsEnabled == true && u.Email.Contains("@company.com")
+SQL : WHERE IsEnabled = 1 AND Email LIKE '%@company.com%'
 ```
 
 ---
 
-## 🎉 Résultat
+## SCIM attribute mapping reference
 
-**Temps d'intégration total:** ~15 minutes  
-**Code à écrire:** ~60 lignes  
-**Résultat:** API SCIM complète avec filtrage server-side !
-
-```
-✅ Pas besoin de réécrire votre code existant
-✅ Pas besoin de dupliquer vos données
-✅ Performance optimale (SQL server-side)
-✅ Compatible avec Azure AD, Okta, etc.
-✅ Maintenance minimale
-```
+| SCIM attribute | Type | Employee property | Example |
+|---|---|---|---|
+| `userName` | `string` | `Email` | `john.doe@company.com` |
+| `name.givenName` | `string` | `FirstName` | `John` |
+| `name.familyName` | `string` | `LastName` | `Doe` |
+| `displayName` | `string` | `FullName` | `John Doe` |
+| `active` | `boolean` | `IsEnabled` | `true` |
+| `title` | `string` | `Position` | `Developer` |
 
 ---
 
-## 📚 Pour aller plus loin
+## Integration with Entra ID
 
-Consultez le guide complet : **REPOSITORY-ADAPTER-GUIDE.md**
+Microsoft Entra ID can provision employees automatically once your SCIM endpoint is exposed.
 
+```text
+Entra ID -> SCIM API (/scim/Users) -> Repository Adapter -> SQL database
+```
+
+Common flows:
+- User lookup by `userName`
+- User creation (`POST /Users`)
+- User update (`PATCH /Users/{id}`)
+- User deactivation (`PATCH active=false`)
+
+---
+
+## Troubleshooting
+
+### Filter does not return expected users
+
+Check that:
+1. Attributes are correctly annotated with `[ScimProperty]`
+2. The requested SCIM attribute names match your mapping
+3. `QueryUsers()` returns an `IQueryable` source
+
+### User creation fails with conflict
+
+If `userName` is unique in your system, ensure duplicate handling returns SCIM `409 Conflict`.
+
+### Nested attributes not mapped
+
+Use SCIM dot notation where needed (for example `name.givenName`) and ensure your translator handles nested paths.
+
+---
+
+## Result
+
+You now expose your existing repository through SCIM with:
+- Minimal code changes
+- Type-safe mapping via attributes
+- Server-side filter execution
+- Compatibility with SCIM clients such as Entra ID
+
+Continue with:
+- [`repository-adapter-guide.md`](./repository-adapter-guide.md)
+- [`repository-mapping-overview.md`](./repository-mapping-overview.md)
+- [`groups-and-constants-extension.md`](./groups-and-constants-extension.md)

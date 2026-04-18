@@ -5,6 +5,7 @@ using System.Reflection;
 using EzSCIM.Attributes;
 using EzSCIM.Constants;
 using EzSCIM.DataRepositories;
+using EzSCIM.Services;
 
 namespace EzSCIM.Repositories
 {
@@ -100,10 +101,17 @@ namespace EzSCIM.Repositories
             return updated == null ? null : _mapper.ToScimUser(updated);
         }
 
-        public Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
+        public async Task<ScimUser?> PatchUserAsync(string id, ScimPatchRequest patchRequest)
         {
-            // TODO: Implement PATCH mapping
-            throw new NotImplementedException("PATCH operations require custom implementation per domain model");
+            var domainUser = await _dataRepository.GetUserAsync(id);
+            if (domainUser == null) return null;
+
+            var scimUser = _mapper.ToScimUser(domainUser);
+            ScimPatchService.ApplyPatch(scimUser, patchRequest);
+
+            var updatedDomainUser = _mapper.FromScimUser(scimUser);
+            var saved = await _dataRepository.UpdateUserAsync(id, updatedDomainUser);
+            return saved == null ? null : _mapper.ToScimUser(saved);
         }
 
         public async Task<bool> DeleteUserAsync(string id)

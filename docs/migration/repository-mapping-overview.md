@@ -1,18 +1,18 @@
-﻿﻿# 🎯 Mapping Repository → SCIM - Guide rapide
+﻿# Repository -> SCIM Mapping - Quick Overview
 
-## Qu'est-ce que c'est ?
+## What is it?
 
-Un système complet permettant de connecter **votre repository utilisateur existant** à SCIM avec **filtrage server-side automatique**.
+A complete system to connect your existing user repository to SCIM with automatic server-side filtering.
 
-```
-Votre base SQL → IQueryable<TUser> → Filtre SCIM → SQL optimisé → Résultats SCIM
+```text
+Your SQL data -> IQueryable<TUser> -> SCIM filter -> optimized SQL -> SCIM response
 ```
 
 ---
 
-## ⚡ Démarrage rapide (3 étapes)
+## Quick start (3 steps)
 
-### 1. Annotez votre modèle
+### 1. Annotate your model
 
 ```csharp
 public class MyUser
@@ -25,147 +25,120 @@ public class MyUser
 }
 ```
 
-### 2. Implémentez IUserDataRepository
+### 2. Implement `IUserDataRepository`
 
 ```csharp
 public class MyUserRepo : IUserDataRepository<MyUser>
 {
-    public IQueryable<MyUser> Query() => _context.Users;
-    // + 4 autres méthodes (Get/Create/Update/Delete)
+    public IQueryable<MyUser> QueryUsers() => _context.Users;
+    // + 4 other methods (Get/Create/Update/Delete)
 }
 ```
 
-### 3. Configurez DI
+### 3. Configure dependency injection
 
 ```csharp
 services.AddScoped<IUserDataRepository<MyUser>, MyUserRepo>();
 services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
-services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp => 
+services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
     new ScimUserRepositoryAdapter<MyUser>(
         sp.GetRequiredService<IUserDataRepository<MyUser>>(),
         sp.GetRequiredService<IScimFilterTranslator<MyUser>>()));
 ```
 
-**C'est tout !** 🎉
+Done.
 
 ---
 
-## 🚀 Exemple d'utilisation
+## Usage example
 
 ```http
 GET /scim/Users?filter=active eq true and userName sw "john"
 ```
 
-**Traduit automatiquement en :**
+Automatically translated to:
+
 ```csharp
-context.Users.Where(u => u.IsActive == true && u.Email.StartsWith("john"))
+context.Users.Where(u => u.IsActive && u.Email.StartsWith("john"))
 ```
 
-**Exécuté en SQL :**
+Executed as SQL:
+
 ```sql
 SELECT * FROM Users WHERE IsActive = 1 AND Email LIKE 'john%'
 ```
 
 ---
 
-## 📦 Composants fournis
+## Provided components
 
-| Composant | Fichier | Rôle |
-|-----------|---------|------|
-| Interface repository | `IUserDataRepository.cs` | Contrat pour votre source de données |
-| Traducteur générique | `GenericScimFilterTranslator.cs` | AST → IQueryable (via attributs) |
-| Traducteur ScimUser | `ScimUserFilterTranslator.cs` | AST → IQueryable (ScimUser direct) |
-| Adaptateur | `ScimUserRepositoryAdapter.cs` | Pont Repository ↔ SCIM |
-| Exemple | `CustomUser.cs`, `CustomUserGroupRepository.cs` | Implémentation de référence |
-
----
-
-## ✅ Tests
-
-```
-✅ 26/26 tests passed (100%)
-   - ScimUserFilterTranslator: 13/13
-   - GenericScimFilterTranslator: 13/13
-```
-
-**Opérateurs testés :**
-- Comparaison: `eq`, `ne`, `co`, `sw`, `ew`, `gt`, `lt`
-- Logique: `and`, `or`, `not`
-- Présence: `pr`
-- Propriétés imbriquées: `name.givenName`
+| Component | File | Purpose |
+|---|---|---|
+| Repository interface | `IUserDataRepository.cs` | Contract for your data source |
+| Generic translator | `GenericScimFilterTranslator.cs` | AST -> `IQueryable` (via attributes) |
+| ScimUser translator | `ScimUserFilterTranslator.cs` | AST -> `IQueryable` (`ScimUser`) |
+| Adapter | `ScimUserRepositoryAdapter.cs` | Repository <-> SCIM bridge |
+| Example | `CustomUser.cs`, `CustomUserGroupRepository.cs` | Reference implementation |
 
 ---
 
-## 📚 Documentation complète
+## Test coverage
+
+```text
+26/26 tests passing
+- ScimUserFilterTranslator: 13/13
+- GenericScimFilterTranslator: 13/13
+```
+
+Covered operators:
+- Comparison: `eq`, `ne`, `co`, `sw`, `ew`, `gt`, `lt`
+- Logical: `and`, `or`, `not`
+- Presence: `pr`
+- Nested properties: `name.givenName`
+
+---
+
+## Full documentation
 
 | Document | Description |
-|----------|-------------|
-| **QUICK-START-REPOSITORY-INTEGRATION.md** | Guide rapide 15 min |
-| **REPOSITORY-ADAPTER-GUIDE.md** | Guide complet avec exemples |
-| **REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md** | Détails d'implémentation |
+|---|---|
+| `quick-start-repository.md` | 15-minute quick start |
+| `repository-adapter-guide.md` | Full guide with examples |
+| `repository-mapping-index.md` | Index and navigation |
 
 ---
 
-## 🎯 Avantages
+## Benefits
 
-✅ **Performance** : Filtrage SQL server-side, pas de chargement mémoire  
-✅ **Simplicité** : 3 étapes, ~15 minutes d'intégration  
-✅ **Flexibilité** : Fonctionne avec n'importe quel modèle annoté  
-✅ **Type-safe** : Mapping par attributs, erreurs à la compilation  
-✅ **Compatible** : EF Core, Dapper, SQL direct, etc.
+- Performance: server-side SQL filtering, no full in-memory load
+- Simplicity: 3 steps, around 15 minutes to integrate
+- Flexibility: works with any annotated model
+- Type safety: attribute-driven mapping and compile-time refactoring
+- Compatibility: EF Core, Dapper, custom SQL repositories
 
 ---
 
-## 🔧 Architecture
+## Architecture
 
-```
-┌─────────────────┐
-│  SCIM Client    │
-└────────┬────────┘
-         │ GET /scim/Users?filter=...
-         v
-┌─────────────────────────────┐
-│   UsersController            │
-│   Parse → FilterExpression   │
-└────────┬────────────────────┘
-         │
-         v
-┌──────────────────────────────────┐
-│ ScimUserRepositoryAdapter<TUser> │
-└────────┬─────────────────────────┘
-         │
-    ┌────┴────┐
-    v         v
-┌────────┐  ┌──────────────────────┐
-│ Repo   │  │ FilterTranslator     │
-│ Query()│  │ AST → Expression     │
-└───┬────┘  └──────────┬───────────┘
-    │                  │
-    └────────┬─────────┘
-             │ IQueryable.Where(predicate)
-             v
-    ┌────────────────┐
-    │   Database     │
-    │   (SQL)        │
-    └────────────────┘
+```text
+SCIM Client
+    |
+    | GET /scim/Users?filter=...
+    v
+UsersController
+    | parse -> FilterExpression
+    v
+ScimUserRepositoryAdapter<TUser>
+    |                    |
+    |                    v
+    v              IScimFilterTranslator<TUser>
+IUserDataRepository<TUser>
 ```
 
 ---
 
-## 💡 Cas d'usage
+## Next steps
 
-- ✅ Intégration Azure AD / Entra ID
-- ✅ Provisioning Okta
-- ✅ Synchronisation multi-systèmes
-- ✅ API SCIM sur base existante
-
----
-
-## 🚀 Commencer
-
-**Lire en premier :** [QUICK-START-REPOSITORY-INTEGRATION.md](QUICK-START-REPOSITORY-INTEGRATION.md)
-
-**Approfondir :** [REPOSITORY-ADAPTER-GUIDE.md](REPOSITORY-ADAPTER-GUIDE.md)
-
-**Détails techniques :** [REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md](REPOSITORY-MAPPING-IMPLEMENTATION-COMPLETE.md)
-
+1. Start with [`quick-start-repository.md`](./quick-start-repository.md)
+2. Deep dive into [`repository-adapter-guide.md`](./repository-adapter-guide.md)
+3. Review related design notes in [`interface-separation.md`](./interface-separation.md)
