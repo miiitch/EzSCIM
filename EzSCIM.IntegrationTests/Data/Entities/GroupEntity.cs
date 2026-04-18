@@ -1,5 +1,6 @@
 using EzSCIM.Attributes;
 using EzSCIM.Constants;
+using EzSCIM.EfCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace EzSCIM.IntegrationTests.Data.Entities;
@@ -8,7 +9,7 @@ namespace EzSCIM.IntegrationTests.Data.Entities;
 /// Entity Framework group entity with SCIM property mappings for integration tests.
 /// Supports all standard SCIM Group attributes plus custom extensions.
 /// </summary>
-public class GroupEntity
+public class GroupEntity : IScimEntity
 {
     // ========== Core SCIM Fields ==========
 

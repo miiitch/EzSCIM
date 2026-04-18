@@ -1,5 +1,6 @@
 using EzSCIM.Attributes;
 using EzSCIM.Constants;
+using EzSCIM.EfCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
@@ -11,7 +12,7 @@ namespace EzSCIM.IntegrationTests.Data.Entities;
 /// Supports all standard SCIM User attributes plus custom extensions.
 /// Multi-valued attributes (emails, phoneNumbers, addresses) are stored as JSON.
 /// </summary>
-public class UserEntity
+public class UserEntity : IScimEntity
 {
     // ========== Core SCIM Fields ==========
 

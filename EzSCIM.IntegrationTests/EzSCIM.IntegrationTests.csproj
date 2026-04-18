@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\EzSCIM.EntraID.Demo\EzSCIM.EntraID.Demo.csproj" />
     <ProjectReference Include="..\EzSCIM\EzSCIM.csproj" />
+    <ProjectReference Include="..\EzSCIM.EfCore\EzSCIM.EfCore.csproj" />
   </ItemGroup>
 
 </Project>
