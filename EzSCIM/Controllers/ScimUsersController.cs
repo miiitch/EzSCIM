@@ -87,6 +87,12 @@ namespace EzSCIM.Controllers
                 var createdUser = await repository.CreateUserAsync(user);
                 return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
             }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("unique attribute"))
+            {
+                // Race condition: another request created the same user between our check and insert
+                logger.LogWarning(ex, "Duplicate user creation attempt for UserName: {UserName}", user.UserName);
+                return Conflict(new ScimError { Detail = "User already exists", Status = 409 });
+            }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error in CreateUser");

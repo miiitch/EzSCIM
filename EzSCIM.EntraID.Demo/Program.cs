@@ -1,9 +1,15 @@
+using EzSCIM.DataRepositories;
+using EzSCIM.EntraID.Demo.Data;
+using EzSCIM.EntraID.Demo.Data.Entities;
+using EzSCIM.EntraID.Demo.Data.Repositories;
+using EzSCIM.Filtering;
 using EzSCIM.Repositories;
 using EzSCIM.Services;
 using EzSCIM.Authentication;
 using EzSCIM.Controllers;
 using EzSCIM.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Azure.Identity;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
@@ -36,8 +42,20 @@ if (!builder.Environment.IsDevelopment())
 
 // Add services to the container
 
-// Register SCIM repository as Singleton for in-memory implementation
-builder.Services.AddSingleton<IScimRepository, InMemoryScimRepository>();
+// Register SQL Server DbContext via Aspire integration (connection name = "scimdb")
+// In dev: SQL Server container orchestrated by Aspire AppHost
+// In prod: Azure SQL connection string injected via config/Key Vault
+builder.AddSqlServerDbContext<DemoScimDbContext>("scimdb");
+
+// Data repository (EF CRUD)
+builder.Services.AddScoped<IUserGroupDataRepository<DemoUserEntity, DemoGroupEntity>, DemoUserGroupRepository>();
+
+// Filter translators (server-side SCIM filter → LINQ)
+builder.Services.AddScoped<IScimFilterTranslator<DemoUserEntity>, GenericScimFilterTranslator<DemoUserEntity>>();
+builder.Services.AddScoped<IScimFilterTranslator<DemoGroupEntity>, GenericScimFilterTranslator<DemoGroupEntity>>();
+
+// SCIM repository — delegates to EF + entity extensions for proper JSON multi-value handling
+builder.Services.AddScoped<IScimRepository, DemoScimRepository>();
 
 // Register JWT token service
 builder.Services.AddJwtTokenService();
@@ -59,6 +77,23 @@ builder.Services.AddScimTokenGeneratorEndpoint();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Apply EF migrations on startup (creates schema on first run, idempotent afterwards)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DemoScimDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to apply database migrations");
+        throw;
+    }
+}
 
 // Load test data if configured
 if (app.Configuration.GetValue("Scim:LoadTestData", false))

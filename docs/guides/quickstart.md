@@ -21,7 +21,7 @@ builder.Services.AddScimTokenGeneratorEndpoint();
 ```
 
 ```powershell
-$response = Invoke-RestMethod -Uri "https://localhost:7001/scim/auth/token" -Method Get
+$response = Invoke-RestMethod -Uri "https://localhost:7269/scim/auth/token" -Method Get
 $token = $response.token
 Write-Host "Token generated: $token"
 ```

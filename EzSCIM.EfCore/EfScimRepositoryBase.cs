@@ -69,8 +69,47 @@ public abstract class EfScimRepositoryBase<TUser, TGroup, TContext>
         user.ModifiedAt = DateTime.UtcNow;
 
         Users.Add(user);
-        await Context.SaveChangesAsync();
+
+        try
+        {
+            await Context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+            when (IsUniqueConstraintViolation(ex))
+        {
+            throw new InvalidOperationException(
+                $"A user with the same unique attribute already exists.", ex);
+        }
+
         return user;
+    }
+
+    /// <summary>
+    /// Returns true when the <see cref="Microsoft.EntityFrameworkCore.DbUpdateException"/>
+    /// is caused by a unique/primary-key constraint violation (SQL Server, SQLite, PostgreSQL).
+    /// </summary>
+    private static bool IsUniqueConstraintViolation(DbUpdateException ex)
+    {
+        // SQL Server: 2601 (unique index), 2627 (unique constraint / PK)
+        // SQLite: error code 19 (SQLITE_CONSTRAINT), message contains "UNIQUE"
+        // PostgreSQL (Npgsql): SqlState "23505"
+        var inner = ex.InnerException;
+        if (inner is null) return false;
+
+        var msg = inner.Message;
+        if (msg.Contains("duplicate key", StringComparison.OrdinalIgnoreCase)
+            || msg.Contains("UNIQUE constraint failed", StringComparison.OrdinalIgnoreCase)
+            || msg.Contains("unique constraint", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // PostgreSQL (Npgsql): SqlState "23505" — checked via reflection to avoid hard dependency
+        var sqlStateProp = inner.GetType().GetProperty("SqlState");
+        if (sqlStateProp != null && sqlStateProp.GetValue(inner) is string sqlState && sqlState == "23505")
+            return true;
+
+        return false;
     }
 
     /// <inheritdoc />
