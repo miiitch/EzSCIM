@@ -12,12 +12,28 @@ This project contains integration tests for the SCIM API using **Testcontainers*
 
 ## Architecture
 
+### Data Layer
+
+The integration tests reuse the **shared data library** `EzSCIM.Demo.Data` (entities, repositories, extensions) with a PostgreSQL-specific DbContext:
+
+```
+EzSCIM.Demo.Data/ScimDbContextBase     ← Provider-agnostic base (keys, indexes)
+        │
+        └── PostgreSqlScimDbContext     ← jsonb column types (in this project)
+```
+
+- **`PostgreSqlScimDbContext`** — inherits `ScimDbContextBase`, maps JSON columns to `jsonb`
+- **`SeedData.cs`** — provides `DemoUserEntity` / `DemoGroupEntity` test data
+- **`ScimWebApplicationFactory`** — swaps the Demo's SQL Server context for PostgreSQL, disables auth
+
 ### Independent Test Collections
 
-The integration tests are organized into **2 independent xUnit collections**:
+The integration tests are organized into **4 independent xUnit collections**:
 
-- **`UsersIntegration`** - 17 tests for UsersController
-- **`GroupsIntegration`** - 18 tests for GroupsController
+- **`UsersIntegration`** - UsersController CRUD + filter tests
+- **`GroupsIntegration`** - GroupsController CRUD + member management tests
+- **`EntraIdIntegration`** - Microsoft Entra ID provisioning pattern tests
+- **`ScimValidatorCompliance`** - SCIM Validator compliance regression tests
 
 Each collection uses its own PostgreSQL container instance, enabling **parallel execution** without interference.
 
@@ -62,7 +78,7 @@ The database is pre-populated with test data on startup:
 ### Run All Integration Tests
 
 ```powershell
-dotnet test ScimAPI.IntegrationTests
+dotnet test EzSCIM.IntegrationTests
 ```
 
 ### Run Specific Collection
@@ -241,8 +257,8 @@ docker exec -it <container-id> psql -U scimuser -d scimdb
 
 ## Related Documentation
 
-- [Run-AllTests.ps1](../Run-AllTests.ps1) - PowerShell script to run all tests
-- [INTEGRATION-TESTS-COMPLETE.md](../INTEGRATION-TESTS-COMPLETE.md) - Complete implementation documentation
-- [ScimAPI](../ScimAPI/) - Main API project
-- [ScimAPI.UnitTests](../ScimAPI.UnitTests/) - Unit tests with mocks
+- [EzSCIM.Demo.Data](../EzSCIM.Demo.Data/) - Shared data layer (entities, base DbContext, repositories)
+- [EzSCIM.EntraID.Demo](../EzSCIM.EntraID.Demo/) - Demo API (SQL Server provider)
+- [EzSCIM.UnitTests](../EzSCIM.UnitTests/) - Unit tests (no DB dependency)
+- [docs/tests/entra-integration.md](../docs/tests/entra-integration.md) - Entra ID test documentation
 

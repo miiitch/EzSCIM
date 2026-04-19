@@ -214,33 +214,39 @@ scimwork/
 ├── docs/                       # Documentation (organized by theme)
 │   ├── README.md              # Documentation index and guide
 │   ├── auth/                  # Authentication & Security
-│   │   ├── setup.md
-│   │   ├── index.md
-│   │   └── pre-production-checklist.md
 │   ├── filters/               # SCIM Filtering system
-│   │   ├── overview.md
-│   │   ├── reference.md
-│   │   └── examples.md
 │   ├── guides/                # General guides and tutorials
-│   │   ├── quickstart.md
-│   │   ├── development-setup.md
-│   │   └── ...
 │   ├── migration/             # Repository integration & migration
 │   ├── schema/                # Schema system documentation
 │   ├── tests/                 # Testing documentation
 │   ├── status/                # Status reports and summaries
+│   ├── issues/                # Bug reports and known issues
 │   └── archive/               # Historical/completed documentation
-├── EzSCIM/                    # Core SCIM library
+├── EzSCIM/                    # Core SCIM library (controllers, models, services)
 │   ├── Controllers/
 │   ├── Services/
 │   ├── Models/
+│   ├── Filtering/
 │   └── Repositories/
-├── EzSCIM.EntraID.Demo/       # Demo SCIM API service
-├── EzSCIM.EntraID.AppHost/    # Aspire orchestration
-├── EzSCIM.ServiceDefaults/    # Shared service configuration
-├── EzSCIM.UnitTests/          # Unit tests
-├── EzSCIM.IntegrationTests/   # Integration tests
-├── README.md                  # Main project documentation
+├── EzSCIM.EfCore/             # EF Core abstractions (EfScimRepositoryBase, IScimEntity)
+├── EzSCIM.Demo.Data/          # Shared data layer (provider-agnostic)
+│   ├── ScimDbContextBase.cs   # Base DbContext (no provider-specific config)
+│   ├── DemoScimRepository.cs  # IScimRepository implementation
+│   ├── DemoUserEntityExtensions.cs
+│   ├── DemoGroupEntityExtensions.cs
+│   ├── Entities/              # DemoUserEntity, DemoGroupEntity, helpers
+│   └── Repositories/          # DemoUserGroupRepository (uses ScimDbContextBase)
+├── EzSCIM.EntraID.Demo/       # Demo SCIM API service (SQL Server / Azure SQL)
+│   ├── Data/DemoScimDbContext.cs  # SQL Server DbContext (nvarchar(max) columns)
+│   ├── Migrations/            # EF Core migrations for SQL Server
+│   └── Program.cs             # App startup with Aspire integration
+├── EzSCIM.EntraID.AppHost/    # Aspire orchestration (SQL Server container)
+├── EzSCIM.ServiceDefaults/    # Shared service configuration (health, telemetry)
+├── EzSCIM.UnitTests/          # Unit tests (in-memory, no DB)
+├── EzSCIM.IntegrationTests/   # Integration tests (PostgreSQL via Testcontainers)
+│   ├── Data/PostgreSqlScimDbContext.cs  # PostgreSQL DbContext (jsonb columns)
+│   ├── Data/SeedData.cs       # Test seed data
+│   └── ScimWebApplicationFactory.cs
 └── CHANGELOG.md               # Version history
 ```
 
@@ -326,9 +332,14 @@ See [Quick Start](../guides/quickstart.md)
 
 ---
 
-**Last Updated**: February 21, 2026  
-**Version**: 1.1  
+**Last Updated**: April 19, 2026  
+**Version**: 1.2  
 **Notable Changes**: 
+- Added `EzSCIM.Demo.Data` shared library (provider-agnostic data layer)
+- Added `EzSCIM.EfCore` abstraction library
+- Multi-provider DbContext architecture (ScimDbContextBase → SQL Server / PostgreSQL)
+- Integration tests now use PostgreSqlScimDbContext via Testcontainers
+- Removed duplicated data layer from EzSCIM.IntegrationTests (~700 lines eliminated)
 - Added `docs/` directory structure for organized documentation
 - Established documentation naming conventions and file placement rules
 - Added documentation quality checklist for new files

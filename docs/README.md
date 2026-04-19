@@ -22,7 +22,56 @@ Start here:
 
 ---
 
-## 📚 Directory Structure
+## 🏗️ Architecture: Multi-Provider Data Layer
+
+The project uses a **provider-agnostic shared data library** pattern:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    EzSCIM.Demo.Data                       │
+│  ScimDbContextBase (no provider config)                  │
+│  DemoUserEntity / DemoGroupEntity                        │
+│  DemoScimRepository (IScimRepository)                    │
+│  DemoUserGroupRepository (EF CRUD)                       │
+│  Entity ↔ ScimModel extensions                           │
+└──────────────────────┬──────────────────────────────────┘
+                       │ inherits
+          ┌────────────┴────────────┐
+          │                         │
+┌─────────▼──────────┐  ┌──────────▼───────────┐
+│  DemoScimDbContext  │  │ PostgreSqlScimDbContext│
+│  (SQL Server)       │  │ (PostgreSQL)          │
+│  nvarchar(max)      │  │ jsonb                 │
+│  EzSCIM.EntraID.Demo│  │ EzSCIM.IntegrationTests│
+└────────────────────┘  └───────────────────────┘
+```
+
+**Key principles:**
+- `ScimDbContextBase` defines schema (keys, indexes, constraints) without column types
+- Provider-specific subclasses override `OnModelCreating` for column type mapping
+- `DemoScimRepository` and `DemoUserGroupRepository` depend on `ScimDbContextBase` (provider-agnostic)
+- DI registers the base type forwarding to the concrete provider context
+
+---
+
+## 📚 Project Structure
+
+```
+scimwork/
+├── EzSCIM/                     # Core SCIM library (controllers, models, services, filtering)
+├── EzSCIM.EfCore/              # EF Core abstractions (EfScimRepositoryBase, IScimEntity)
+├── EzSCIM.Demo.Data/           # Shared data layer (entities, base DbContext, repositories)
+├── EzSCIM.EntraID.Demo/        # Demo API (SQL Server via Aspire, DemoScimDbContext)
+├── EzSCIM.EntraID.AppHost/     # Aspire orchestration (SQL Server container)
+├── EzSCIM.ServiceDefaults/     # Shared service config (health checks, telemetry)
+├── EzSCIM.UnitTests/           # Unit tests (in-memory, no DB dependency)
+├── EzSCIM.IntegrationTests/    # Integration tests (PostgreSQL via Testcontainers)
+└── docs/                       # Documentation (this directory)
+```
+
+---
+
+## 📚 Documentation Directory Structure
 
 ```
 docs/
@@ -214,7 +263,7 @@ See [docs/status/migration-summary.md](./status/migration-summary.md) for comple
 
 ---
 
-**Last Updated**: April 15, 2026  
-**Convention Version**: 1.1  
+**Last Updated**: April 19, 2026  
+**Convention Version**: 1.2  
 **Language**: English only
 
