@@ -19,7 +19,7 @@ public class GroupsControllerIntegrationTests : IClassFixture<ScimWebApplication
     private readonly ScimWebApplicationFactory _factory;
     private readonly HttpClient _client;
     private readonly IServiceScope _scope;
-    private readonly ScimDbContext _context;
+    private readonly PostgreSqlScimDbContext _context;
     private readonly ITestOutputHelper _output;
     private IDbContextTransaction _transaction = null!;
 
@@ -33,7 +33,7 @@ public class GroupsControllerIntegrationTests : IClassFixture<ScimWebApplication
         
         // Create and store scope for scoped services
         _scope = _factory.Services.CreateScope();
-        _context = _scope.ServiceProvider.GetRequiredService<ScimDbContext>();
+        _context = _scope.ServiceProvider.GetRequiredService<PostgreSqlScimDbContext>();
     }
 
     public async Task InitializeAsync()
@@ -74,8 +74,8 @@ public class GroupsControllerIntegrationTests : IClassFixture<ScimWebApplication
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var groups = await response.Content.ReadFromJsonAsync<ScimListResponse<ScimGroup>>();
         groups.ShouldNotBeNull();
-        groups.TotalResults.ShouldBeGreaterThanOrEqualTo(3); // At least 3 seed groups (may have more from other tests)
-        groups.Resources.Count.ShouldBeGreaterThanOrEqualTo(3);
+        groups.TotalResults.ShouldBeGreaterThanOrEqualTo(2); // At least 2 seed groups (other tests may delete some)
+        groups.Resources.Count.ShouldBeGreaterThanOrEqualTo(2);
         groups.StartIndex.ShouldBe(1);
     }
 

@@ -1,7 +1,8 @@
 using EzSCIM.DataRepositories;
+using EzSCIM.Demo.Data;
+using EzSCIM.Demo.Data.Entities;
+using EzSCIM.Demo.Data.Repositories;
 using EzSCIM.EntraID.Demo.Data;
-using EzSCIM.EntraID.Demo.Data.Entities;
-using EzSCIM.EntraID.Demo.Data.Repositories;
 using EzSCIM.Filtering;
 using EzSCIM.Repositories;
 using EzSCIM.Services;
@@ -47,6 +48,9 @@ if (!builder.Environment.IsDevelopment())
 // In prod: Azure SQL connection string injected via config/Key Vault
 builder.AddSqlServerDbContext<DemoScimDbContext>("scimdb");
 
+// Register the base DbContext type so DemoUserGroupRepository (which depends on ScimDbContextBase) resolves correctly
+builder.Services.AddScoped<ScimDbContextBase>(sp => sp.GetRequiredService<DemoScimDbContext>());
+
 // Data repository (EF CRUD)
 builder.Services.AddScoped<IUserGroupDataRepository<DemoUserEntity, DemoGroupEntity>, DemoUserGroupRepository>();
 
@@ -79,8 +83,10 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // Apply EF migrations on startup (creates schema on first run, idempotent afterwards)
-using (var scope = app.Services.CreateScope())
+// Skip migrations in test environment (test factory manages its own schema)
+if (!app.Environment.IsEnvironment("Testing"))
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<DemoScimDbContext>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try

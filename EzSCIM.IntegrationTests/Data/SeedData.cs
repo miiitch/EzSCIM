@@ -1,4 +1,4 @@
-using EzSCIM.IntegrationTests.Data.Entities;
+using EzSCIM.Demo.Data.Entities;
 using System.Text.Json;
 
 namespace EzSCIM.IntegrationTests.Data;
@@ -16,11 +16,11 @@ public static class SeedData
     /// <summary>
     /// Gets 5 predefined test users.
     /// </summary>
-    public static List<UserEntity> GetSeedUsers()
+    public static List<DemoUserEntity> GetSeedUsers()
     {
-        return new List<UserEntity>
+        return new List<DemoUserEntity>
         {
-            new UserEntity
+            new DemoUserEntity
             {
                 Id = "user-001",
                 UserName = "john.doe@example.com",
@@ -57,7 +57,7 @@ public static class SeedData
                 CreatedAt = DateTime.UtcNow.AddDays(-30),
                 ModifiedAt = DateTime.UtcNow.AddDays(-5)
             },
-            new UserEntity
+            new DemoUserEntity
             {
                 Id = "user-002",
                 UserName = "jane.smith@example.com",
@@ -92,7 +92,7 @@ public static class SeedData
                 CreatedAt = DateTime.UtcNow.AddDays(-60),
                 ModifiedAt = DateTime.UtcNow.AddDays(-2)
             },
-            new UserEntity
+            new DemoUserEntity
             {
                 Id = "user-003",
                 UserName = "bob.wilson@example.com",
@@ -127,7 +127,7 @@ public static class SeedData
                 CreatedAt = DateTime.UtcNow.AddDays(-90),
                 ModifiedAt = DateTime.UtcNow.AddDays(-10)
             },
-            new UserEntity
+            new DemoUserEntity
             {
                 Id = "user-004",
                 UserName = "alice.johnson@example.com",
@@ -162,7 +162,7 @@ public static class SeedData
                 CreatedAt = DateTime.UtcNow.AddDays(-45),
                 ModifiedAt = DateTime.UtcNow.AddDays(-1)
             },
-            new UserEntity
+            new DemoUserEntity
             {
                 Id = "user-005",
                 UserName = "charlie.brown@example.com",
@@ -203,11 +203,11 @@ public static class SeedData
     /// <summary>
     /// Gets 3 predefined test groups.
     /// </summary>
-    public static List<GroupEntity> GetSeedGroups()
+    public static List<DemoGroupEntity> GetSeedGroups()
     {
-        return new List<GroupEntity>
+        return new List<DemoGroupEntity>
         {
-            new GroupEntity
+            new DemoGroupEntity
             {
                 Id = "group-001",
                 DisplayName = "Administrators",
@@ -216,7 +216,7 @@ public static class SeedData
                 CreatedAt = DateTime.UtcNow.AddDays(-100),
                 ModifiedAt = DateTime.UtcNow.AddDays(-20)
             },
-            new GroupEntity
+            new DemoGroupEntity
             {
                 Id = "group-002",
                 DisplayName = "Developers",
@@ -225,7 +225,7 @@ public static class SeedData
                 CreatedAt = DateTime.UtcNow.AddDays(-80),
                 ModifiedAt = DateTime.UtcNow.AddDays(-10)
             },
-            new GroupEntity
+            new DemoGroupEntity
             {
                 Id = "group-003",
                 DisplayName = "Users",
@@ -237,4 +237,3 @@ public static class SeedData
         };
     }
 }
-

@@ -1,9 +1,9 @@
 using System.Text.Json;
 
-namespace EzSCIM.EntraID.Demo.Data.Entities;
+namespace EzSCIM.Demo.Data.Entities;
 
 /// <summary>
-/// Simple POCO for storing email data as JSON in SQL Server.
+/// Simple POCO for storing email data as JSON.
 /// </summary>
 public class EmailData
 {
@@ -13,7 +13,7 @@ public class EmailData
 }
 
 /// <summary>
-/// Simple POCO for storing phone number data as JSON in SQL Server.
+/// Simple POCO for storing phone number data as JSON.
 /// </summary>
 public class PhoneNumberData
 {
@@ -23,7 +23,7 @@ public class PhoneNumberData
 }
 
 /// <summary>
-/// Simple POCO for storing address data as JSON in SQL Server.
+/// Simple POCO for storing address data as JSON.
 /// </summary>
 public class AddressData
 {
@@ -38,7 +38,7 @@ public class AddressData
 }
 
 /// <summary>
-/// Simple POCO for storing group member data as JSON in SQL Server.
+/// Simple POCO for storing group member data as JSON.
 /// </summary>
 public class MemberData
 {
@@ -54,6 +54,7 @@ public static class MultiValuedAttributeHelper
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
         WriteIndented = false
     };
 

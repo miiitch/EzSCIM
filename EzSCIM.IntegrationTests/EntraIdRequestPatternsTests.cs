@@ -5,7 +5,6 @@ using EzSCIM.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using EzSCIM.Models;
 using Shouldly;
 using Xunit.Abstractions;
 
@@ -22,7 +21,7 @@ public class EntraIdRequestPatternsTests : IAsyncLifetime
     private readonly ScimWebApplicationFactory _factory;
     private readonly HttpClient _client;
     private readonly IServiceScope _scope;
-    private readonly ScimDbContext _context;
+    private readonly PostgreSqlScimDbContext _context;
     private readonly ITestOutputHelper _output;
     private IDbContextTransaction _transaction = null!;
 
@@ -35,7 +34,7 @@ public class EntraIdRequestPatternsTests : IAsyncLifetime
         _client = _factory.CreateClient();
         
         _scope = _factory.Services.CreateScope();
-        _context = _scope.ServiceProvider.GetRequiredService<ScimDbContext>();
+        _context = _scope.ServiceProvider.GetRequiredService<PostgreSqlScimDbContext>();
     }
 
     public async Task InitializeAsync()

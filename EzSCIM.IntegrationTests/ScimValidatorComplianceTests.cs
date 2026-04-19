@@ -29,7 +29,7 @@ public class ScimValidatorComplianceTests : IAsyncLifetime
     private readonly ScimWebApplicationFactory _factory;
     private readonly HttpClient _client;
     private readonly IServiceScope _scope;
-    private readonly ScimDbContext _context;
+    private readonly PostgreSqlScimDbContext _context;
     private readonly ITestOutputHelper _output;
     private IDbContextTransaction _transaction = null!;
 
@@ -47,7 +47,7 @@ public class ScimValidatorComplianceTests : IAsyncLifetime
         _output = output;
         _client = _factory.CreateClient();
         _scope = _factory.Services.CreateScope();
-        _context = _scope.ServiceProvider.GetRequiredService<ScimDbContext>();
+        _context = _scope.ServiceProvider.GetRequiredService<PostgreSqlScimDbContext>();
     }
 
     public async Task InitializeAsync()
@@ -1518,6 +1518,163 @@ public class ScimValidatorComplianceTests : IAsyncLifetime
         // Assert
         fetched.ShouldNotBeNull();
         fetched.DisplayName.ShouldBeNull("displayName should be null after remove operation");
+    }
+
+    #endregion
+
+    #region Failure: PATCH /Users/Id - Patch User Replace Attributes (run 07 - filtered + bulk)
+
+    /// <summary>
+    /// Regression test for SCIM Validator "PATCH /Users/Id" - "Patch User - Replace Attributes".
+    /// Source: docs/scim-test-results/PATCH _Users_Id_details.json
+    ///
+    /// The validator creates a user, then sends a single PATCH request with 9 operations:
+    ///   - Ops 1-8: replace with filtered paths (emails[primary eq true].value, etc.)
+    ///   - Op 9: replace without path (bulk scalar attributes using dotted name notation)
+    ///
+    /// After the PATCH, the validator performs a GET and expects all 8 filtered-path values
+    /// to be present. The errors reported are:
+    ///   - "The value of emails[primary eq true].value is Missing from the fetched Resource"
+    ///   - "The value of phoneNumbers[primary eq true].value is Missing from the fetched Resource"
+    ///   - "The value of addresses[primary eq true].formatted is Missing from the fetched Resource"
+    ///   - "The value of addresses[primary eq true].streetAddress is Missing from the fetched Resource"
+    ///   - "The value of addresses[primary eq true].locality is Missing from the fetched Resource"
+    ///   - "The value of addresses[primary eq true].region is Missing from the fetched Resource"
+    ///   - "The value of addresses[primary eq true].postalCode is Missing from the fetched Resource"
+    ///   - "The value of addresses[primary eq true].country is Missing from the fetched Resource"
+    ///
+    /// Root cause: Filtered path operations on multi-valued attributes combined with a
+    /// bulk replace (no path) for scalar attributes may not persist the multi-valued changes.
+    /// </summary>
+    [Fact]
+    public async Task PatchUser_ReplaceFilteredMultiValuedWithBulkScalars_Run07_ShouldPersistAll()
+    {
+        // Arrange: Create user with initial multi-valued attributes (matches validator POST)
+        var user = await CreateTestUserAsync();
+        _output.WriteLine($"[TEST RUN 07] Initial user created: {user.Id}");
+        _output.WriteLine($"  Email: {user.Emails.FirstOrDefault()?.Value}");
+        _output.WriteLine($"  Phone: {user.PhoneNumbers.FirstOrDefault()?.Value}");
+        _output.WriteLine($"  Address: {user.Addresses.FirstOrDefault()?.StreetAddress}");
+
+        // Build PATCH request matching exact validator scenario (9 operations)
+        var patchBody = new
+        {
+            schemas = new[] { "urn:ietf:params:scim:api:messages:2.0:PatchOp" },
+            Operations = new object[]
+            {
+                // Operations 1-8: Filtered path replacements on multi-valued attributes
+                new { op = "replace", path = "emails[primary eq true].value", value = "marques@hintz.name" },
+                new { op = "replace", path = "phoneNumbers[primary eq true].value", value = "58-036-1653" },
+                new { op = "replace", path = "addresses[primary eq true].formatted", value = "ULYSMNPMXOFJ" },
+                new { op = "replace", path = "addresses[primary eq true].streetAddress", value = "20838 Madisyn Station" },
+                new { op = "replace", path = "addresses[primary eq true].locality", value = "JEARZXJUDQBX" },
+                new { op = "replace", path = "addresses[primary eq true].region", value = "KMBYOLKJDNRI" },
+                new { op = "replace", path = "addresses[primary eq true].postalCode", value = "xb30 9dn" },
+                new { op = "replace", path = "addresses[primary eq true].country", value = "Switzerland" },
+
+                // Operation 9: Replace without path (bulk scalar attributes using dotted notation)
+                // NOTE: This operation does NOT include emails, phoneNumbers, or addresses
+                new {
+                    op = "replace",
+                    value = (object)new JsonObject
+                    {
+                        ["externalId"] = "3dde0ec3-cb34-47f7-8bd5-3c0e2fa2b54a",
+                        ["name.formatted"] = "Jailyn",
+                        ["name.familyName"] = "Lenora",
+                        ["name.givenName"] = "Eileen",
+                        ["name.middleName"] = "Jaydon",
+                        ["name.honorificPrefix"] = "Leone",
+                        ["name.honorificSuffix"] = "Noelia",
+                        ["displayName"] = "VMGRDOMSTBZW",
+                        ["nickName"] = "FQEAFPPACLAR",
+                        ["profileUrl"] = "QDGAPAWRMXRJ",
+                        ["title"] = "UBIESQLIXFJL",
+                        ["userType"] = "YLAXLLFSRLJH",
+                        ["preferredLanguage"] = "et",
+                        ["locale"] = "MRDSTVHXEUQC",
+                        ["timezone"] = "America/Goose_Bay",
+                        ["active"] = true,
+                    }
+                }
+            }
+        };
+
+        // Act: Send PATCH
+        var patchResponse = await SendPatchAsync($"/scim/Users/{user.Id}", patchBody);
+        var patchBody_str = await patchResponse.Content.ReadAsStringAsync();
+        _output.WriteLine($"[PATCH RESPONSE] {patchResponse.StatusCode}: {patchBody_str}");
+        patchResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        // Act: Send GET (exactly what the validator does after PATCH)
+        var getResponse = await _client.GetAsync($"/scim/Users/{user.Id}");
+        var getBody = await getResponse.Content.ReadAsStringAsync();
+        _output.WriteLine($"[GET RESPONSE] {getResponse.StatusCode}: {getBody}");
+        getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var fetchedUser = await getResponse.Content.ReadFromJsonAsync<ScimUser>(JsonOptions);
+        fetchedUser.ShouldNotBeNull();
+
+        // Assert: Verify filtered path operations (ops 1-8) are persisted after GET
+        _output.WriteLine("[VALIDATION] Checking multi-valued attributes from filtered path ops...");
+
+        // emails[primary eq true].value
+        fetchedUser.Emails.ShouldNotBeEmpty("Emails should not be empty after PATCH");
+        var primaryEmail = fetchedUser.Emails.FirstOrDefault(e => e.Primary);
+        primaryEmail.ShouldNotBeNull(
+            "Should have a primary email. " +
+            "VALIDATOR ERROR: 'The value of emails[primary eq true].value is Missing from the fetched Resource'");
+        primaryEmail.Value.ShouldBe("marques@hintz.name",
+            "emails[primary eq true].value should be updated to marques@hintz.name");
+        _output.WriteLine($"  ✓ emails[primary eq true].value = {primaryEmail.Value}");
+
+        // phoneNumbers[primary eq true].value
+        fetchedUser.PhoneNumbers.ShouldNotBeEmpty("PhoneNumbers should not be empty after PATCH");
+        var primaryPhone = fetchedUser.PhoneNumbers.FirstOrDefault(p => p.Primary);
+        primaryPhone.ShouldNotBeNull(
+            "Should have a primary phone number. " +
+            "VALIDATOR ERROR: 'The value of phoneNumbers[primary eq true].value is Missing from the fetched Resource'");
+        primaryPhone.Value.ShouldBe("58-036-1653",
+            "phoneNumbers[primary eq true].value should be updated to 58-036-1653");
+        _output.WriteLine($"  ✓ phoneNumbers[primary eq true].value = {primaryPhone.Value}");
+
+        // addresses[primary eq true].*
+        fetchedUser.Addresses.ShouldNotBeEmpty("Addresses should not be empty after PATCH");
+        var primaryAddr = fetchedUser.Addresses.FirstOrDefault(a => a.Primary);
+        primaryAddr.ShouldNotBeNull(
+            "Should have a primary address. " +
+            "VALIDATOR ERROR: 'The value of addresses[primary eq true].* is Missing from the fetched Resource'");
+        primaryAddr.Formatted.ShouldBe("ULYSMNPMXOFJ",
+            "addresses[primary eq true].formatted should be updated");
+        _output.WriteLine($"  ✓ addresses[primary eq true].formatted = {primaryAddr.Formatted}");
+        primaryAddr.StreetAddress.ShouldBe("20838 Madisyn Station",
+            "addresses[primary eq true].streetAddress should be updated");
+        _output.WriteLine($"  ✓ addresses[primary eq true].streetAddress = {primaryAddr.StreetAddress}");
+        primaryAddr.Locality.ShouldBe("JEARZXJUDQBX",
+            "addresses[primary eq true].locality should be updated");
+        _output.WriteLine($"  ✓ addresses[primary eq true].locality = {primaryAddr.Locality}");
+        primaryAddr.Region.ShouldBe("KMBYOLKJDNRI",
+            "addresses[primary eq true].region should be updated");
+        _output.WriteLine($"  ✓ addresses[primary eq true].region = {primaryAddr.Region}");
+        primaryAddr.PostalCode.ShouldBe("xb30 9dn",
+            "addresses[primary eq true].postalCode should be updated");
+        _output.WriteLine($"  ✓ addresses[primary eq true].postalCode = {primaryAddr.PostalCode}");
+        primaryAddr.Country.ShouldBe("Switzerland",
+            "addresses[primary eq true].country should be updated");
+        _output.WriteLine($"  ✓ addresses[primary eq true].country = {primaryAddr.Country}");
+
+        // Assert: Verify bulk replace scalar attributes (op 9)
+        _output.WriteLine("[VALIDATION] Checking scalar attributes from bulk replace...");
+        fetchedUser.ExternalId.ShouldBe("3dde0ec3-cb34-47f7-8bd5-3c0e2fa2b54a");
+        fetchedUser.DisplayName.ShouldBe("VMGRDOMSTBZW");
+        fetchedUser.NickName.ShouldBe("FQEAFPPACLAR");
+        fetchedUser.Name.ShouldNotBeNull();
+        fetchedUser.Name.Formatted.ShouldBe("Jailyn");
+        fetchedUser.Name.FamilyName.ShouldBe("Lenora");
+        fetchedUser.Name.GivenName.ShouldBe("Eileen");
+        fetchedUser.Name.MiddleName.ShouldBe("Jaydon");
+        fetchedUser.PreferredLanguage.ShouldBe("et");
+        fetchedUser.Timezone.ShouldBe("America/Goose_Bay");
+        _output.WriteLine($"  ✓ All scalar attributes from bulk replace verified");
     }
 
     #endregion

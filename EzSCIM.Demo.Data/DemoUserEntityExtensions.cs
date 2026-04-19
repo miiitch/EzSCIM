@@ -1,7 +1,7 @@
-using EzSCIM.EntraID.Demo.Data.Entities;
+using EzSCIM.Demo.Data.Entities;
 using EzSCIM.Models;
 
-namespace EzSCIM.EntraID.Demo.Data;
+namespace EzSCIM.Demo.Data;
 
 /// <summary>
 /// Extension methods to convert DemoUserEntity ↔ ScimUser.

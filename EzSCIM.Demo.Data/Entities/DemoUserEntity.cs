@@ -2,13 +2,13 @@ using EzSCIM.Attributes;
 using EzSCIM.Constants;
 using EzSCIM.EfCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EzSCIM.EntraID.Demo.Data.Entities;
+namespace EzSCIM.Demo.Data.Entities;
 
 /// <summary>
-/// EF entity for SCIM Users stored in SQL Server (Azure SQL or local container).
-/// Multi-valued attributes (emails, phones, addresses) are stored as JSON in nvarchar(max) columns.
+/// EF entity for SCIM Users. Provider-agnostic — column types are configured
+/// by the provider-specific DbContext subclass (SQL Server, PostgreSQL, etc.).
+/// Multi-valued attributes (emails, phones, addresses) are stored as JSON.
 /// </summary>
 public class DemoUserEntity : IScimEntity
 {
@@ -43,14 +43,11 @@ public class DemoUserEntity : IScimEntity
     [ScimProperty("name.honorificSuffix", "string")]
     public string? NameHonorificSuffix { get; set; }
 
-    // Multi-valued attributes stored as JSON (nvarchar(max) for SQL Server / Azure SQL)
-    [Column(TypeName = "nvarchar(max)")]
+    // Multi-valued attributes stored as JSON (column type set by provider-specific DbContext)
     public string? EmailsJson { get; set; }
 
-    [Column(TypeName = "nvarchar(max)")]
     public string? PhoneNumbersJson { get; set; }
 
-    [Column(TypeName = "nvarchar(max)")]
     public string? AddressesJson { get; set; }
 
     [ScimProperty(ScimAttributeNames.User.Title, "string")]

@@ -1,5 +1,5 @@
 using EzSCIM.DataRepositories;
-using EzSCIM.EntraID.Demo.Data.Entities;
+using EzSCIM.Demo.Data.Entities;
 using EzSCIM.Filtering;
 using EzSCIM.Filtering.AST;
 using EzSCIM.Models;
@@ -7,13 +7,13 @@ using EzSCIM.Repositories;
 using EzSCIM.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace EzSCIM.EntraID.Demo.Data;
+namespace EzSCIM.Demo.Data;
 
 /// <summary>
-/// SCIM repository for the demo app backed by SQL Server / Azure SQL.
+/// SCIM repository backed by EF Core.
 /// Uses <see cref="IUserGroupDataRepository{TUser,TGroup}"/> for raw EF CRUD and entity
 /// extension methods to handle JSON multi-valued attributes (emails, phones, addresses, members).
-/// This is the main <see cref="IScimRepository"/> registered in DI.
+/// This is the main <see cref="IScimRepository"/> implementation for demo applications.
 /// </summary>
 public class DemoScimRepository : IScimRepository
 {

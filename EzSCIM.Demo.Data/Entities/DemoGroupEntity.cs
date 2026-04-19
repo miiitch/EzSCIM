@@ -2,13 +2,13 @@ using EzSCIM.Attributes;
 using EzSCIM.Constants;
 using EzSCIM.EfCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EzSCIM.EntraID.Demo.Data.Entities;
+namespace EzSCIM.Demo.Data.Entities;
 
 /// <summary>
-/// EF entity for SCIM Groups stored in SQL Server (Azure SQL or local container).
-/// Members are stored as JSON in a nvarchar(max) column.
+/// EF entity for SCIM Groups. Provider-agnostic — column types are configured
+/// by the provider-specific DbContext subclass (SQL Server, PostgreSQL, etc.).
+/// Members are stored as JSON.
 /// </summary>
 public class DemoGroupEntity : IScimEntity
 {
@@ -22,8 +22,7 @@ public class DemoGroupEntity : IScimEntity
     [ScimProperty(ScimAttributeNames.Common.ExternalId, "string")]
     public string? ExternalId { get; set; }
 
-    // Members stored as JSON (nvarchar(max) for SQL Server / Azure SQL)
-    [Column(TypeName = "nvarchar(max)")]
+    // Members stored as JSON (column type set by provider-specific DbContext)
     public string? MembersJson { get; set; }
 
     [ScimProperty("description", "string")]

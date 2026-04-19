@@ -27,6 +27,7 @@
       <ProjectReference Include="..\EzSCIM.ServiceDefaults\EzSCIM.ServiceDefaults.csproj" />
       <ProjectReference Include="..\EzSCIM\EzSCIM.csproj" />
       <ProjectReference Include="..\EzSCIM.EfCore\EzSCIM.EfCore.csproj" />
+      <ProjectReference Include="..\EzSCIM.Demo.Data\EzSCIM.Demo.Data.csproj" />
     </ItemGroup>
 
 </Project>
