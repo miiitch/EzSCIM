@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Library</OutputType>
+        <IsPackable>true</IsPackable>
+        <PackageId>EzSCIM</PackageId>
+        <Title>EzSCIM</Title>
+        <Authors>EzSCIM Contributors</Authors>
+        <Description>SCIM 2.0 server implementation for ASP.NET Core with flexible repository integration.</Description>
+        <PackageTags>scim;aspnetcore;identity;entra;provisioning</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/miiitch/scimwork</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/miiitch/scimwork</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>EzSCIM.png</PackageIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ErrorOr" Version="2.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\docs\public\README.md" Pack="true" PackagePath="README.md" />
+        <None Include="..\EzSCIM.png" Pack="true" PackagePath="EzSCIM.png" />
+    </ItemGroup>
+
+</Project>
