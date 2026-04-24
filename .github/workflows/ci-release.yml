@@ -45,6 +45,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     needs: build_test
     runs-on: ubuntu-latest
+    environment: nuget-release
 
     steps:
       - name: Checkout

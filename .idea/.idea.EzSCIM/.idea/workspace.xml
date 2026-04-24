@@ -11,9 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c6b5a524-0ac6-43d1-a49d-12ca9d30ff23" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/ci-release.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EzSCIM.EfCore/EzSCIM.EfCore.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/EzSCIM.EfCore/EzSCIM.EfCore.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EzSCIM/EzSCIM.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/EzSCIM/EzSCIM.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/ci-release.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/ci-release.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.EzSCIM/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.EzSCIM/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +58,9 @@
     <setting file="file://$PROJECT_DIR$/EzSCIM.IntegrationTests/Data/PostgreSqlScimDbContext.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="Toolset" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -82,7 +84,7 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/refactoring&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -186,6 +188,8 @@
       <workItem from="1776521131273" duration="8863000" />
       <workItem from="1776631198346" duration="448000" />
       <workItem from="1777058730860" duration="5062000" />
+      <workItem from="1777067010010" duration="25000" />
+      <workItem from="1777067150139" duration="780000" />
     </task>
     <task id="LOCAL-00001" summary="refactoruing">
       <option name="closed" value="true" />
