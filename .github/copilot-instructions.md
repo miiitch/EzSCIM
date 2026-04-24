@@ -1,4 +1,4 @@
-﻿﻿﻿# Global Instructions for EzSCIM Repository
+﻿﻿# Global Instructions for EzSCIM Repository
 
 This document outlines the global coding and documentation standards for this repository.
 
@@ -211,16 +211,20 @@ _logger.LogError(ex, "Unexpected error processing request {RequestId}", requestI
 scimwork/
 ├── .github/                    # GitHub configuration and workflows
 │   └── copilot-instructions.md
-├── docs/                       # Documentation (organized by theme)
-│   ├── README.md              # Documentation index and guide
-│   ├── auth/                  # Authentication & Security
-│   ├── filters/               # SCIM Filtering system
-│   ├── guides/                # General guides and tutorials
-│   ├── migration/             # Repository integration & migration
-│   ├── schema/                # Schema system documentation
-│   ├── tests/                 # Testing documentation
-│   ├── status/                # Status reports and summaries
-│   ├── issues/                # Bug reports and known issues
+├── docs/                       # Documentation
+│   ├── README.md              # Entry point → public/ or internal/
+│   ├── public/                # NuGet package user documentation
+│   │   ├── README.md          # Choose IQueryable or EF Core model
+│   │   ├── authentication.md  # JWT setup (both models)
+│   │   ├── iqueryable/        # Model 1: any data source via IQueryable
+│   │   └── efcore/            # Model 2: EF Core / DbContext
+│   ├── internal/              # Contributor documentation
+│   │   ├── architecture.md    # Multi-provider DbContext, request flow
+│   │   ├── development-setup.md
+│   │   ├── testing.md         # Testcontainers, xUnit collections
+│   │   ├── scim-validator.md  # Validator runs, known issues
+│   │   └── issues/            # Known bugs
+│   ├── scim-test-results/     # Raw SCIM validator JSON exports
 │   └── archive/               # Historical/completed documentation
 ├── EzSCIM/                    # Core SCIM library (controllers, models, services)
 │   ├── Controllers/
@@ -252,64 +256,54 @@ scimwork/
 
 ## Documentation Organization
 
+The `docs/` directory is split into two audiences:
+
+- **`docs/public/`** — NuGet package user documentation (IQueryable path, EF Core path, authentication, SCIM attributes, schema extensions)
+- **`docs/internal/`** — Contributor documentation (architecture, development setup, testing, SCIM validator)
+- **`docs/archive/`** — Historical/completed documentation (not maintained)
+
 ### File Placement Rules
 
-**All new Markdown documentation files must be placed in `docs/<theme>/` directory, NOT at repository root.**
-
-Theme categories:
-- `docs/auth/` - Authentication, security, JWT configuration
-- `docs/filters/` - SCIM filter system documentation
-- `docs/guides/` - Getting started, tutorials, how-to guides
-- `docs/migration/` - Repository integration, data migration
-- `docs/schema/` - Schema system, extensions, models
-- `docs/tests/` - Testing guides, test documentation
-- `docs/status/` - Status reports, completion reports, summaries
-- `docs/archive/` - Historical/completed documentation
-
-### Naming Convention
-
-File naming pattern: `<topic>-<context>.md` (lowercase with hyphens)
-
-Examples:
-- `docs/auth/jwt-service-quick-fix.md`
-- `docs/filters/implementation-guide.md`
-- `docs/guides/development-setup.md`
-- `docs/migration/quick-start-repository.md`
+| Audience | Location |
+|---|---|
+| NuGet package users | `docs/public/iqueryable/` or `docs/public/efcore/` or `docs/public/` |
+| Authentication (both models) | `docs/public/authentication.md` |
+| Contributors / maintainers | `docs/internal/` |
+| Known bugs | `docs/internal/issues/` |
+| Historical / obsolete | `docs/archive/` |
 
 ### Creating New Documentation
 
 When creating new Markdown files:
 
-1. **Choose the appropriate `docs/<theme>/` folder**
+1. **Determine the audience** — package user (`docs/public/`) or contributor (`docs/internal/`)
 2. **Use lowercase filenames with hyphens** (e.g., `my-new-guide.md`)
 3. **Write in English only** (no French or other languages)
 4. **Include a clear title/header** at the top
 5. **Update `docs/README.md`** to include a reference to the new file
-6. **Use relative paths** for internal links (e.g., `./other-file.md` or `../../main-readme.md`)
-7. **No content duplication** - consolidate related information instead of duplicating files
+6. **Use relative paths** for internal links
+7. **No content duplication** — consolidate related information instead of duplicating files
 
 ### Link Format Standards
 
-Internal links must use relative paths:
-
 ```markdown
 # ✅ Correct
-See [Quick Start](./quickstart.md)
-See [Authentication](../auth/setup.md)
+See [EF Core setup](./efcore/getting-started.md)
+See [Authentication](../authentication.md)
 
-# ❌ Incorrect (do not use absolute paths or root references)
-See [Quick Start](../guides/quickstart.md)
+# ❌ Incorrect
+See [Setup](/docs/public/efcore/getting-started.md)
 ```
 
 ### Documentation Quality Checklist
 
-- [ ] File is in correct `docs/<theme>/` folder
+- [ ] File is in `docs/public/` (user-facing) or `docs/internal/` (contributor)
 - [ ] Filename uses lowercase with hyphens
-- [ ] Language is 100% English (no French, no code comments in French)
+- [ ] Language is 100% English
 - [ ] Includes clear title and structure
 - [ ] All internal links are relative paths
 - [ ] File is referenced in `docs/README.md`
-- [ ] No duplicate content from other documentation files
+- [ ] No duplicate content
 - [ ] Follows Microsoft writing style (clear, concise, technical)
 
 ## Breaking Changes
@@ -332,16 +326,16 @@ See [Quick Start](../guides/quickstart.md)
 
 ---
 
-**Last Updated**: April 19, 2026  
-**Version**: 1.2  
+**Last Updated**: April 24, 2026  
+**Version**: 1.3  
 **Notable Changes**: 
 - Added `EzSCIM.Demo.Data` shared library (provider-agnostic data layer)
 - Added `EzSCIM.EfCore` abstraction library
 - Multi-provider DbContext architecture (ScimDbContextBase → SQL Server / PostgreSQL)
 - Integration tests now use PostgreSqlScimDbContext via Testcontainers
 - Removed duplicated data layer from EzSCIM.IntegrationTests (~700 lines eliminated)
-- Added `docs/` directory structure for organized documentation
-- Established documentation naming conventions and file placement rules
-- Added documentation quality checklist for new files
-- Enforced relative path linking standards
-- Clarified English-only language requirement for documentation
+- Restructured `docs/` into `docs/public/` (NuGet users) and `docs/internal/` (contributors)
+- Two integration paths documented: IQueryable and EF Core
+- Authentication documented as a standalone section
+- SCIM 2.0 attribute reference added as public doc
+- Old `docs/status/`, `docs/auth/`, `docs/filters/` etc. archived
