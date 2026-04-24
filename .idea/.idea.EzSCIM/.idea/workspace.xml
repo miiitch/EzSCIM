@@ -11,112 +11,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c6b5a524-0ac6-43d1-a49d-12ca9d30ff23" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/docs/internal/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/internal/architecture.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/internal/development-setup.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/internal/scim-validator.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/internal/testing.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/authentication.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/efcore/efrepositorybase.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/efcore/getting-started.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/efcore/iscimentity.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/efcore/multi-provider.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/iqueryable/filtering.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/iqueryable/getting-started.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/iqueryable/repository.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/iqueryable/schema-extensions.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public/iqueryable/scim-attributes.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/copilot-instructions.md" beforeDir="false" afterPath="$PROJECT_DIR$/.github/copilot-instructions.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/auth/index.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/auth/jwt-di-resolution.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/auth/jwt-service-quick-fix.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/auth/pre-production-checklist.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/auth/setup.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/error-handling.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/examples.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/implementation-guide.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/nested-filters.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/overview.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/parser.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/reference.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/url-encoding.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/value-types-quick-reference.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/filters/value-types.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/development-setup.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/next-tasks-checklist.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/next-tasks.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/powershell-scripts.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/provider-modes.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/quickstart.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/useful-commands.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guides/visual-separation.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/issues/scim-validator-bug-patch-replace-attributes.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/groups-and-constants-extension.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/interface-separation.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/mapping-readme.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/quick-start-repository.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/repository-adapter-guide.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/repository-mapping-index.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/migration/repository-mapping-overview.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/schema/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/schema/expected-actual-pattern.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/schema/extension-guide.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/schema/models-required-optional.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/schema/scim-validator-fix.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/schema/system-overview.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/schema/testing-scim-schema-validation.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/ACTION-PLAN-FIX-SCIM-ERRORS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/CODE-CHANGES-SUMMARY.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/IMPLEMENTATION-COMPLETE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/IMPLEMENTATION-PROGRESS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/IMPLEMENTATION-RUN06-FR.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/INDEX.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/README-IMPLEMENTATION.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/SCIM-ERRORS-SUMMARY.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/SCIM-VALIDATOR-ERRORS-ANALYSIS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/april-2026-integration-fix.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/completion-report.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/delivery-manifest.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/documentation-migration.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/github-copilot-skill-complete.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/implementation-status.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/jwt-extension-delivery.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/migration-complete.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/migration-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/migration-verification.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/patch-group-filter-fix-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/patch-implementation-complete.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/phase-4-completion.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-results-05-fix-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-complete-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-fix-implementation-fr.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-fix-implementation.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-index.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-patch-error-analysis.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-quickref.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-test-fixes.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-run06-tests-implementation.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-tests-multivalued-fix.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/scim-validator-tests-failures.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/session-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/test-fixes-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/tests-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/today-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/status/userentity-multivalued-migration.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/base-classes-summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/base-classes-tests.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/entra-integration.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/filter-error-tests.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/filter-tests.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/integration-xunit-fixture-fix.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/tests/test-suite-update.md" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/ci-release.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzSCIM.EfCore/EzSCIM.EfCore.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/EzSCIM.EfCore/EzSCIM.EfCore.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EzSCIM/EzSCIM.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/EzSCIM/EzSCIM.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -288,7 +185,7 @@
       <workItem from="1776513566365" duration="3315000" />
       <workItem from="1776521131273" duration="8863000" />
       <workItem from="1776631198346" duration="448000" />
-      <workItem from="1777058730860" duration="3005000" />
+      <workItem from="1777058730860" duration="5062000" />
     </task>
     <task id="LOCAL-00001" summary="refactoruing">
       <option name="closed" value="true" />
@@ -362,7 +259,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777058991457</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Doc update">
+      <option name="closed" value="true" />
+      <created>1777061753502</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1777061753502</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -388,7 +293,8 @@
     <MESSAGE value="add generic EF Core repository for SCIM user and group management" />
     <MESSAGE value="docs" />
     <MESSAGE value="WIP" />
-    <option name="LAST_COMMIT_MESSAGE" value="WIP" />
+    <MESSAGE value="Doc update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Doc update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

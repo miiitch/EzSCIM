@@ -1,0 +1,106 @@
+name: CI and NuGet Publish
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
+      - "[0-9]*"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  build_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore EzSCIM.sln
+
+      - name: Build
+        run: dotnet build EzSCIM.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test EzSCIM.sln --configuration Release --no-build --verbosity normal
+
+  pack_publish:
+    name: Pack and Publish NuGet Packages
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build_test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve package version from tag
+        id: version
+        shell: bash
+        run: |
+          RAW_TAG="${GITHUB_REF_NAME}"
+          VERSION="${RAW_TAG#v}"
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z\.-]+)?$ ]]; then
+            echo "Tag '$RAW_TAG' does not match expected version format (vX.Y.Z or X.Y.Z, optional prerelease)."
+            exit 1
+          fi
+
+          echo "package_version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore EzSCIM.sln
+
+      - name: Pack EzSCIM
+        run: |
+          dotnet pack EzSCIM/EzSCIM.csproj \
+            --configuration Release \
+            --no-restore \
+            --output ./artifacts \
+            /p:PackageVersion=${{ steps.version.outputs.package_version }} \
+            /p:Version=${{ steps.version.outputs.package_version }}
+
+      - name: Pack EzSCIM.EfCore
+        run: |
+          dotnet pack EzSCIM.EfCore/EzSCIM.EfCore.csproj \
+            --configuration Release \
+            --no-restore \
+            --output ./artifacts \
+            /p:PackageVersion=${{ steps.version.outputs.package_version }} \
+            /p:Version=${{ steps.version.outputs.package_version }}
+
+      - name: Publish packages to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "./artifacts/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+          dotnet nuget push "./artifacts/*.snupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+

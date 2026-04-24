@@ -8,7 +8,20 @@
         <IsPackable>true</IsPackable>
         <RootNamespace>EzSCIM.EfCore</RootNamespace>
         <AssemblyName>EzSCIM.EfCore</AssemblyName>
+        <PackageId>EzSCIM.EfCore</PackageId>
+        <Title>EzSCIM.EfCore</Title>
+        <Authors>EzSCIM Contributors</Authors>
         <Description>Entity Framework Core integration for EzSCIM — provides a generic base repository for SCIM-compatible EF DbContexts.</Description>
+        <PackageTags>scim;aspnetcore;efcore;identity;entra;provisioning</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/miiitch/scimwork</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/miiitch/scimwork</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>EzSCIM.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,6 +30,11 @@
 
     <ItemGroup>
         <ProjectReference Include="..\EzSCIM\EzSCIM.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\docs\public\README.md" Pack="true" PackagePath="README.md" />
+        <None Include="..\EzSCIM.png" Pack="true" PackagePath="EzSCIM.png" />
     </ItemGroup>
 
 </Project>
