@@ -1,0 +1,49 @@
+name: Apply GitHub Labels
+
+on:
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  apply-labels:
+    name: Apply labels from labels.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'EOF'
+          import subprocess, json, sys
+
+          try:
+              import yaml
+          except ImportError:
+              subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyyaml', '-q'])
+              import yaml
+
+          with open('.github/labels.yml') as f:
+              config = yaml.safe_load(f)
+
+          for label in config['labels']:
+              name = label['name']
+              color = label['color'].lstrip('#')
+              description = label.get('description', '')
+
+              result = subprocess.run(
+                  ['gh', 'label', 'create', name,
+                   '--color', color,
+                   '--description', description,
+                   '--force'],
+                  capture_output=True, text=True
+              )
+              if result.returncode == 0:
+                  print(f"✅ {name}")
+              else:
+                  print(f"⚠️  {name}: {result.stderr.strip()}")
+          EOF

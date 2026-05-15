@@ -75,7 +75,7 @@ jobs:
 
       - name: Pack EzSCIM
         run: |
-          dotnet pack EzSCIM/EzSCIM.csproj \
+          dotnet pack src/EzSCIM/EzSCIM.csproj \
             --configuration Release \
             --no-restore \
             --output ./artifacts \
@@ -84,7 +84,7 @@ jobs:
 
       - name: Pack EzSCIM.EfCore
         run: |
-          dotnet pack EzSCIM.EfCore/EzSCIM.EfCore.csproj \
+          dotnet pack src/EzSCIM.EfCore/EzSCIM.EfCore.csproj \
             --configuration Release \
             --no-restore \
             --output ./artifacts \

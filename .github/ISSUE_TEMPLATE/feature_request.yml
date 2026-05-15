@@ -1,0 +1,48 @@
+name: Feature Request
+description: Suggest a new feature or improvement for EzSCIM
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement! Please describe your use case clearly.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: Describe the problem or use case that motivates this feature.
+      placeholder: I need to ... because ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or change you'd like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative solutions or workarounds you've considered?
+
+  - type: dropdown
+    id: integration-model
+    attributes:
+      label: Relevant integration model
+      options:
+        - IQueryable (EzSCIM only)
+        - EF Core (EzSCIM + EzSCIM.EfCore)
+        - Both
+        - Not applicable
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other relevant information or examples.

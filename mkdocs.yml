@@ -1,0 +1,62 @@
+site_name: EzSCIM
+site_description: SCIM 2.0 server implementation for ASP.NET Core
+site_url: https://miiitch.github.io/EzSCIM
+repo_url: https://github.com/miiitch/EzSCIM
+repo_name: miiitch/EzSCIM
+edit_uri: edit/master/docs/public/
+
+docs_dir: docs/public
+
+theme:
+  name: material
+  logo: https://raw.githubusercontent.com/miiitch/EzSCIM/master/EzSCIM.png
+  favicon: https://raw.githubusercontent.com/miiitch/EzSCIM/master/EzSCIM.png
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: README.md
+  - IQueryable model:
+    - Getting started: iqueryable/getting-started.md
+    - Repository interface: iqueryable/repository.md
+    - SCIM filter syntax: iqueryable/filtering.md
+    - Schema extensions: iqueryable/schema-extensions.md
+    - SCIM 2.0 attribute reference: iqueryable/scim-attributes.md
+  - EF Core model:
+    - Getting started: efcore/getting-started.md
+    - IScimEntity interface: efcore/iscimentity.md
+    - EfScimRepositoryBase reference: efcore/efrepositorybase.md
+    - Multi-provider setup: efcore/multi-provider.md
+  - Authentication: authentication.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true

@@ -1,0 +1,79 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in EzSCIM
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please fill in the details below to help us diagnose the issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+      placeholder: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Step-by-step instructions to reproduce the bug.
+      placeholder: |
+        1. Configure EzSCIM with ...
+        2. Send request ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened? Include error messages or logs if applicable.
+    validations:
+      required: true
+
+  - type: input
+    id: ezscim-version
+    attributes:
+      label: EzSCIM version
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET version
+      placeholder: e.g. net10.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: integration-model
+    attributes:
+      label: Integration model
+      options:
+        - IQueryable (EzSCIM only)
+        - EF Core (EzSCIM + EzSCIM.EfCore)
+        - Both / Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other relevant information (identity provider, configuration, etc.)
