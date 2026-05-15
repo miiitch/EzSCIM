@@ -82,6 +82,18 @@ This repository ships an **Agent Skill** that guides you through integrating EzS
 gh skill install miiitch/EzSCIM ezscim
 ```
 
+### Publish a new release (maintainers)
+
+Use `gh skill publish` — it validates the skill against the spec, adds the `agent-skills` repo topic, creates the tag and the GitHub Release, then triggers the CI which publishes NuGet packages and attaches the skill zip to the release.
+
+```bash
+# Validate only (no publish)
+gh skill publish --dry-run
+
+# Publish a new version
+gh skill publish --tag v1.2.3
+```
+
 ### Manual install — per repository
 
 Copy `skills/ezscim/` into your project:
