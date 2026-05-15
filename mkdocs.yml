@@ -10,8 +10,8 @@ docs_dir: docs/public
 
 theme:
   name: material
-  logo: https://raw.githubusercontent.com/miiitch/EzSCIM/master/EzSCIM.png
-  favicon: https://raw.githubusercontent.com/miiitch/EzSCIM/master/EzSCIM.png
+  logo: EzSCIM.png
+  favicon: EzSCIM.png
   palette:
     - scheme: default
       primary: indigo
