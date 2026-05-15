@@ -108,7 +108,7 @@ jobs:
   release_skill:
     name: Package and Release Skill
     if: startsWith(github.ref, 'refs/tags/')
-    needs: build_test
+    needs: pack_publish
     runs-on: ubuntu-latest
     permissions:
       contents: write
