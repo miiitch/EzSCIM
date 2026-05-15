@@ -29,7 +29,6 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - navigation.tabs
-    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
     - navigation.path
@@ -46,17 +45,19 @@ theme:
 
 nav:
   - Home: README.md
-  - IQueryable model:
-    - Getting started: iqueryable/getting-started.md
-    - Repository interface: iqueryable/repository.md
-    - SCIM filter syntax: iqueryable/filtering.md
-    - Schema extensions: iqueryable/schema-extensions.md
-    - SCIM 2.0 attribute reference: iqueryable/scim-attributes.md
-  - EF Core model:
-    - Getting started: efcore/getting-started.md
-    - IScimEntity interface: efcore/iscimentity.md
-    - EfScimRepositoryBase reference: efcore/efrepositorybase.md
-    - Multi-provider setup: efcore/multi-provider.md
+  - Getting Started:
+    - IQueryable model: iqueryable/getting-started.md
+    - EF Core model: efcore/getting-started.md
+  - Reference:
+    - IQueryable:
+      - Repository interface: iqueryable/repository.md
+      - SCIM filter syntax: iqueryable/filtering.md
+      - Schema extensions: iqueryable/schema-extensions.md
+      - SCIM 2.0 attribute reference: iqueryable/scim-attributes.md
+    - EF Core:
+      - IScimEntity interface: efcore/iscimentity.md
+      - EfScimRepositoryBase reference: efcore/efrepositorybase.md
+      - Multi-provider setup: efcore/multi-provider.md
   - Authentication: authentication.md
 
 plugins:
