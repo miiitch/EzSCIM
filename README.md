@@ -71,6 +71,40 @@ public class MyRepository : EfScimRepositoryBase<MyUser, MyGroup, MyDbContext>
 | Architecture (contributors) | [docs/internal/architecture.md](docs/internal/architecture.md) |
 | Changelog | [CHANGELOG.md](CHANGELOG.md) |
 
+## Copilot Skill
+
+This repository ships an **Agent Skill** that guides you through integrating EzSCIM step-by-step
+(choose model, generate boilerplate, configure auth).
+
+### Install via `gh`
+
+```bash
+gh skill install miiitch/EzSCIM ezscim
+```
+
+### Manual install — per repository
+
+Copy `skills/ezscim/` into your project:
+
+```
+<your-repo>/
+  .github/
+    copilot/
+      skills/
+        ezscim/
+```
+
+### Manual install — per user (all workspaces)
+
+| OS | Path |
+|----|------|
+| Windows | `%USERPROFILE%\.agents\skills\ezscim\` |
+| macOS / Linux | `~/.agents/skills/ezscim/` |
+
+Once installed, activate the skill by asking Copilot to set up EzSCIM or add SCIM provisioning.
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please read the [contributor guide](docs/internal/README.md) before submitting a PR.
