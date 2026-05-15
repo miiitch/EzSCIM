@@ -80,5 +80,49 @@ JWT Bearer token authentication — applies to **both** models.
 
 ---
 
+## 🤖 Copilot Skill
+
+The repository ships a **GitHub Copilot Agent Skill** that guides you through the full EzSCIM setup interactively — no need to read the docs first.
+
+### Install
+
+```bash
+gh skill install miiitch/EzSCIM ezscim
+```
+
+### Usage
+
+Open GitHub Copilot Chat and describe what you want to do, mentioning your stack:
+
+> *"Set up EzSCIM in my ASP.NET Core project using EF Core and SQL Server"*
+
+or just:
+
+> *"Add SCIM provisioning to my app"*
+
+The skill will ask you four questions before writing any code:
+
+| # | Question | Options |
+|---|----------|---------|
+| 1 | Integration model? | **IQueryable** (Dapper, Cosmos DB, custom…) or **EF Core** |
+| 2 | Group support needed? | Yes / No |
+| 3 | Database / ORM in use? | Free text — e.g. `"EF Core + PostgreSQL"` |
+| 4 | Add JWT Bearer authentication? | Yes / No |
+
+It then generates all the boilerplate: entity, repository, `Program.cs` DI registration, and `appsettings.json` JWT configuration.
+
+### Manual install
+
+**Per repository** — copy `skills/ezscim/` into your project under `.github/copilot/skills/ezscim/`.
+
+**Per user (all workspaces)**:
+
+| OS | Path |
+|----|------|
+| Windows | `%USERPROFILE%\.agents\skills\ezscim\` |
+| macOS / Linux | `~/.agents/skills/ezscim/` |
+
+---
+
 **Last Updated**: May 2026
 

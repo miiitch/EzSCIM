@@ -13,7 +13,7 @@
 | 🔐 [Authentication](./public/authentication.md) | JWT Bearer token setup, Entra ID configuration |
 | 📋 [SCIM 2.0 attribute reference](./public/iqueryable/scim-attributes.md) | All standard User / Group attributes |
 | 🧭 [Entra ID required SCIM fields](./public/iqueryable/scim-attributes.md#microsoft-entra-id-required-scim-fields) | Minimum attributes, model example, validator links |
-| 🔍 [SCIM filter syntax](./public/iqueryable/filtering.md) | Operators, examples, URL encoding |
+| 🤖 [Copilot Skill](./public/README.md#-copilot-skill) | Install the Agent Skill to get guided setup via Copilot Chat |
 | 🧩 [Schema extensions](./public/iqueryable/schema-extensions.md) | `[ScimProperty]`, custom schemas |
 
 ---

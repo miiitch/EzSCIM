@@ -73,14 +73,58 @@ public class MyRepository : EfScimRepositoryBase<MyUser, MyGroup, MyDbContext>
 
 ## Copilot Skill
 
-This repository ships an **Agent Skill** that guides you through integrating EzSCIM step-by-step
-(choose model, generate boilerplate, configure auth).
+This repository ships an **Agent Skill** that guides you through integrating EzSCIM step-by-step:
+choose your integration model, answer four quick questions, and get ready-to-use boilerplate for your entity, repository, DI registration, and JWT authentication.
 
 ### Install via `gh`
 
 ```bash
 gh skill install miiitch/EzSCIM ezscim
 ```
+
+### Usage
+
+After installing, open GitHub Copilot Chat and ask it to set up EzSCIM, describing your stack:
+
+> *"Set up EzSCIM in my ASP.NET Core project using EF Core and SQL Server"*
+
+or simply:
+
+> *"Add SCIM provisioning to my app"*
+
+The skill will ask four questions before generating any code:
+
+| # | Question | Options |
+|---|----------|---------|
+| 1 | Integration model? | **IQueryable** (Dapper, Cosmos DB, custom…) or **EF Core** |
+| 2 | Group support needed? | Yes / No |
+| 3 | Database / ORM in use? | Free text — e.g. "EF Core + PostgreSQL" |
+| 4 | Add JWT Bearer authentication? | Yes / No |
+
+Based on your answers it generates:
+- Entity class annotated with `[ScimProperty]` (IQueryable) or implementing `IScimEntity` (EF Core)
+- Repository class (`IUserGroupDataRepository` or `EfScimRepositoryBase`)
+- `Program.cs` DI registration
+- `appsettings.json` JWT configuration (if auth requested)
+
+### Install — per repository (manual)
+
+Copy `skills/ezscim/` into your project:
+
+```
+<your-repo>/
+  .github/
+    copilot/
+      skills/
+        ezscim/
+```
+
+### Install — per user (all workspaces, manual)
+
+| OS | Path |
+|----|------|
+| Windows | `%USERPROFILE%\.agents\skills\ezscim\` |
+| macOS / Linux | `~/.agents/skills/ezscim/` |
 
 ### Publish a new release (maintainers)
 
@@ -93,27 +137,6 @@ gh skill publish --dry-run
 # Publish a new version
 gh skill publish --tag v1.2.3
 ```
-
-### Manual install — per repository
-
-Copy `skills/ezscim/` into your project:
-
-```
-<your-repo>/
-  .github/
-    copilot/
-      skills/
-        ezscim/
-```
-
-### Manual install — per user (all workspaces)
-
-| OS | Path |
-|----|------|
-| Windows | `%USERPROFILE%\.agents\skills\ezscim\` |
-| macOS / Linux | `~/.agents/skills/ezscim/` |
-
-Once installed, activate the skill by asking Copilot to set up EzSCIM or add SCIM provisioning.
 
 ---
 
