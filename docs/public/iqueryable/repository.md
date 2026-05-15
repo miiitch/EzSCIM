@@ -105,40 +105,40 @@ Register this in DI and the controllers resolve it automatically.
 
 ## DI registration patterns
 
-### Pattern A — Users only
+!!! tip "Pattern B is recommended for most applications"
 
-```csharp
-builder.Services.AddScoped<IUserDataRepository<MyUser>, MyUserRepository>();
-builder.Services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
-builder.Services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
-    new ScimUserRepositoryAdapter<MyUser>(
-        sp.GetRequiredService<IUserDataRepository<MyUser>>(),
-        sp.GetRequiredService<IScimFilterTranslator<MyUser>>()));
-```
+=== "Pattern A — Users only"
 
-### Pattern B — Users + Groups (recommended)
+    ```csharp
+    builder.Services.AddScoped<IUserDataRepository<MyUser>, MyUserRepository>();
+    builder.Services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
+    builder.Services.AddScoped<IScimUserOnlyRepository<ScimUser>>(sp =>
+        new ScimUserRepositoryAdapter<MyUser>(
+            sp.GetRequiredService<IUserDataRepository<MyUser>>(),
+            sp.GetRequiredService<IScimFilterTranslator<MyUser>>()));
+    ```
 
-```csharp
-builder.Services.AddScoped<IUserGroupDataRepository<MyUser, MyGroup>, MyRepository>();
-builder.Services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
-builder.Services.AddScoped<IScimFilterTranslator<MyGroup>, GenericScimFilterTranslator<MyGroup>>();
-builder.Services.AddScoped<IScimRepository, MyScimRepository>();
-```
+=== "Pattern B — Users + Groups (recommended)"
 
-### Pattern C — Direct IScimRepository implementation
+    ```csharp
+    builder.Services.AddScoped<IUserGroupDataRepository<MyUser, MyGroup>, MyRepository>();
+    builder.Services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
+    builder.Services.AddScoped<IScimFilterTranslator<MyGroup>, GenericScimFilterTranslator<MyGroup>>();
+    builder.Services.AddScoped<IScimRepository, MyScimRepository>();
+    ```
 
-If you prefer to implement `IScimRepository` directly instead of using adapters:
+=== "Pattern C — Direct IScimRepository"
 
-```csharp
-public class MyScimRepository : IScimRepository
-{
-    public Task<ScimUser?> GetUserAsync(string id) { ... }
-    public Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter, int startIndex, int count) { ... }
-    // ... all other methods
-}
+    ```csharp
+    public class MyScimRepository : IScimRepository
+    {
+        public Task<ScimUser?> GetUserAsync(string id) { ... }
+        public Task<ScimListResponse<ScimUser>> GetUsersAsync(FilterExpression? filter, int startIndex, int count) { ... }
+        // ... all other methods
+    }
 
-builder.Services.AddScoped<IScimRepository, MyScimRepository>();
-```
+    builder.Services.AddScoped<IScimRepository, MyScimRepository>();
+    ```
 
 ---
 
@@ -156,31 +156,33 @@ entity class to resolve attribute name → C# property mappings automatically.
 builder.Services.AddScoped<IScimFilterTranslator<MyUser>, GenericScimFilterTranslator<MyUser>>();
 ```
 
-Custom translator (advanced):
+??? example "Custom filter translator (advanced)"
 
-```csharp
-public class MyUserFilterTranslator : IScimFilterTranslator<MyUser>
-{
-    public IQueryable<MyUser> ApplyFilter(IQueryable<MyUser> query, FilterExpression filter)
+    ```csharp
+    public class MyUserFilterTranslator : IScimFilterTranslator<MyUser>
     {
-        // custom LINQ translation
-        return query;
+        public IQueryable<MyUser> ApplyFilter(IQueryable<MyUser> query, FilterExpression filter)
+        {
+            // custom LINQ translation
+            return query;
+        }
     }
-}
-```
+    ```
 
 ---
 
 ## Notes on `IQueryable<T>`
 
-- The `QueryUsers()` / `QueryGroups()` methods **must** return a real `IQueryable<T>` source
-  (EF Core `DbSet.AsQueryable()`, Cosmos `Container.GetItemLinqQueryable<T>()`, etc.)
-- EzSCIM calls `.Where(filterExpression)` → `.Skip()` → `.Take()` → `.ToListAsync()` on it
-- In-memory lists (`list.AsQueryable()`) work for simple cases but load all rows first
-- If your data source does not support `IQueryable`, implement `IScimRepository` directly
-  and apply filters manually
+!!! warning "Use a real IQueryable source"
+    - The `QueryUsers()` / `QueryGroups()` methods **must** return a real `IQueryable<T>` source
+      (EF Core `DbSet.AsQueryable()`, Cosmos `Container.GetItemLinqQueryable<T>()`, etc.)
+    - EzSCIM calls `.Where(filterExpression)` → `.Skip()` → `.Take()` → `.ToListAsync()` on it
+    - In-memory lists (`list.AsQueryable()`) work for simple cases but load all rows first
+    - If your data source does not support `IQueryable`, implement `IScimRepository` directly
+      and apply filters manually
 
 ---
 
 **Next**: [SCIM filter syntax →](./filtering.md) | [SCIM 2.0 attributes →](./scim-attributes.md)
+
 

@@ -4,6 +4,7 @@ site_url: https://miiitch.github.io/EzSCIM
 repo_url: https://github.com/miiitch/EzSCIM
 repo_name: miiitch/EzSCIM
 edit_uri: edit/master/docs/public/
+copyright: Copyright &copy; 2024 – 2026 miiitch
 
 docs_dir: docs/public
 
@@ -25,12 +26,23 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   features:
+    - navigation.instant
+    - navigation.instant.progress
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
     - navigation.top
+    - toc.follow
     - search.suggest
     - search.highlight
+    - search.share
     - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
 
 nav:
   - Home: README.md
@@ -52,11 +64,25 @@ plugins:
 
 markdown_extensions:
   - admonition
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
+  - attr_list
+  - def_list
+  - md_in_html
   - tables
   - toc:
       permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg

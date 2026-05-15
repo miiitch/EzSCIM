@@ -44,7 +44,9 @@ public class AppUserGroupRepository
 }
 ```
 
-Two lines of non-trivial code. Everything else is inherited.
+!!! tip "That's all you need"
+    Two property overrides. All CRUD operations, Id generation, timestamp management,
+    and unique constraint handling are inherited from the base class.
 
 ---
 
@@ -88,13 +90,15 @@ protected override Task OnBeforeUpdateUserAsync(AppUser existing, AppUser update
     // Default: copies all scalar columns
     Context.Entry(existing).CurrentValues.SetValues(updated);
 
-    // Example: handle JSON column manually
+    // Example: handle JSON column manually // (1)
     existing.EmailsJson = updated.EmailsJson;
     existing.PhoneNumbersJson = updated.PhoneNumbersJson;
 
     return Task.CompletedTask;
 }
 ```
+
+1. JSON columns are not copied by `SetValues` — they must be assigned explicitly.
 
 ### `OnBeforeUpdateGroupAsync`
 
@@ -118,20 +122,16 @@ as `InvalidOperationException`. This is translated to `409 Conflict` by the SCIM
 controller layer.
 
 Supported databases:
-- **SQL Server**: error codes 2601 and 2627
-- **PostgreSQL**: SqlState `23505`
-- **SQLite**: `UNIQUE constraint failed` message
 
-```csharp
-try
-{
-    await _repository.CreateUserAsync(entity);
-}
-catch (InvalidOperationException ex) when (ex.Message.Contains("already exists"))
-{
-    // Returns 409 Conflict automatically — no action needed
-}
-```
+| Database | Detection method |
+|---|---|
+| SQL Server | Error codes 2601 and 2627 |
+| PostgreSQL | SqlState `23505` |
+| SQLite | `UNIQUE constraint failed` message |
+
+!!! note "Automatic — no action needed"
+    The `409 Conflict` response is handled automatically. You don't need to catch
+    `DbUpdateException` in your code.
 
 ---
 
@@ -146,38 +146,41 @@ protected readonly TContext Context;
 
 ## Full example with JSON columns
 
-```csharp
-public class DemoUserGroupRepository
-    : EfScimRepositoryBase<DemoUserEntity, DemoGroupEntity, AppDbContext>
-{
-    public DemoUserGroupRepository(AppDbContext ctx) : base(ctx) { }
+??? example "DemoUserGroupRepository with JSON column overrides"
 
-    protected override DbSet<DemoUserEntity>  Users  => Context.Users;
-    protected override DbSet<DemoGroupEntity> Groups => Context.Groups;
-
-    protected override Task OnBeforeUpdateUserAsync(
-        DemoUserEntity existing, DemoUserEntity updated)
+    ```csharp
+    public class DemoUserGroupRepository
+        : EfScimRepositoryBase<DemoUserEntity, DemoGroupEntity, AppDbContext>
     {
-        // Use CurrentValues for scalars, but handle JSON columns explicitly
-        Context.Entry(existing).CurrentValues.SetValues(updated);
-        existing.EmailsJson        = updated.EmailsJson;
-        existing.PhoneNumbersJson  = updated.PhoneNumbersJson;
-        existing.AddressesJson     = updated.AddressesJson;
-        return Task.CompletedTask;
-    }
+        public DemoUserGroupRepository(AppDbContext ctx) : base(ctx) { }
 
-    protected override Task OnBeforeUpdateGroupAsync(
-        DemoGroupEntity existing, DemoGroupEntity updated)
-    {
-        Context.Entry(existing).CurrentValues.SetValues(updated);
-        existing.MembersJson = updated.MembersJson;
-        return Task.CompletedTask;
+        protected override DbSet<DemoUserEntity>  Users  => Context.Users;
+        protected override DbSet<DemoGroupEntity> Groups => Context.Groups;
+
+        protected override Task OnBeforeUpdateUserAsync(
+            DemoUserEntity existing, DemoUserEntity updated)
+        {
+            // Use CurrentValues for scalars, but handle JSON columns explicitly
+            Context.Entry(existing).CurrentValues.SetValues(updated);
+            existing.EmailsJson        = updated.EmailsJson;
+            existing.PhoneNumbersJson  = updated.PhoneNumbersJson;
+            existing.AddressesJson     = updated.AddressesJson;
+            return Task.CompletedTask;
+        }
+
+        protected override Task OnBeforeUpdateGroupAsync(
+            DemoGroupEntity existing, DemoGroupEntity updated)
+        {
+            Context.Entry(existing).CurrentValues.SetValues(updated);
+            existing.MembersJson = updated.MembersJson;
+            return Task.CompletedTask;
+        }
     }
-}
-```
+    ```
 
 ---
 
 **Next**: [Multi-provider: SQL Server / PostgreSQL →](./multi-provider.md)  
 **Back**: [IScimEntity →](./iscimentity.md)
+
 

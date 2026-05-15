@@ -51,7 +51,8 @@ public string UserName { get; set; }
 | `Returned` | string | `"default"` | `always`, `never`, `default`, `request` |
 | `CaseExact` | bool | `false` | Case-sensitive value comparison |
 
-**SCIM data types**: `string`, `boolean`, `complex`, `reference`, `dateTime`, `integer`, `decimal`, `binary`
+!!! info "SCIM data types"
+    `string`, `boolean`, `complex`, `reference`, `dateTime`, `integer`, `decimal`, `binary`
 
 ---
 
@@ -91,8 +92,9 @@ public class AcmeUser : ScimUser
 }
 ```
 
-All `[ScimProperty]` annotations from `ScimUser` are automatically inherited.
-The generated schema contains both base and extension attributes.
+!!! tip "Inheritance"
+    All `[ScimProperty]` annotations from `ScimUser` are automatically inherited.
+    The generated schema contains both base and extension attributes.
 
 ---
 
@@ -120,42 +122,44 @@ public class AcmeGroup : ScimGroup
 
 ## Complex nested types
 
-Nested complex attributes (sub-objects) also use `[ScimProperty]`:
+??? example "Complex attribute with sub-attributes"
 
-```csharp
-[ScimProperty("badge", "complex", Description = "Badge information")]
-public BadgeInfo? Badge { get; set; }
+    Nested complex attributes (sub-objects) also use `[ScimProperty]`:
 
-public class BadgeInfo
-{
-    [ScimProperty("badgeNumber", "string", Description = "Badge ID")]
-    public string? BadgeNumber { get; set; }
+    ```csharp
+    [ScimProperty("badge", "complex", Description = "Badge information")]
+    public BadgeInfo? Badge { get; set; }
 
-    [ScimProperty("accessLevel", "integer", Description = "Access level 1-5")]
-    public int AccessLevel { get; set; }
+    public class BadgeInfo
+    {
+        [ScimProperty("badgeNumber", "string", Description = "Badge ID")]
+        public string? BadgeNumber { get; set; }
 
-    [ScimProperty("expiryDate", "dateTime", Description = "Expiry date")]
-    public DateTime? ExpiryDate { get; set; }
-}
-```
+        [ScimProperty("accessLevel", "integer", Description = "Access level 1-5")]
+        public int AccessLevel { get; set; }
+
+        [ScimProperty("expiryDate", "dateTime", Description = "Expiry date")]
+        public DateTime? ExpiryDate { get; set; }
+    }
+    ```
 
 ---
 
 ## URN naming convention
 
-Use the following URN format for custom extension schemas:
+!!! tip "Use the correct URN format for custom schemas"
+    ```
+    urn:enterprise:params:scim:schemas:extension:{OrganizationName}:{Version}
+    ```
 
-```
-urn:enterprise:params:scim:schemas:extension:{OrganizationName}:{Version}
-```
+    Examples:
 
-Examples:
-- `urn:enterprise:params:scim:schemas:extension:Contoso:2.0`
-- `urn:enterprise:params:scim:schemas:extension:AcmeCorp:1.0`
+    - `urn:enterprise:params:scim:schemas:extension:Contoso:2.0`
+    - `urn:enterprise:params:scim:schemas:extension:AcmeCorp:1.0`
 
-Do **not** reuse SCIM core URNs:
-- `urn:ietf:params:scim:schemas:core:2.0:User` ← official only
-- `urn:ietf:params:scim:schemas:core:2.0:Group` ← official only
+!!! warning "Do not reuse SCIM core URNs"
+    - `urn:ietf:params:scim:schemas:core:2.0:User` ← official only
+    - `urn:ietf:params:scim:schemas:core:2.0:Group` ← official only
 
 ---
 
@@ -170,15 +174,15 @@ var userSchema = ScimSchemaGenerator.GetSchema<AcmeUser>();
 var groupSchema = ScimSchemaGenerator.GetSchema<AcmeGroup>();
 ```
 
-Validate schema loading at startup:
+??? tip "Validate schema loading at startup"
 
-```csharp
-var schema = ScimSchemaGenerator.GetSchema<AcmeUser>();
-if (schema.Attributes.Count == 0)
-    app.Logger.LogWarning("AcmeUser schema has no attributes — check [ScimProperty] annotations");
-else
-    app.Logger.LogInformation("AcmeUser schema: {Count} attributes", schema.Attributes.Count);
-```
+    ```csharp
+    var schema = ScimSchemaGenerator.GetSchema<AcmeUser>();
+    if (schema.Attributes.Count == 0)
+        app.Logger.LogWarning("AcmeUser schema has no attributes — check [ScimProperty] annotations");
+    else
+        app.Logger.LogInformation("AcmeUser schema: {Count} attributes", schema.Attributes.Count);
+    ```
 
 ---
 
@@ -199,4 +203,5 @@ builder.Services.AddScoped<IScimUserGroupRepository<AcmeUser, AcmeGroup>, AcmeSc
 ---
 
 **Next**: [SCIM 2.0 attribute reference →](./scim-attributes.md) | [EF Core getting started →](../efcore/getting-started.md)
+
 

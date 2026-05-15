@@ -21,55 +21,65 @@ builder.Services.AddAuthentication()
 builder.Services.AddAuthorization();
 ```
 
-For **development only**, you can enable a token generation endpoint:
-
-```csharp
-// Exposes GET /scim/auth/token (disabled in production automatically)
-builder.Services.AddScimTokenGeneratorEndpoint();
-```
+!!! tip "Development token endpoint"
+    Enable a token generation endpoint for local testing:
+    ```csharp
+    // Exposes GET /scim/auth/token (disabled in production automatically)
+    builder.Services.AddScimTokenGeneratorEndpoint();
+    ```
 
 ---
 
 ## 2. Configuration
 
-### appsettings.json (development)
+=== "Development"
 
-```json
-{
-  "Jwt": {
-    "SecretKey": "dev-secret-key-12345678901234567890",
-    "ExpirationMinutes": 1440
-  }
-}
-```
+    ```json title="appsettings.json"
+    {
+      "Jwt": {
+        "SecretKey": "dev-secret-key-12345678901234567890",
+        "ExpirationMinutes": 1440
+      }
+    }
+    ```
 
-### appsettings.Production.json
+=== "Production"
 
-```json
-{
-  "Jwt": {
-    "SecretKey": "loaded-from-key-vault",
-    "ExpirationMinutes": 60
-  },
-  "AzureKeyVault": {
-    "VaultUri": "https://your-keyvault.vault.azure.net/"
-  }
-}
-```
+    ```json title="appsettings.Production.json"
+    {
+      "Jwt": {
+        "SecretKey": "loaded-from-key-vault",
+        "ExpirationMinutes": 60
+      },
+      "AzureKeyVault": {
+        "VaultUri": "https://your-keyvault.vault.azure.net/"
+      }
+    }
+    ```
+
+!!! warning "Secret key requirements"
+    - Must be at least **32 characters**
+    - Must **never** be committed to Git
+    - Use Azure Key Vault in production (see [below](#5-production-azure-key-vault))
 
 ---
 
 ## 3. Generate a token (development)
 
-```bash
-# cURL
-curl -s https://localhost:7001/scim/auth/token | jq '.token'
+=== "cURL"
 
-# PowerShell
-$token = (Invoke-RestMethod -Uri "https://localhost:7001/scim/auth/token").token
-```
+    ```bash
+    curl -s https://localhost:7001/scim/auth/token | jq '.token'
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    $token = (Invoke-RestMethod -Uri "https://localhost:7001/scim/auth/token").token
+    ```
 
 Response:
+
 ```json
 { "token": "eyJ0eXAiOiJKV1Qi...", "expiresIn": "1440 minutes" }
 ```
@@ -78,14 +88,18 @@ Response:
 
 ## 4. Use the token
 
-```bash
-curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Users
-```
+=== "cURL"
 
-```powershell
-$headers = @{ "Authorization" = "Bearer $token"; "Content-Type" = "application/scim+json" }
-Invoke-RestMethod -Uri "https://localhost:7001/scim/Users" -Headers $headers
-```
+    ```bash
+    curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Users
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    $headers = @{ "Authorization" = "Bearer $token"; "Content-Type" = "application/scim+json" }
+    Invoke-RestMethod -Uri "https://localhost:7001/scim/Users" -Headers $headers
+    ```
 
 ---
 
@@ -93,13 +107,17 @@ Invoke-RestMethod -Uri "https://localhost:7001/scim/Users" -Headers $headers
 
 ### Generate a secret key
 
-```bash
-# Linux/macOS
-openssl rand -hex 32
+=== "Linux / macOS"
 
-# PowerShell
-[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((New-Guid).ToString() + (New-Guid).ToString()))
-```
+    ```bash
+    openssl rand -hex 32
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((New-Guid).ToString() + (New-Guid).ToString()))
+    ```
 
 ### Store in Key Vault
 
@@ -112,9 +130,7 @@ az keyvault secret set \
 
 ### Configure the application to read from Key Vault
 
-In `Program.cs`:
-
-```csharp
+```csharp title="Program.cs"
 if (!builder.Environment.IsDevelopment())
 {
     var keyVaultUrl = builder.Configuration["AzureKeyVault:VaultUri"];
@@ -148,47 +164,49 @@ az keyvault set-policy \
 4. **Secret Token**: paste the full JWT prefixed with `Bearer ` (e.g. `Bearer eyJ...`)
 5. Click **Test Connection**
 
-To generate a long-lived token for Entra ID:
+??? example "Generate a long-lived token for Entra ID"
 
-```csharp
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
+    ```csharp
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
+    using System.Text;
+    using Microsoft.IdentityModel.Tokens;
 
-var secretKey = "your-production-secret-key";
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+    var secretKey = "your-production-secret-key";
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-var token = new JwtSecurityToken(
-    claims: new[]
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, "scim-client"),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    },
-    expires: DateTime.UtcNow.AddMinutes(525600), // 1 year
-    signingCredentials: credentials
-);
+    var token = new JwtSecurityToken(
+        claims: new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, "scim-client"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        },
+        expires: DateTime.UtcNow.AddMinutes(525600), // 1 year
+        signingCredentials: credentials
+    );
 
-Console.WriteLine("Bearer " + new JwtSecurityTokenHandler().WriteToken(token));
-```
+    Console.WriteLine("Bearer " + new JwtSecurityTokenHandler().WriteToken(token));
+    ```
 
 ---
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-|---|---|---|
-| `HTTP 401` on all requests | Token missing or wrong format | Ensure `Authorization: Bearer <token>` header |
-| `HTTP 403` on `/scim/auth/token` | Expected in production | Generate token via CLI script |
-| Token rejected | Secret mismatch between signing and validation | Verify `Jwt:SecretKey` config matches signing key |
-| Key Vault error at startup | Managed Identity not configured | Check identity assignment and Key Vault access policy |
+??? failure "Common authentication errors"
+
+    | Symptom | Cause | Fix |
+    |---|---|---|
+    | `HTTP 401` on all requests | Token missing or wrong format | Ensure `Authorization: Bearer <token>` header |
+    | `HTTP 403` on `/scim/auth/token` | Expected in production | Generate token via CLI script |
+    | Token rejected | Secret mismatch between signing and validation | Verify `Jwt:SecretKey` config matches signing key |
+    | Key Vault error at startup | Managed Identity not configured | Check identity assignment and Key Vault access policy |
 
 ---
 
 ## Security checklist
 
-- [ ] Secret key is at least 32 characters
+- [x] Secret key is at least 32 characters
 - [ ] Secret key is never committed to Git
 - [ ] Secret key is stored in Azure Key Vault in production
 - [ ] Managed Identity is configured for Key Vault access
@@ -200,4 +218,5 @@ Console.WriteLine("Bearer " + new JwtSecurityTokenHandler().WriteToken(token));
 ---
 
 **Next**: [Repository interfaces →](./iqueryable/repository.md) | [EF Core setup →](./efcore/getting-started.md)
+
 

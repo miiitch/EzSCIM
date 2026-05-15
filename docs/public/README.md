@@ -1,46 +1,67 @@
-# EzSCIM — NuGet Package Documentation
+# EzSCIM
 
-EzSCIM provides a complete **SCIM 2.0** server implementation for ASP.NET Core.
-You expose your data through one of two integration models.
+EzSCIM is a complete **SCIM 2.0** server implementation for ASP.NET Core.
+Install one NuGet package, annotate your entity, implement one interface — and your API is provisioning-ready.
+
+[![NuGet](https://img.shields.io/nuget/v/EzSCIM?label=EzSCIM&logo=nuget)](https://www.nuget.org/packages/EzSCIM)
+[![NuGet](https://img.shields.io/nuget/v/EzSCIM.EfCore?label=EzSCIM.EfCore&logo=nuget)](https://www.nuget.org/packages/EzSCIM.EfCore)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/miiitch/EzSCIM/blob/master/LICENSE)
+
+---
+
+## Quick install
+
+```bash
+# Any data source (Dapper, Cosmos DB, custom…)
+dotnet add package EzSCIM
+
+# Entity Framework Core
+dotnet add package EzSCIM
+dotnet add package EzSCIM.EfCore
+```
 
 ---
 
 ## Choose your integration model
 
-### 🔌 Model 1 — IQueryable (any data source)
+<div class="grid cards" markdown>
 
-**NuGet package**: `EzSCIM`
+-   :material-connection: **IQueryable model**
 
-Use this model if you:
-- Already have an existing repository or ORM (Dapper, Cosmos DB, MongoDB, custom…)
-- Want full control over data access
-- Do **not** use Entity Framework Core
+    ---
 
-Your entity class gets annotated with `[ScimProperty]` attributes. You implement
-`IUserGroupDataRepository<TUser, TGroup>` with an `IQueryable<T>` source, and EzSCIM
-translates SCIM filters to LINQ server-side.
+    Use this if you already have a repository or ORM that is **not** EF Core (Dapper, Cosmos DB, MongoDB, custom…).
 
-→ **[Get started with IQueryable](./iqueryable/getting-started.md)**
+    Annotate your entity with `[ScimProperty]`, implement `IUserGroupDataRepository<TUser, TGroup>` returning an `IQueryable<T>`, and EzSCIM translates SCIM filters to LINQ server-side.
 
----
+    [:octicons-arrow-right-24: Get started with IQueryable](./iqueryable/getting-started.md)
 
-### 🗄️ Model 2 — EF Core / DbContext
+-   :material-database: **EF Core model**
 
-**NuGet packages**: `EzSCIM` + `EzSCIM.EfCore`
+    ---
 
-Use this model if you use Entity Framework Core. Inherit `EfScimRepositoryBase<TUser, TGroup, TContext>`
-and your entities get automatic Id generation, timestamps, CRUD, filter translation, and
-unique-constraint detection — with zero boilerplate.
+    Use this if you use **Entity Framework Core**. Inherit `EfScimRepositoryBase<TUser, TGroup, TContext>` and get automatic Id generation, timestamps, CRUD, filter translation, and unique-constraint detection — with zero boilerplate.
 
-→ **[Get started with EF Core](./efcore/getting-started.md)**
+    [:octicons-arrow-right-24: Get started with EF Core](./efcore/getting-started.md)
+
+</div>
 
 ---
 
-## 🔐 Authentication
+## Prerequisites
+
+!!! info "Requirements"
+    - [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0) or later
+    - ASP.NET Core 8+
+    - (EF Core model only) Entity Framework Core 8+
+
+---
+
+## :material-lock: Authentication
 
 JWT Bearer token authentication — applies to **both** models.
 
-→ **[Authentication setup](./authentication.md)**
+[:octicons-arrow-right-24: Authentication setup](./authentication.md)
 
 ---
 
@@ -59,5 +80,5 @@ JWT Bearer token authentication — applies to **both** models.
 
 ---
 
-**Last Updated**: April 24, 2026
+**Last Updated**: May 2026
 

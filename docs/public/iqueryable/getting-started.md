@@ -3,7 +3,8 @@
 This guide shows how to expose any existing data source as a SCIM 2.0 endpoint
 using the `EzSCIM` package. No EF Core required.
 
-**Time to complete**: ~15 minutes.
+!!! info "Time to complete: ~15 minutes"
+    Works with any data source that supports `IQueryable<T>` — EF Core, Dapper, Cosmos DB, MongoDB, or custom.
 
 ---
 
@@ -18,7 +19,7 @@ dotnet add package EzSCIM
 ## 2. Annotate your entity
 
 Add `[ScimProperty]` to the properties you want to expose via SCIM.
-Only annotated properties are mapped.
+**Only annotated properties are mapped** — unannotated properties are never sent over the wire.
 
 ```csharp
 using EzSCIM.Attributes;
@@ -27,7 +28,7 @@ public class Employee
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
-    [ScimProperty("userName", "string", Required = true, Uniqueness = "server")]
+    [ScimProperty("userName", "string", Required = true, Uniqueness = "server")] // (1)
     public string Email { get; set; } = string.Empty;
 
     [ScimProperty("givenName", "string")]
@@ -39,13 +40,21 @@ public class Employee
     [ScimProperty("displayName", "string")]
     public string FullName { get; set; } = string.Empty;
 
-    [ScimProperty("active", "boolean")]
+    [ScimProperty("active", "boolean")] // (2)
     public bool IsEnabled { get; set; } = true;
 
     [ScimProperty("title", "string")]
     public string Position { get; set; } = string.Empty;
 }
 ```
+
+1. `userName` is the SCIM attribute name. `Required = true` makes it mandatory in the schema.
+2. `active` is used by Entra ID for enable/disable lifecycle operations.
+
+!!! tip "SCIM attribute names"
+    Use the standard SCIM names (`userName`, `active`, `givenName`…) so Entra ID
+    and other provisioning clients can map their attributes automatically.
+    See the [SCIM 2.0 attribute reference →](./scim-attributes.md)
 
 ---
 
@@ -64,7 +73,7 @@ public class EmployeeRepository : IUserGroupDataRepository<Employee, Department>
 
     public EmployeeRepository(AppDbContext context) => _context = context;
 
-    // IQueryable<T> is required — EzSCIM applies SCIM filters as LINQ
+    // IQueryable<T> is required — EzSCIM applies SCIM filters as LINQ // (1)
     public IQueryable<Employee> QueryUsers() => _context.Employees.AsQueryable();
 
     public async Task<Employee?> GetUserAsync(string id)
@@ -105,6 +114,13 @@ public class EmployeeRepository : IUserGroupDataRepository<Employee, Department>
 }
 ```
 
+1. Returning `IQueryable<T>` (not `IEnumerable<T>`) is critical — filters and pagination are
+   pushed down to the database. Returning `list.AsQueryable()` works but loads all rows first.
+
+!!! note "Users only?"
+    If you don't need group support, implement `IUserDataRepository<TUser>` instead and register
+    `IScimUserOnlyRepository<ScimUser>` in DI. See the [repository interfaces reference →](./repository.md)
+
 ---
 
 ## 4. Register services in Program.cs
@@ -123,14 +139,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Your DbContext
 builder.Services.AddDbContext<AppDbContext>(/* ... */);
 
-// Data repository — provides IQueryable<T> sources
+// Data repository — provides IQueryable<T> sources // (1)
 builder.Services.AddScoped<IUserGroupDataRepository<Employee, Department>, EmployeeRepository>();
 
-// Filter translators — convert SCIM filter expressions to LINQ
+// Filter translators — convert SCIM filter expressions to LINQ // (2)
 builder.Services.AddScoped<IScimFilterTranslator<Employee>, GenericScimFilterTranslator<Employee>>();
 builder.Services.AddScoped<IScimFilterTranslator<Department>, GenericScimFilterTranslator<Department>>();
 
-// SCIM repository — bridges data repo + filter translators to SCIM operations
+// SCIM repository — bridges data repo + filter translators to SCIM operations // (3)
 builder.Services.AddScoped<IScimRepository, ScimRepository<Employee, Department>>();
 
 // Authentication
@@ -139,7 +155,7 @@ builder.Services.AddAuthentication()
     .AddScheme<JwtBearerTokenAuthenticationOptions, JwtBearerTokenAuthenticationHandler>("Bearer", null);
 builder.Services.AddAuthorization();
 
-// SCIM controllers (registers /scim/Users, /scim/Groups, /scim/Schemas, etc.)
+// SCIM controllers (registers /scim/Users, /scim/Groups, /scim/Schemas, etc.) // (4)
 builder.Services.AddScimControllers();
 
 // Development-only token endpoint
@@ -153,24 +169,45 @@ app.MapControllers();
 app.Run();
 ```
 
+1. Your repository implementation that returns `IQueryable<T>`.
+2. `GenericScimFilterTranslator<T>` uses `[ScimProperty]` to map SCIM names to C# properties.
+3. `ScimRepository<TUser, TGroup>` wires data + filter translators into SCIM operations.
+4. Registers controllers for `/scim/Users`, `/scim/Groups`, `/scim/Schemas`, and `/scim/ServiceProviderConfig`.
+
 ---
 
 ## 5. Verify
 
-```bash
-# List users
-curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Users
+=== "cURL"
 
-# Filter users
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://localhost:7001/scim/Users?filter=active%20eq%20true"
+    ```bash
+    # List users
+    curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Users
 
-# Create user
-curl -X POST https://localhost:7001/scim/Users \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/scim+json" \
-  -d '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:User"],"userName":"jane.doe@acme.com","active":true}'
-```
+    # Filter users
+    curl -H "Authorization: Bearer $TOKEN" \
+      "https://localhost:7001/scim/Users?filter=active%20eq%20true"
+
+    # Create user
+    curl -X POST https://localhost:7001/scim/Users \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/scim+json" \
+      -d '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:User"],"userName":"jane.doe@acme.com","active":true}'
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    $headers = @{ Authorization = "Bearer $TOKEN" }
+
+    # List users
+    Invoke-RestMethod -Uri "https://localhost:7001/scim/Users" -Headers $headers
+
+    # Filter users
+    $filter = 'active eq true'
+    $uri = "https://localhost:7001/scim/Users?filter=$([uri]::EscapeDataString($filter))"
+    Invoke-RestMethod -Uri $uri -Headers $headers
+    ```
 
 ---
 

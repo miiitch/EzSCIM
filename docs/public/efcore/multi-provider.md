@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 public class AppDbContextBase : DbContext
 {
-    // Accept non-generic DbContextOptions so subclass options resolve correctly
+    // Accept non-generic DbContextOptions so subclass options resolve correctly // (1)
     public AppDbContextBase(DbContextOptions options) : base(options) { }
 
     public DbSet<AppUser>  Users  { get; set; } = null!;
@@ -34,7 +34,7 @@ public class AppDbContextBase : DbContext
             e.HasIndex(u => u.UserName).IsUnique();
             e.Property(u => u.UserName).IsRequired().HasMaxLength(256);
             e.Property(u => u.Active).HasDefaultValue(true);
-            // No column type here — defined in provider subclass
+            // No column type here — defined in provider subclass // (2)
         });
 
         modelBuilder.Entity<AppGroup>(e =>
@@ -47,123 +47,129 @@ public class AppDbContextBase : DbContext
 }
 ```
 
-### SQL Server subclass
+1. Using `DbContextOptions` (non-generic) lets subclasses pass `DbContextOptions<SubclassType>`
+   without breaking the base constructor.
+2. JSON column types are declared in provider-specific subclasses below.
 
-```csharp
-using Microsoft.EntityFrameworkCore;
+### Provider subclasses
 
-public class SqlServerAppDbContext : AppDbContextBase
-{
-    public SqlServerAppDbContext(DbContextOptions<SqlServerAppDbContext> options)
-        : base(options) { }
+=== "SQL Server"
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    ```csharp
+    using Microsoft.EntityFrameworkCore;
+
+    public class SqlServerAppDbContext : AppDbContextBase
     {
-        base.OnModelCreating(modelBuilder);
+        public SqlServerAppDbContext(DbContextOptions<SqlServerAppDbContext> options)
+            : base(options) { }
 
-        // SQL Server uses nvarchar(max) for JSON stored as text
-        modelBuilder.Entity<AppUser>(e =>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            e.Property(u => u.EmailsJson).HasColumnType("nvarchar(max)");
-            e.Property(u => u.PhoneNumbersJson).HasColumnType("nvarchar(max)");
-            e.Property(u => u.AddressesJson).HasColumnType("nvarchar(max)");
-        });
+            base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<AppGroup>(e =>
-        {
-            e.Property(g => g.MembersJson).HasColumnType("nvarchar(max)");
-        });
+            // SQL Server uses nvarchar(max) for JSON stored as text
+            modelBuilder.Entity<AppUser>(e =>
+            {
+                e.Property(u => u.EmailsJson).HasColumnType("nvarchar(max)");
+                e.Property(u => u.PhoneNumbersJson).HasColumnType("nvarchar(max)");
+                e.Property(u => u.AddressesJson).HasColumnType("nvarchar(max)");
+            });
+
+            modelBuilder.Entity<AppGroup>(e =>
+            {
+                e.Property(g => g.MembersJson).HasColumnType("nvarchar(max)");
+            });
+        }
     }
-}
-```
+    ```
 
-### PostgreSQL subclass
+=== "PostgreSQL"
 
-```csharp
-using Microsoft.EntityFrameworkCore;
+    ```csharp
+    using Microsoft.EntityFrameworkCore;
 
-public class PostgreSqlAppDbContext : AppDbContextBase
-{
-    public PostgreSqlAppDbContext(DbContextOptions<PostgreSqlAppDbContext> options)
-        : base(options) { }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public class PostgreSqlAppDbContext : AppDbContextBase
     {
-        base.OnModelCreating(modelBuilder);
+        public PostgreSqlAppDbContext(DbContextOptions<PostgreSqlAppDbContext> options)
+            : base(options) { }
 
-        // PostgreSQL uses jsonb for indexed, binary JSON
-        modelBuilder.Entity<AppUser>(e =>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            e.Property(u => u.EmailsJson).HasColumnType("jsonb");
-            e.Property(u => u.PhoneNumbersJson).HasColumnType("jsonb");
-            e.Property(u => u.AddressesJson).HasColumnType("jsonb");
-        });
+            base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<AppGroup>(e =>
-        {
-            e.Property(g => g.MembersJson).HasColumnType("jsonb");
-        });
+            // PostgreSQL uses jsonb for indexed, binary JSON
+            modelBuilder.Entity<AppUser>(e =>
+            {
+                e.Property(u => u.EmailsJson).HasColumnType("jsonb");
+                e.Property(u => u.PhoneNumbersJson).HasColumnType("jsonb");
+                e.Property(u => u.AddressesJson).HasColumnType("jsonb");
+            });
+
+            modelBuilder.Entity<AppGroup>(e =>
+            {
+                e.Property(g => g.MembersJson).HasColumnType("jsonb");
+            });
+        }
     }
-}
-```
+    ```
 
-### SQLite subclass (testing / development)
+=== "SQLite (testing / development)"
 
-```csharp
-using Microsoft.EntityFrameworkCore;
+    ```csharp
+    using Microsoft.EntityFrameworkCore;
 
-public class SqliteAppDbContext : AppDbContextBase
-{
-    public SqliteAppDbContext(DbContextOptions<SqliteAppDbContext> options)
-        : base(options) { }
+    public class SqliteAppDbContext : AppDbContextBase
+    {
+        public SqliteAppDbContext(DbContextOptions<SqliteAppDbContext> options)
+            : base(options) { }
 
-    // SQLite stores JSON as TEXT — no override needed,
-    // EF Core maps string properties to TEXT by default.
-}
-```
+        // SQLite stores JSON as TEXT — no override needed,
+        // EF Core maps string properties to TEXT by default.
+    }
+    ```
 
 ---
 
 ## DI registration per provider
 
-### SQL Server (production / Azure SQL)
+=== "SQL Server"
 
-```csharp
-// Using Aspire SQL Server integration
-builder.AddSqlServerDbContext<SqlServerAppDbContext>("scimdb");
+    ```csharp
+    // Using Aspire SQL Server integration
+    builder.AddSqlServerDbContext<SqlServerAppDbContext>("scimdb");
 
-// Forward base type so repositories that inject AppDbContextBase resolve correctly
-builder.Services.AddScoped<AppDbContextBase>(sp =>
-    sp.GetRequiredService<SqlServerAppDbContext>());
+    // Forward base type so repositories that inject AppDbContextBase resolve correctly
+    builder.Services.AddScoped<AppDbContextBase>(sp =>
+        sp.GetRequiredService<SqlServerAppDbContext>());
 
-builder.Services.AddScoped<
-    IUserGroupDataRepository<AppUser, AppGroup>,
-    AppUserGroupRepository>();
-```
+    builder.Services.AddScoped<
+        IUserGroupDataRepository<AppUser, AppGroup>,
+        AppUserGroupRepository>();
+    ```
 
-### PostgreSQL (e.g. integration tests with Testcontainers)
+=== "PostgreSQL"
 
-```csharp
-builder.Services.AddDbContext<PostgreSqlAppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    ```csharp
+    builder.Services.AddDbContext<PostgreSqlAppDbContext>(options =>
+        options.UseNpgsql(connectionString));
 
-builder.Services.AddScoped<AppDbContextBase>(sp =>
-    sp.GetRequiredService<PostgreSqlAppDbContext>());
+    builder.Services.AddScoped<AppDbContextBase>(sp =>
+        sp.GetRequiredService<PostgreSqlAppDbContext>());
 
-builder.Services.AddScoped<
-    IUserGroupDataRepository<AppUser, AppGroup>,
-    AppUserGroupRepository>();
-```
+    builder.Services.AddScoped<
+        IUserGroupDataRepository<AppUser, AppGroup>,
+        AppUserGroupRepository>();
+    ```
 
-### SQLite (unit tests / local development)
+=== "SQLite"
 
-```csharp
-builder.Services.AddDbContext<SqliteAppDbContext>(options =>
-    options.UseSqlite("Data Source=:memory:"));
+    ```csharp
+    builder.Services.AddDbContext<SqliteAppDbContext>(options =>
+        options.UseSqlite("Data Source=:memory:"));
 
-builder.Services.AddScoped<AppDbContextBase>(sp =>
-    sp.GetRequiredService<SqliteAppDbContext>());
-```
+    builder.Services.AddScoped<AppDbContextBase>(sp =>
+        sp.GetRequiredService<SqliteAppDbContext>());
+    ```
 
 ---
 
@@ -188,25 +194,30 @@ public class AppUserGroupRepository
 
 Migrations are per-provider-context. Run them from the Demo/API project.
 
-```bash
-# SQL Server migrations
-dotnet ef migrations add InitialCreate \
-  --context SqlServerAppDbContext \
-  --project YourApiProject \
-  --output-dir Migrations/SqlServer
+=== "SQL Server"
 
-dotnet ef database update --context SqlServerAppDbContext
+    ```bash
+    dotnet ef migrations add InitialCreate \
+      --context SqlServerAppDbContext \
+      --project YourApiProject \
+      --output-dir Migrations/SqlServer
 
-# PostgreSQL migrations
-dotnet ef migrations add InitialCreate \
-  --context PostgreSqlAppDbContext \
-  --project YourApiProject \
-  --output-dir Migrations/PostgreSql
-```
+    dotnet ef database update --context SqlServerAppDbContext
+    ```
 
-> **Tip**: For integration tests using Testcontainers + PostgreSQL, call
-> `await context.Database.EnsureCreatedAsync()` instead of `MigrateAsync()` —
-> it creates the schema directly from the model without migrations.
+=== "PostgreSQL"
+
+    ```bash
+    dotnet ef migrations add InitialCreate \
+      --context PostgreSqlAppDbContext \
+      --project YourApiProject \
+      --output-dir Migrations/PostgreSql
+    ```
+
+!!! tip "Integration tests with Testcontainers"
+    For integration tests using Testcontainers + PostgreSQL, call
+    `await context.Database.EnsureCreatedAsync()` instead of `MigrateAsync()` —
+    it creates the schema directly from the model without requiring migration files.
 
 ---
 
@@ -224,4 +235,5 @@ dotnet ef migrations add InitialCreate \
 
 **Back**: [EfScimRepositoryBase →](./efrepositorybase.md)  
 **Next**: [Authentication →](../authentication.md)
+
 

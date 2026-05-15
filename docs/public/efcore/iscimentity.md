@@ -92,14 +92,16 @@ modelBuilder.Entity<AppUser>(e =>
 
 ## Notes
 
-- `Id` is a `string` (not `Guid`) to be compatible with SCIM's string ID requirement
-  and to allow any format (GUID, int-as-string, opaque string, etc.)
-- `CreatedAt` and `ModifiedAt` use `DateTime` (UTC). Use `DateTimeOffset` if you need
-  timezone offset storage.
-- The interface has no behavior — it is purely a compile-time constraint used by
-  `EfScimRepositoryBase<TUser, TGroup, TContext>` generic constraints.
+!!! info "Design decisions"
+    - `Id` is a `string` (not `Guid`) to be compatible with SCIM's string ID requirement
+      and to allow any format (GUID, int-as-string, opaque string, etc.)
+    - `CreatedAt` and `ModifiedAt` use `DateTime` (UTC). Use `DateTimeOffset` if you need
+      timezone offset storage.
+    - The interface has no behavior — it is purely a compile-time constraint used by
+      `EfScimRepositoryBase<TUser, TGroup, TContext>` generic constraints.
 
 ---
 
 **Next**: [EfScimRepositoryBase reference →](./efrepositorybase.md)
+
 

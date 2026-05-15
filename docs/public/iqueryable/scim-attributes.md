@@ -37,78 +37,78 @@ Complete reference of SCIM 2.0 standard attributes as defined in
 
 ### Multi-valued attributes
 
-#### `emails`
+??? info "emails"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `emails.value` | string | Email address |
-| `emails.type` | string | `work`, `home`, `other` |
-| `emails.primary` | boolean | `true` for the primary address |
-| `emails.display` | string | Display label |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `emails.value` | string | Email address |
+    | `emails.type` | string | `work`, `home`, `other` |
+    | `emails.primary` | boolean | `true` for the primary address |
+    | `emails.display` | string | Display label |
 
-#### `phoneNumbers`
+??? info "phoneNumbers"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `phoneNumbers.value` | string | Phone number |
-| `phoneNumbers.type` | string | `work`, `home`, `mobile`, `fax`, `other` |
-| `phoneNumbers.primary` | boolean | Primary phone |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `phoneNumbers.value` | string | Phone number |
+    | `phoneNumbers.type` | string | `work`, `home`, `mobile`, `fax`, `other` |
+    | `phoneNumbers.primary` | boolean | Primary phone |
 
-#### `addresses`
+??? info "addresses"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `addresses.formatted` | string | Full address formatted |
-| `addresses.streetAddress` | string | Street address |
-| `addresses.locality` | string | City |
-| `addresses.region` | string | State / province |
-| `addresses.postalCode` | string | Postal code |
-| `addresses.country` | string | ISO 3166-1 alpha-2 country code |
-| `addresses.type` | string | `work`, `home`, `other` |
-| `addresses.primary` | boolean | Primary address |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `addresses.formatted` | string | Full address formatted |
+    | `addresses.streetAddress` | string | Street address |
+    | `addresses.locality` | string | City |
+    | `addresses.region` | string | State / province |
+    | `addresses.postalCode` | string | Postal code |
+    | `addresses.country` | string | ISO 3166-1 alpha-2 country code |
+    | `addresses.type` | string | `work`, `home`, `other` |
+    | `addresses.primary` | boolean | Primary address |
 
-#### `ims` (Instant messaging)
+??? info "ims (Instant messaging)"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `ims.value` | string | IM handle |
-| `ims.type` | string | `aim`, `gtalk`, `icq`, `xmpp`, `msn`, `skype`, `qq`, `yahoo` |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `ims.value` | string | IM handle |
+    | `ims.type` | string | `aim`, `gtalk`, `icq`, `xmpp`, `msn`, `skype`, `qq`, `yahoo` |
 
-#### `photos`
+??? info "photos"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `photos.value` | string | URL of the photo |
-| `photos.type` | string | `photo`, `thumbnail` |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `photos.value` | string | URL of the photo |
+    | `photos.type` | string | `photo`, `thumbnail` |
 
-#### `groups` (read-only)
+??? info "groups (read-only)"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `groups.value` | string | Group ID |
-| `groups.display` | string | Group display name |
-| `groups.type` | string | `direct`, `indirect` |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `groups.value` | string | Group ID |
+    | `groups.display` | string | Group display name |
+    | `groups.type` | string | `direct`, `indirect` |
 
-#### `roles`
+??? info "roles"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `roles.value` | string | Role value |
-| `roles.display` | string | Role label |
-| `roles.primary` | boolean | Primary role |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `roles.value` | string | Role value |
+    | `roles.display` | string | Role label |
+    | `roles.primary` | boolean | Primary role |
 
-#### `entitlements`
+??? info "entitlements"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `entitlements.value` | string | Entitlement value |
-| `entitlements.display` | string | Entitlement label |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `entitlements.value` | string | Entitlement value |
+    | `entitlements.display` | string | Entitlement label |
 
-#### `x509Certificates`
+??? info "x509Certificates"
 
-| Sub-attribute | Type | Description |
-|---|---|---|
-| `x509Certificates.value` | string | Base64-encoded DER certificate |
+    | Sub-attribute | Type | Description |
+    |---|---|---|
+    | `x509Certificates.value` | string | Base64-encoded DER certificate |
 
 ---
 
@@ -146,25 +146,25 @@ Commonly used by Entra ID provisioning.
 | `manager.displayName` | string | Manager's display name |
 | `manager.$ref` | string | Manager's resource URI |
 
-PATCH example from Entra ID:
+??? example "PATCH example from Entra ID"
 
-```json
-{
-  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-  "Operations": [
+    ```json
     {
-      "op": "Replace",
-      "path": "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department",
-      "value": "Engineering"
-    },
-    {
-      "op": "Replace",
-      "path": "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber",
-      "value": "EMP-12345"
+      "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+      "Operations": [
+        {
+          "op": "Replace",
+          "path": "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department",
+          "value": "Engineering"
+        },
+        {
+          "op": "Replace",
+          "path": "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber",
+          "value": "EMP-12345"
+        }
+      ]
     }
-  ]
-}
-```
+    ```
 
 ---
 
@@ -175,13 +175,14 @@ configure mappings so Entra can reliably create, match, and update resources.
 
 ### Validator-focused checklist
 
-Before running the Microsoft SCIM Validator, verify these baseline conditions:
+!!! warning "Before running the Microsoft SCIM Validator"
+    Verify these baseline conditions:
 
-- `User.userName` is present and unique
-- `User.active` is mapped for lifecycle operations
-- `Group.displayName` is present
-- Server-managed attributes (`id`, `schemas`, `meta`) are returned correctly
-- Entra mappings are saved for both create and update flows
+    - `User.userName` is present and unique
+    - `User.active` is mapped for lifecycle operations
+    - `Group.displayName` is present
+    - Server-managed attributes (`id`, `schemas`, `meta`) are returned correctly
+    - Entra mappings are saved for both create and update flows
 
 ### User (`urn:ietf:params:scim:schemas:core:2.0:User`)
 
@@ -201,62 +202,63 @@ Before running the Microsoft SCIM Validator, verify these baseline conditions:
 | `displayName` | Required for group provisioning | Group display name in target app |
 | `externalId` | Commonly used for correlation | Stable link to source directory object |
 
-### Example model classes for Entra provisioning
+??? example "Model classes for Entra provisioning"
 
-```csharp
-using EzSCIM.Attributes;
-using EzSCIM.Constants;
+    ```csharp
+    using EzSCIM.Attributes;
+    using EzSCIM.Constants;
 
-public class EntraScimUser
-{
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public class EntraScimUser
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
-    [ScimProperty(ScimAttributeNames.User.UserName, "string", Required = true, Uniqueness = "server")]
-    public string UserName { get; set; } = string.Empty;
+        [ScimProperty(ScimAttributeNames.User.UserName, "string", Required = true, Uniqueness = "server")]
+        public string UserName { get; set; } = string.Empty;
 
-    [ScimProperty(ScimAttributeNames.User.Active, "boolean")]
-    public bool Active { get; set; } = true;
+        [ScimProperty(ScimAttributeNames.User.Active, "boolean")]
+        public bool Active { get; set; } = true;
 
-    [ScimProperty(ScimAttributeNames.User.NameGivenName, "string")]
-    public string GivenName { get; set; } = string.Empty;
+        [ScimProperty(ScimAttributeNames.User.NameGivenName, "string")]
+        public string GivenName { get; set; } = string.Empty;
 
-    [ScimProperty(ScimAttributeNames.User.NameFamilyName, "string")]
-    public string FamilyName { get; set; } = string.Empty;
+        [ScimProperty(ScimAttributeNames.User.NameFamilyName, "string")]
+        public string FamilyName { get; set; } = string.Empty;
 
-    [ScimProperty(ScimAttributeNames.User.EmailsValue, "string")]
-    public string Email { get; set; } = string.Empty;
+        [ScimProperty(ScimAttributeNames.User.EmailsValue, "string")]
+        public string Email { get; set; } = string.Empty;
 
-    [ScimProperty(ScimAttributeNames.Common.ExternalId, "string")]
-    public string? ExternalId { get; set; }
-}
+        [ScimProperty(ScimAttributeNames.Common.ExternalId, "string")]
+        public string? ExternalId { get; set; }
+    }
 
-public class EntraScimGroup
-{
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public class EntraScimGroup
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
-    [ScimProperty(ScimAttributeNames.Group.DisplayName, "string", Required = true)]
-    public string DisplayName { get; set; } = string.Empty;
+        [ScimProperty(ScimAttributeNames.Group.DisplayName, "string", Required = true)]
+        public string DisplayName { get; set; } = string.Empty;
 
-    [ScimProperty(ScimAttributeNames.Common.ExternalId, "string")]
-    public string? ExternalId { get; set; }
-}
-```
+        [ScimProperty(ScimAttributeNames.Common.ExternalId, "string")]
+        public string? ExternalId { get; set; }
+    }
+    ```
 
-The example intentionally uses a flattened `Email` property for readability. In production,
-map it to the SCIM `emails.value` contract used by your Entra attribute mappings.
+    The example uses a flattened `Email` property for readability. In production,
+    map it to the SCIM `emails.value` contract used by your Entra attribute mappings.
 
 ### Quick links
 
-- Microsoft Entra SCIM provisioning reference: [Tutorial: Develop a SCIM endpoint for user provisioning to apps from Microsoft Entra ID](https://learn.microsoft.com/entra/identity/app-provisioning/use-scim-to-provision-users-and-groups)
-- Microsoft SCIM Validator: [https://scimvalidator.microsoft.com/](https://scimvalidator.microsoft.com/)
-- SCIM Core Schema (RFC 7643): [https://www.rfc-editor.org/rfc/rfc7643](https://www.rfc-editor.org/rfc/rfc7643)
-- SCIM Protocol (RFC 7644): [https://www.rfc-editor.org/rfc/rfc7644](https://www.rfc-editor.org/rfc/rfc7644)
+- [Tutorial: Develop a SCIM endpoint for user provisioning](https://learn.microsoft.com/entra/identity/app-provisioning/use-scim-to-provision-users-and-groups)
+- [Microsoft SCIM Validator](https://scimvalidator.microsoft.com/)
+- [SCIM Core Schema (RFC 7643)](https://www.rfc-editor.org/rfc/rfc7643)
+- [SCIM Protocol (RFC 7644)](https://www.rfc-editor.org/rfc/rfc7644)
 
 ---
 
 ## `meta` attributes (read-only)
 
-Returned on every resource. Set automatically by EzSCIM.
+!!! info "Automatically set by EzSCIM"
+    These are returned on every resource and should not be set by the client.
 
 | Attribute | Type | Description |
 |---|---|---|
@@ -309,4 +311,5 @@ filter=displayName co "Engineering"          # Groups by name pattern
 ---
 
 **Next**: [Schema extensions →](./schema-extensions.md) | [Filtering →](./filtering.md)
+
 

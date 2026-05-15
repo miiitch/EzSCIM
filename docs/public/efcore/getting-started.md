@@ -3,7 +3,9 @@
 This guide shows how to expose your EF Core data as a SCIM 2.0 endpoint
 using the `EzSCIM` and `EzSCIM.EfCore` packages.
 
-**Time to complete**: ~10 minutes.
+!!! info "Time to complete: ~10 minutes"
+    If you already have an EF Core `DbContext` and entity classes, you only need
+    to add `IScimEntity`, inherit `EfScimRepositoryBase`, and register the services.
 
 ---
 
@@ -26,9 +28,9 @@ using EzSCIM.EfCore;
 
 public class AppUser : IScimEntity
 {
-    public string Id { get; set; } = string.Empty;     // Auto-generated GUID if empty
-    public DateTime CreatedAt { get; set; }             // Set on creation
-    public DateTime ModifiedAt { get; set; }            // Updated on every write
+    public string Id { get; set; } = string.Empty;     // (1)
+    public DateTime CreatedAt { get; set; }             // (2)
+    public DateTime ModifiedAt { get; set; }            // (3)
 
     // Your domain properties
     public string UserName { get; set; } = string.Empty;
@@ -36,7 +38,7 @@ public class AppUser : IScimEntity
     public string? GivenName { get; set; }
     public string? FamilyName { get; set; }
     public bool Active { get; set; } = true;
-    public string EmailsJson { get; set; } = "[]";     // Store multi-value as JSON
+    public string EmailsJson { get; set; } = "[]";     // (4)
 }
 
 public class AppGroup : IScimEntity
@@ -46,51 +48,95 @@ public class AppGroup : IScimEntity
     public DateTime ModifiedAt { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
-    public string MembersJson { get; set; } = "[]";    // Store members as JSON
+    public string MembersJson { get; set; } = "[]";    // (4)
 }
 ```
+
+1. Auto-generated GUID if empty on creation.
+2. Set once when the entity is first created. Maps to `meta.created`.
+3. Updated on every write. Maps to `meta.lastModified`.
+4. Multi-value attributes (emails, members) stored as JSON strings.
 
 ---
 
 ## 3. Create your DbContext
 
-```csharp
-using Microsoft.EntityFrameworkCore;
+=== "SQL Server"
 
-public class AppDbContext : DbContext
-{
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    ```csharp
+    using Microsoft.EntityFrameworkCore;
 
-    public DbSet<AppUser> Users { get; set; } = null!;
-    public DbSet<AppGroup> Groups { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public class AppDbContext : DbContext
     {
-        base.OnModelCreating(modelBuilder);
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        modelBuilder.Entity<AppUser>(e =>
-        {
-            e.HasKey(u => u.Id);
-            e.HasIndex(u => u.UserName).IsUnique();
-            e.Property(u => u.UserName).IsRequired().HasMaxLength(256);
-            e.Property(u => u.Active).HasDefaultValue(true);
-            // SQL Server:
-            e.Property(u => u.EmailsJson).HasColumnType("nvarchar(max)");
-            // PostgreSQL:
-            // e.Property(u => u.EmailsJson).HasColumnType("jsonb");
-        });
+        public DbSet<AppUser> Users { get; set; } = null!;
+        public DbSet<AppGroup> Groups { get; set; } = null!;
 
-        modelBuilder.Entity<AppGroup>(e =>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            e.HasKey(g => g.Id);
-            e.HasIndex(g => g.DisplayName).IsUnique();
-            e.Property(g => g.DisplayName).IsRequired().HasMaxLength(256);
-            // SQL Server:
-            e.Property(g => g.MembersJson).HasColumnType("nvarchar(max)");
-        });
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AppUser>(e =>
+            {
+                e.HasKey(u => u.Id);
+                e.HasIndex(u => u.UserName).IsUnique();
+                e.Property(u => u.UserName).IsRequired().HasMaxLength(256);
+                e.Property(u => u.Active).HasDefaultValue(true);
+                e.Property(u => u.EmailsJson).HasColumnType("nvarchar(max)");
+            });
+
+            modelBuilder.Entity<AppGroup>(e =>
+            {
+                e.HasKey(g => g.Id);
+                e.HasIndex(g => g.DisplayName).IsUnique();
+                e.Property(g => g.DisplayName).IsRequired().HasMaxLength(256);
+                e.Property(g => g.MembersJson).HasColumnType("nvarchar(max)");
+            });
+        }
     }
-}
-```
+    ```
+
+=== "PostgreSQL"
+
+    ```csharp
+    using Microsoft.EntityFrameworkCore;
+
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+        public DbSet<AppUser> Users { get; set; } = null!;
+        public DbSet<AppGroup> Groups { get; set; } = null!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AppUser>(e =>
+            {
+                e.HasKey(u => u.Id);
+                e.HasIndex(u => u.UserName).IsUnique();
+                e.Property(u => u.UserName).IsRequired().HasMaxLength(256);
+                e.Property(u => u.Active).HasDefaultValue(true);
+                e.Property(u => u.EmailsJson).HasColumnType("jsonb"); // Native JSON indexing
+            });
+
+            modelBuilder.Entity<AppGroup>(e =>
+            {
+                e.HasKey(g => g.Id);
+                e.HasIndex(g => g.DisplayName).IsUnique();
+                e.Property(g => g.DisplayName).IsRequired().HasMaxLength(256);
+                e.Property(g => g.MembersJson).HasColumnType("jsonb");
+            });
+        }
+    }
+    ```
+
+!!! tip "Multi-provider setup"
+    If you need to support both SQL Server and PostgreSQL (e.g. production vs. tests),
+    use a base context with provider-specific subclasses.
+    See [Multi-provider setup →](./multi-provider.md)
 
 ---
 
@@ -102,23 +148,22 @@ using EzSCIM.EfCore;
 using Microsoft.EntityFrameworkCore;
 
 public class AppUserGroupRepository
-    : EfScimRepositoryBase<AppUser, AppGroup, AppDbContext>
+    : EfScimRepositoryBase<AppUser, AppGroup, AppDbContext> // (1)
 {
     public AppUserGroupRepository(AppDbContext context) : base(context) { }
 
-    // Map DbSets to the base class
-    protected override DbSet<AppUser>  Users  => Context.Users;
+    protected override DbSet<AppUser>  Users  => Context.Users;  // (2)
     protected override DbSet<AppGroup> Groups => Context.Groups;
 }
 ```
 
-That's all the EF CRUD you need. `EfScimRepositoryBase` provides:
-- `GetUserAsync` / `GetGroupAsync`
-- `QueryUsers` / `QueryGroups` (returns `IQueryable<T>`)
-- `CreateUserAsync` / `CreateGroupAsync` (with auto-Id and timestamps)
-- `UpdateUserAsync` / `UpdateGroupAsync`
-- `DeleteUserAsync` / `DeleteGroupAsync`
-- Unique constraint violation → SCIM `409 Conflict` response
+1. Three generic parameters: your user entity, group entity, and DbContext type.
+2. Just point to your DbSets. All CRUD, Id generation, and timestamps are handled by the base class.
+
+!!! note "What you get for free"
+    `EfScimRepositoryBase` provides: `GetUserAsync`, `QueryUsers`, `CreateUserAsync`
+    (with auto-Id + timestamps), `UpdateUserAsync`, `DeleteUserAsync` — and the same for groups.
+    Unique constraint violations are automatically converted to `409 Conflict`.
 
 ---
 
@@ -242,10 +287,20 @@ dotnet ef database update
 
 ## Verify
 
-```bash
-curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Users
-curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Schemas
-```
+=== "cURL"
+
+    ```bash
+    curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Users
+    curl -H "Authorization: Bearer $TOKEN" https://localhost:7001/scim/Schemas
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    $headers = @{ Authorization = "Bearer $TOKEN" }
+    Invoke-RestMethod -Uri "https://localhost:7001/scim/Users" -Headers $headers
+    Invoke-RestMethod -Uri "https://localhost:7001/scim/Schemas" -Headers $headers
+    ```
 
 ---
 

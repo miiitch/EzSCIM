@@ -16,7 +16,9 @@ GET /scim/Groups?filter=<expression>&startIndex=1&count=50
 attributeName OPERATOR value
 ```
 
-Values must be **URL-encoded** when using HTTP. String values use double quotes.
+!!! note "URL encoding"
+    Values must be **URL-encoded** when using HTTP. String values use double quotes.
+    See [URL encoding →](#url-encoding)
 
 ---
 
@@ -49,31 +51,62 @@ Values must be **URL-encoded** when using HTTP. String values use double quotes.
 
 ### User filters
 
-```bash
-# Exact match on userName (Entra ID lookup pattern)
-filter=userName eq "jane.doe@acme.com"
+=== "cURL"
 
-# Active users only
-filter=active eq true
+    ```bash
+    # Exact match on userName (Entra ID lookup pattern)
+    curl -H "Authorization: Bearer $TOKEN" \
+      "https://localhost:7001/scim/Users?filter=userName%20eq%20%22jane.doe%40acme.com%22"
 
-# Users whose email ends with domain
-filter=emails.value ew "@acme.com"
+    # Active users only
+    curl -H "Authorization: Bearer $TOKEN" \
+      "https://localhost:7001/scim/Users?filter=active%20eq%20true"
 
-# Active users in engineering
-filter=active eq true and title eq "Engineer"
+    # Active users with email domain
+    curl -H "Authorization: Bearer $TOKEN" \
+      "https://localhost:7001/scim/Users?filter=emails.value%20ew%20%22%40acme.com%22%20and%20active%20eq%20true"
+    ```
 
-# Users with a work email who are active
-filter=emails.value ew "@company.com" and active eq true
+=== "Filter expressions (unencoded)"
 
-# Users with given name present
-filter=name.givenName pr
+    ```bash
+    # Exact match on userName (Entra ID lookup pattern)
+    filter=userName eq "jane.doe@acme.com"
 
-# Complex with grouping
-filter=(active eq true) and (title eq "Manager" or title eq "Lead")
+    # Active users only
+    filter=active eq true
 
-# All active users except service accounts
-filter=active eq true and not (userName sw "svc-")
-```
+    # Users whose email ends with domain
+    filter=emails.value ew "@acme.com"
+
+    # Active users in engineering
+    filter=active eq true and title eq "Engineer"
+
+    # Users with given name present
+    filter=name.givenName pr
+
+    # Complex with grouping
+    filter=(active eq true) and (title eq "Manager" or title eq "Lead")
+
+    # All active users except service accounts
+    filter=active eq true and not (userName sw "svc-")
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    $headers = @{ Authorization = "Bearer $TOKEN" }
+
+    # Exact match on userName
+    $filter = 'userName eq "jane.doe@acme.com"'
+    $uri = "https://localhost:7001/scim/Users?filter=$([uri]::EscapeDataString($filter))"
+    Invoke-RestMethod -Uri $uri -Headers $headers
+
+    # Active users only
+    $filter = 'active eq true'
+    $uri = "https://localhost:7001/scim/Users?filter=$([uri]::EscapeDataString($filter))"
+    Invoke-RestMethod -Uri $uri -Headers $headers
+    ```
 
 ### Group filters
 
@@ -100,9 +133,10 @@ GET /scim/Users?filter=active%20eq%20true&startIndex=1&count=50
 GET /scim/Users?filter=active%20eq%20true&startIndex=51&count=50
 ```
 
-- `startIndex` is **1-based** (not 0-based)
-- Default `count`: 100
-- Maximum recommended: 1000
+!!! info "Pagination rules"
+    - `startIndex` is **1-based** (not 0-based)
+    - Default `count`: 100
+    - Maximum recommended: 1000
 
 ---
 
@@ -126,13 +160,12 @@ curl -H "Authorization: Bearer $TOKEN" \
   "https://localhost:7001/scim/Users?filter=emails.value%20ew%20%22%40acme.com%22%20and%20active%20eq%20true"
 ```
 
-PowerShell automatic encoding:
-
-```powershell
-$filter = 'active eq true and userName sw "admin"'
-$uri = "/scim/Users?filter=$([uri]::EscapeDataString($filter))"
-Invoke-RestMethod -Uri "https://localhost:7001$uri" -Headers $headers
-```
+!!! tip "PowerShell auto-encodes filters"
+    ```powershell
+    $filter = 'active eq true and userName sw "admin"'
+    $uri = "/scim/Users?filter=$([uri]::EscapeDataString($filter))"
+    Invoke-RestMethod -Uri "https://localhost:7001$uri" -Headers $headers
+    ```
 
 ---
 
@@ -205,13 +238,15 @@ SQL:          WHERE IsEnabled = 1 AND Email LIKE '%@acme.com%'
 
 ## Implementation notes
 
-- String comparisons via `co`, `sw`, `ew` are **case-insensitive** by default (SQL `LIKE`)
-- Attribute names are **case-sensitive** per SCIM spec (`userName` ≠ `UserName`)
-- `pr` generates `.IsNotNull()` / `.IsNotEmpty()` in LINQ
-- Nested attributes (e.g. `name.givenName`, `emails.value`) require the property's
-  `[ScimProperty]` name to include the dot notation (`"name.givenName"`)
+!!! note "Behavior details"
+    - String comparisons via `co`, `sw`, `ew` are **case-insensitive** by default (SQL `LIKE`)
+    - Attribute names are **case-sensitive** per SCIM spec (`userName` ≠ `UserName`)
+    - `pr` generates `.IsNotNull()` / `.IsNotEmpty()` in LINQ
+    - Nested attributes (e.g. `name.givenName`, `emails.value`) require the property's
+      `[ScimProperty]` name to include the dot notation (`"name.givenName"`)
 
 ---
 
 **Next**: [SCIM 2.0 attribute reference →](./scim-attributes.md) | [Schema extensions →](./schema-extensions.md)
+
 
