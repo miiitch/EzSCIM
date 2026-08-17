@@ -1,6 +1,6 @@
 ---
 name: ezscim
-description: "Guided setup for integrating EzSCIM into an ASP.NET Core project. USE FOR: add SCIM 2.0 endpoint, integrate EzSCIM package, set up SCIM provisioning, implement SCIM users and groups, connect Entra ID provisioning, annotate entity with ScimProperty, implement IUserGroupDataRepository, use EfScimRepositoryBase, register EzSCIM services, add JWT authentication to SCIM API, EzSCIM getting started, EzSCIM IQueryable model, EzSCIM EF Core model. DO NOT USE FOR: SCIM protocol questions unrelated to EzSCIM, non-.NET projects, Azure AD application registration steps."
+description: "Guided setup for integrating EzSCIM into an ASP.NET Core project. USE FOR: add SCIM 2.0 endpoint, integrate EzSCIM package, set up SCIM provisioning, implement SCIM users and groups, connect Entra ID provisioning, annotate entity with ScimProperty, implement IUserGroupDataRepository, use EfScimRepositoryBase, register EzSCIM services, add JWT authentication to SCIM API, add SCIM operation callbacks, observe SCIM reads/updates, log SCIM errors in host logger, EzSCIM getting started, EzSCIM IQueryable model, EzSCIM EF Core model. DO NOT USE FOR: SCIM protocol questions unrelated to EzSCIM, non-.NET projects, Azure AD application registration steps."
 argument-hint: "Describe your project stack (e.g. ASP.NET Core + EF Core + SQL Server, or ASP.NET Core + Dapper)"
 license: MIT
 metadata:
@@ -110,6 +110,19 @@ For local testing, expose the token endpoint:
 builder.Services.AddScimTokenGeneratorEndpoint(); // disabled automatically in production
 ```
 
+## Observability (optional)
+
+See [references/observability.md](references/observability.md).
+
+Lets a host app register callbacks for SCIM operations (last read, last update, etc.) and capture
+errors for its own logging/monitoring — fully optional, does not replace EzSCIM's internal `ILogger<T>`
+logging, zero overhead if never registered.
+
+```csharp
+builder.Services.AddScoped<IScimRepository, MyScimRepository>();
+builder.Services.AddScimOperationCallback<MyScimMonitoringCallbacks>(); // must come after IScimRepository
+```
+
 ## SCIM Endpoints Exposed
 
 Once registered, EzSCIM mounts the following routes:
@@ -147,3 +160,4 @@ Full guide: [https://ezscim.miiitch.dev/authentication/#6-configure-entra-id-mic
 - [ ] JWT secret key is at least 32 characters and not committed to Git
 - [ ] JSON columns (`EmailsJson`, `MembersJson`) handled in `OnBeforeUpdateUserAsync` / `OnBeforeUpdateGroupAsync` (EF Core path)
 - [ ] `userName` is unique-indexed in the database
+- [ ] Operation callbacks (if used) are registered via `AddScimOperationCallback` — never required
