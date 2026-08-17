@@ -101,6 +101,35 @@ builder.Services.AddScimTokenGeneratorEndpoint();
 
 ---
 
+## Operation Observability (`IScimOperationCallbacks`)
+
+Optional, additive observability for host applications that want to know when SCIM operations
+happen (last read, last update, etc.) and capture errors for their own logging/monitoring — without
+replacing the standard `ILogger<T>` logging already performed inside the controllers.
+
+| Component | Description |
+|---|---|
+| `Observability.IScimOperationCallbacks` | Interface a host implements: `OnOperationCompletedAsync` and `OnErrorAsync` |
+| `Observability.ScimOperationCallbacksBase` | Convenience base class with virtual no-op methods |
+| `Observability.ScimOperationContext` | Resource/operation kind, resource id, result, duration, timestamp |
+| `Repositories.ObservableScimRepository` (internal) | Decorator around `IScimRepository` that invokes registered callbacks |
+| `AddScimOperationCallback<T>()` / `AddScimOperationCallback(instance)` | DI registration, following the `AddJwtTokenService` extension-method pattern |
+
+**100% opt-in.** `ObservableScimRepository` is only created if a host calls
+`AddScimOperationCallback(...)` at least once, *after* registering `IScimRepository`. Hosts that never
+call it get their own `IScimRepository` implementation untouched — no decorator, no overhead. Multiple
+callbacks can be registered; each is notified independently, and an exception thrown by a callback is
+logged and swallowed so it can never break the SCIM request pipeline. The decorator never alters the
+wrapped repository's result or exception — on error it always rethrows the original exception unchanged
+(so e.g. `ScimUsersController`'s `catch (InvalidOperationException ex) when (...)` on `CreateUser` still
+behaves identically).
+
+> **Not to be confused with** `EfScimRepositoryBase.OnBeforeUpdateUserAsync` / `OnBeforeUpdateGroupAsync`
+> below — those are inheritance-based template-method hooks for customizing EF entity merging before
+> `SaveChangesAsync()`, a completely different mechanism from this DI-registered observer pattern.
+
+---
+
 ## EzSCIM.EfCore library
 
 Thin abstraction layer on top of EF Core:
