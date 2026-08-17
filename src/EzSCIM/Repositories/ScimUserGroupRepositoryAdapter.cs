@@ -367,6 +367,16 @@ namespace EzSCIM.Repositories
                 }
             }
 
+            // Handle Members -> MembersJson (special case, symmetric with ToScimGroup)
+            var membersJsonProp = typeof(TGroup).GetProperty("MembersJson");
+            if (membersJsonProp != null && membersJsonProp.CanWrite)
+            {
+                var memberInfos = (scimGroup.Members ?? new List<ScimMember>())
+                    .Select(m => new MemberInfo { Value = m.Value, Display = m.Display ?? "" })
+                    .ToList();
+                membersJsonProp.SetValue(group, System.Text.Json.JsonSerializer.Serialize(memberInfos));
+            }
+
             return group;
         }
 
